@@ -93,9 +93,9 @@ export const FeaturedGamesSection = () => {
                 }`}
               >
                 {/* Game Icon */}
-                <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl overflow-hidden mb-6 group-hover:scale-110 transition-transform duration-300 ${!game.image ? `bg-gradient-to-br ${game.color}` : ''}`}>
+                <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl overflow-hidden mb-6 group-hover:scale-110 transition-transform duration-300 ${!game.image ? `bg-gradient-to-br ${game.color}` : 'bg-black/20'}`}>
                   {game.image ? (
-                    <img src={game.image} alt={game.name} className="w-full h-full object-cover" />
+                    <img src={game.image} alt={game.name} className="w-full h-full object-contain" />
                   ) : (
                     <Gamepad2 className="w-12 h-12 text-white" />
                   )}
