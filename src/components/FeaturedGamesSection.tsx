@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Gamepad2 } from "lucide-react";
+import nba2k26Cover from "@/assets/nba-2k26-cover.png";
 
 export const FeaturedGamesSection = () => {
   const games = [
     {
       name: "NBA 2K26",
       description: "Official Basketball Simulation",
-      color: "from-red-600 to-orange-500"
+      color: "from-red-600 to-orange-500",
+      image: nba2k26Cover
     },
     {
       name: "Madden 25",
@@ -91,8 +93,12 @@ export const FeaturedGamesSection = () => {
                 }`}
               >
                 {/* Game Icon */}
-                <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br ${game.color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <Gamepad2 className="w-12 h-12 text-white" />
+                <div className={`inline-flex items-center justify-center w-24 h-24 rounded-2xl overflow-hidden mb-6 group-hover:scale-110 transition-transform duration-300 ${!game.image ? `bg-gradient-to-br ${game.color}` : ''}`}>
+                  {game.image ? (
+                    <img src={game.image} alt={game.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Gamepad2 className="w-12 h-12 text-white" />
+                  )}
                 </div>
                 
                 {/* Game Info */}
