@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Gamepad2 } from "lucide-react";
 export const FeaturedGamesSection = () => {
   const games = [
     {
-      name: "NBA 2K25",
+      name: "NBA 2K26",
       description: "Official Basketball Simulation",
       color: "from-red-600 to-orange-500"
     },
