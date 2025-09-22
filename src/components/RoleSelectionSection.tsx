@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Gamepad2, Users, UserCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Gamepad2, Users, Shield } from "lucide-react";
 import { GoldButton } from "@/components/ui/button-variants";
 
 export const RoleSelectionSection = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const roles = [
     {
@@ -25,21 +27,19 @@ export const RoleSelectionSection = () => {
       borderGradient: 'from-green-500 to-emerald-500'
     },
     {
-      id: 'both',
-      title: 'Both Roles',
-      icon: UserCheck,
-      description: 'Experience the complete esports ecosystem as both competitor and leader.',
-      features: ['Full Access', 'Dual Perspective', 'Leadership Skills', 'Complete Experience'],
-      gradient: 'from-primary/20 to-amber-600/20',
-      borderGradient: 'from-primary to-amber-500'
+      id: 'admin',
+      title: 'Admin',
+      icon: Shield,
+      description: 'Manage the platform, oversee tournaments, and support the HBCU esports community.',
+      features: ['Platform Management', 'Tournament Oversight', 'User Support', 'Analytics Access'],
+      gradient: 'from-amber-600/20 to-orange-600/20',
+      borderGradient: 'from-amber-500 to-orange-500'
     }
   ];
 
   const handleContinue = () => {
     if (selectedRole) {
-      // Navigate to authentication page
-      console.log(`Selected role: ${selectedRole}`);
-      // This would navigate to the auth page in a real app
+      navigate(`/auth?role=${selectedRole}`);
     }
   };
 
@@ -53,8 +53,8 @@ export const RoleSelectionSection = () => {
             <span className="text-primary"> Role</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Select how you want to participate in the National HBCU Esports League. 
-            Each role offers unique opportunities and experiences.
+            🎯 Select how you want to participate in the National HBCU Esports League! 
+            Each role offers unique opportunities and experiences. Let's get started! ✨
           </p>
         </div>
 
@@ -64,10 +64,10 @@ export const RoleSelectionSection = () => {
             <div
               key={role.id}
               onClick={() => setSelectedRole(role.id)}
-              className={`luxury-card p-8 cursor-pointer group transition-all duration-500 hover:scale-105 animate-slide-up ${
+              className={`luxury-card p-8 cursor-pointer group transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 animate-slide-up ${
                 selectedRole === role.id 
-                  ? 'ring-2 ring-primary shadow-2xl bg-gradient-to-br ' + role.gradient
-                  : 'hover:shadow-xl'
+                  ? 'ring-2 ring-primary shadow-2xl bg-gradient-to-br ' + role.gradient + ' animate-glow-pulse'
+                  : 'hover:shadow-xl hover:shadow-primary/10'
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -119,13 +119,13 @@ export const RoleSelectionSection = () => {
                 ? 'opacity-50 cursor-not-allowed' 
                 : 'animate-glow-pulse'
             }`}
-          >
-            Continue to Registration
-          </GoldButton>
+            >
+              🚀 Continue to Sign Up
+            </GoldButton>
           
           {selectedRole && (
             <p className="mt-4 text-sm text-muted-foreground animate-fade-in">
-              Selected: <span className="text-primary font-semibold">
+              🎉 Awesome choice! Selected: <span className="text-primary font-semibold">
                 {roles.find(r => r.id === selectedRole)?.title}
               </span>
             </p>
@@ -135,8 +135,8 @@ export const RoleSelectionSection = () => {
         {/* Additional Info */}
         <div className="mt-16 luxury-card p-6 text-center animate-fade-in">
           <p className="text-sm text-muted-foreground">
-            <strong className="text-primary">Note:</strong> You can change your role preferences later in your profile settings.
-            All participants receive access to mentorship programs and community events.
+            <strong className="text-primary">💡 Pro Tip:</strong> You can change your role preferences later in your profile settings.
+            All participants receive access to mentorship programs and community events! 🤝
           </p>
         </div>
       </div>
