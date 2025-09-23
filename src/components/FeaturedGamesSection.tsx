@@ -11,7 +11,7 @@ export const FeaturedGamesSection = () => {
       image: nba2k26Cover
     },
     {
-      name: "Madden 25",
+      name: "Madden 26",
       description: "NFL Football Championship",
       color: "from-green-600 to-emerald-500"
     },
