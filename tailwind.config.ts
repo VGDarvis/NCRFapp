@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'display': ['DM Serif Display', 'serif'],
+        'sans': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        'display': ['Orbitron', 'Space Grotesk', 'serif'],
+        'cyber': ['JetBrains Mono', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -96,10 +97,26 @@ export default {
         },
         "glow-pulse": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsl(51 100% 50% / 0.3)"
+            boxShadow: "0 0 20px hsl(194 100% 50% / 0.4)"
           },
           "50%": {
-            boxShadow: "0 0 40px hsl(51 100% 50% / 0.6)"
+            boxShadow: "0 0 40px hsl(194 100% 50% / 0.8)"
+          }
+        },
+        "cyber-rotate": {
+          "0%": {
+            transform: "rotate(0deg)"
+          },
+          "100%": {
+            transform: "rotate(360deg)"
+          }
+        },
+        "neon-glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px hsl(154 100% 50% / 0.4), 0 0 40px hsl(194 100% 50% / 0.2)"
+          },
+          "50%": {
+            boxShadow: "0 0 40px hsl(154 100% 50% / 0.8), 0 0 80px hsl(194 100% 50% / 0.4)"
           }
         },
         "float": {
@@ -118,11 +135,14 @@ export default {
         "slide-up": "slide-up 0.8s ease-out",
         "glow-pulse": "glow-pulse 2s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
+        "cyber-rotate": "cyber-rotate 20s linear infinite",
+        "neon-glow": "neon-glow 2s ease-in-out infinite",
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
-        'gradient-gold': 'var(--gradient-gold)',
+        'gradient-cyber': 'var(--gradient-cyber)',
         'gradient-card': 'var(--gradient-card)',
+        'gradient-neon': 'var(--gradient-neon)',
       },
     },
   },
