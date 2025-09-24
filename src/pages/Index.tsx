@@ -1,15 +1,15 @@
-import { HeroSection } from "@/components/HeroSection";
-import { AboutSection } from "@/components/AboutSection";
-import { FeaturedGamesSection } from "@/components/FeaturedGamesSection";
-import { RoleSelectionSection } from "@/components/RoleSelectionSection";
+import { NCRFHeroSection } from "@/components/NCRFHeroSection";
+import { ProgramsSection } from "@/components/ProgramsSection";
+import { ImpactStatsSection } from "@/components/ImpactStatsSection";
+import { ServicesSection } from "@/components/ServicesSection";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
-      <HeroSection />
-      <AboutSection />
-      <FeaturedGamesSection />
-      <RoleSelectionSection />
+      <NCRFHeroSection />
+      <ProgramsSection />
+      <ImpactStatsSection />
+      <ServicesSection />
     </div>
   );
 };
