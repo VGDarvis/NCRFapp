@@ -97,18 +97,18 @@ export const RotatingLogoCircle = () => {
                   top: `calc(50% + ${y}px)`,
                   transform: 'translate(-50%, -50%)'
                 }}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <motion.div
+                <div
                   className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
-                  }}
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
                   }}
                 >
                   <img
@@ -116,18 +116,10 @@ export const RotatingLogoCircle = () => {
                     alt={program.name}
                     className="w-full h-full object-contain"
                   />
-                </motion.div>
-                <motion.p
-                  className="text-xs text-center mt-2 text-foreground font-medium"
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                >
+                </div>
+                <p className="text-xs text-center mt-2 text-foreground font-medium">
                   {program.name}
-                </motion.p>
+                </p>
               </motion.div>
             );
           })}
@@ -159,18 +151,18 @@ export const RotatingLogoCircle = () => {
                   top: `calc(50% + ${y}px)`,
                   transform: 'translate(-50%, -50%)'
                 }}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <motion.div
+                <div
                   className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
-                  }}
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
                   }}
                 >
                   <img
@@ -178,18 +170,10 @@ export const RotatingLogoCircle = () => {
                     alt={program.name}
                     className="w-full h-full object-contain"
                   />
-                </motion.div>
-                <motion.p
-                  className="text-[10px] text-center mt-1 text-foreground font-medium"
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                >
+                </div>
+                <p className="text-[10px] text-center mt-1 text-foreground font-medium">
                   {program.name}
-                </motion.p>
+                </p>
               </motion.div>
             );
           })}
