@@ -22,7 +22,7 @@ const programs: Program[] = [
     name: 'Esports',
     logo: logoEsports,
     route: '/auth/esports',
-    color: 'hsl(194 100% 50%)', // Neon Blue
+    color: 'hsl(194 100% 50%)',
     angle: 0
   },
   {
@@ -30,7 +30,7 @@ const programs: Program[] = [
     name: 'Green & Clean',
     logo: logoGreenClean,
     route: '/auth/green-clean',
-    color: 'hsl(154 100% 50%)', // Cyber Green
+    color: 'hsl(154 100% 50%)',
     angle: 72
   },
   {
@@ -38,7 +38,7 @@ const programs: Program[] = [
     name: 'STEaM',
     logo: logoSteam,
     route: '/auth/steam',
-    color: 'hsl(280 100% 60%)', // Purple
+    color: 'hsl(280 100% 60%)',
     angle: 144
   },
   {
@@ -46,7 +46,7 @@ const programs: Program[] = [
     name: 'Movement Enrichment',
     logo: logoMovement,
     route: '/auth/movement',
-    color: 'hsl(330 100% 60%)', // Pink
+    color: 'hsl(330 100% 60%)',
     angle: 216
   },
   {
@@ -54,7 +54,7 @@ const programs: Program[] = [
     name: 'Student Athlete',
     logo: logoAthlete,
     route: '/auth/athlete',
-    color: 'hsl(60 100% 50%)', // Yellow
+    color: 'hsl(60 100% 50%)',
     angle: 288
   }
 ];
@@ -66,8 +66,8 @@ export const RotatingLogoCircle = () => {
     navigate(program.route);
   };
 
-  const circleRadius = 180; // Desktop radius
-  const mobileRadius = 130; // Mobile radius
+  const circleRadius = 180;
+  const mobileRadius = 130;
 
   return (
     <div className="relative">
