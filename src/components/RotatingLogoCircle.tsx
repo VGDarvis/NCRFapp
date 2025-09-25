@@ -89,13 +89,19 @@ export const RotatingLogoCircle = () => {
             const y = Math.sin(radian) * circleRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
                 className="absolute cursor-pointer"
                 style={{
                   left: `calc(50% + ${x}px)`,
                   top: `calc(50% + ${y}px)`,
                   transform: 'translate(-50%, -50%)'
+                }}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
@@ -114,7 +120,7 @@ export const RotatingLogoCircle = () => {
                 <p className="text-xs text-center mt-2 text-foreground font-medium">
                   {program.name}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </motion.div>
@@ -137,13 +143,19 @@ export const RotatingLogoCircle = () => {
             const y = Math.sin(radian) * mobileRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
                 className="absolute cursor-pointer"
                 style={{
                   left: `calc(50% + ${x}px)`,
                   top: `calc(50% + ${y}px)`,
                   transform: 'translate(-50%, -50%)'
+                }}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
@@ -162,7 +174,7 @@ export const RotatingLogoCircle = () => {
                 <p className="text-[10px] text-center mt-1 text-foreground font-medium">
                   {program.name}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </motion.div>
