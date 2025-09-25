@@ -17,7 +17,7 @@ export const LogoSelectionLanding = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-6xl font-display font-bold cyber-text-glow mb-4">
-            NCRF Programs
+            National College Resources Foundation Programs
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Select your program to begin your journey
