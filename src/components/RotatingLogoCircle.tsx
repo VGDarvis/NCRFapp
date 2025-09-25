@@ -104,7 +104,7 @@ export const RotatingLogoCircle = () => {
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
                   }}
-                  animate={{ rotate: -360 }}
+                  animate={{ rotate: 360 }}
                   transition={{
                     duration: 20,
                     repeat: Infinity,
@@ -119,7 +119,7 @@ export const RotatingLogoCircle = () => {
                 </motion.div>
                 <motion.p
                   className="text-xs text-center mt-2 text-foreground font-medium"
-                  animate={{ rotate: -360 }}
+                  animate={{ rotate: 360 }}
                   transition={{
                     duration: 20,
                     repeat: Infinity,
@@ -166,7 +166,7 @@ export const RotatingLogoCircle = () => {
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
                   }}
-                  animate={{ rotate: -360 }}
+                  animate={{ rotate: 360 }}
                   transition={{
                     duration: 20,
                     repeat: Infinity,
@@ -181,7 +181,7 @@ export const RotatingLogoCircle = () => {
                 </motion.div>
                 <motion.p
                   className="text-[10px] text-center mt-1 text-foreground font-medium"
-                  animate={{ rotate: -360 }}
+                  animate={{ rotate: 360 }}
                   transition={{
                     duration: 20,
                     repeat: Infinity,
