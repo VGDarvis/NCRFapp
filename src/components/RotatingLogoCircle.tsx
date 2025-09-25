@@ -102,17 +102,18 @@ export const RotatingLogoCircle = () => {
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
                   }}
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
                 >
-                  <img
+                  <motion.img
                     src={program.logo}
                     alt={program.name}
                     className="w-full h-full object-contain"
+                    style={{ transformOrigin: "center" }}
+                    animate={{ rotate: -360 }}
+                    transition={{
+                      duration: 20,
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
                   />
                 </motion.div>
                 <motion.p
@@ -162,17 +163,18 @@ export const RotatingLogoCircle = () => {
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
                   }}
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
                 >
-                  <img
+                  <motion.img
                     src={program.logo}
                     alt={program.name}
                     className="w-full h-full object-contain"
+                    style={{ transformOrigin: "center" }}
+                    animate={{ rotate: -360 }}
+                    transition={{
+                      duration: 20,
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
                   />
                 </motion.div>
                 <motion.p
