@@ -89,7 +89,7 @@ export const RotatingLogoCircle = () => {
             const y = Math.sin(radian) * circleRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
                 className="absolute cursor-pointer"
                 style={{
@@ -98,6 +98,12 @@ export const RotatingLogoCircle = () => {
                   transform: 'translate(-50%, -50%)'
                 }}
                 onClick={() => handleProgramSelect(program)}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
               >
                 <div
                   className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
@@ -114,7 +120,7 @@ export const RotatingLogoCircle = () => {
                 <p className="text-xs text-center mt-2 text-foreground font-medium">
                   {program.name}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </motion.div>
@@ -137,7 +143,7 @@ export const RotatingLogoCircle = () => {
             const y = Math.sin(radian) * mobileRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
                 className="absolute cursor-pointer"
                 style={{
@@ -146,6 +152,12 @@ export const RotatingLogoCircle = () => {
                   transform: 'translate(-50%, -50%)'
                 }}
                 onClick={() => handleProgramSelect(program)}
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
               >
                 <div
                   className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
@@ -162,7 +174,7 @@ export const RotatingLogoCircle = () => {
                 <p className="text-[10px] text-center mt-1 text-foreground font-medium">
                   {program.name}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </motion.div>
