@@ -14,7 +14,7 @@ export const LogoSelectionLanding = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
           <h1 className="text-4xl md:text-6xl font-display font-bold cyber-text-glow mb-4">
             National College Resources Foundation Programs
@@ -25,14 +25,16 @@ export const LogoSelectionLanding = () => {
         </motion.div>
 
         {/* Rotating Logo Circle */}
-        <RotatingLogoCircle />
+        <div className="my-8 md:my-12">
+          <RotatingLogoCircle />
+        </div>
 
         {/* Instructions */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.5 }}
-          className="text-center mt-12"
+          className="text-center mt-8 md:mt-12"
         >
           <p className="text-sm text-muted-foreground">
             Touch or click a program logo to get started

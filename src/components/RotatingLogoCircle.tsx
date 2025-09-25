@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 // Import logo assets
@@ -73,25 +74,41 @@ export const RotatingLogoCircle = () => {
     <div className="relative">
       {/* Desktop Circle */}
       <div className="hidden md:block">
-        <div className="relative w-96 h-96">
+        <motion.div
+          className="relative w-96 h-96"
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
           {programs.map((program) => {
             const radian = (program.angle * Math.PI) / 180;
             const x = Math.cos(radian) * circleRadius;
             const y = Math.sin(radian) * circleRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
-                className="absolute top-1/2 left-1/2 cursor-pointer transition-transform hover:scale-105"
+                className="absolute cursor-pointer"
                 style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: 'translate(-50%, -50%)'
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <div
-                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow"
+                <motion.div
+                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
+                  }}
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
                   }}
                 >
                   <img
@@ -99,37 +116,61 @@ export const RotatingLogoCircle = () => {
                     alt={program.name}
                     className="w-full h-full object-contain"
                   />
-                </div>
-                <p className="text-xs text-center mt-2 text-foreground font-medium">
+                </motion.div>
+                <motion.p
+                  className="text-xs text-center mt-2 text-foreground font-medium"
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                >
                   {program.name}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
 
       {/* Mobile Circle */}
       <div className="md:hidden">
-        <div className="relative w-72 h-72">
+        <motion.div
+          className="relative w-72 h-72"
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
           {programs.map((program) => {
             const radian = (program.angle * Math.PI) / 180;
             const x = Math.cos(radian) * mobileRadius;
             const y = Math.sin(radian) * mobileRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
-                className="absolute top-1/2 left-1/2 cursor-pointer transition-transform hover:scale-105"
+                className="absolute cursor-pointer"
                 style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: 'translate(-50%, -50%)'
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <div
-                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow"
+                <motion.div
+                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
+                  }}
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
                   }}
                 >
                   <img
@@ -137,14 +178,22 @@ export const RotatingLogoCircle = () => {
                     alt={program.name}
                     className="w-full h-full object-contain"
                   />
-                </div>
-                <p className="text-[10px] text-center mt-1 text-foreground font-medium">
+                </motion.div>
+                <motion.p
+                  className="text-[10px] text-center mt-1 text-foreground font-medium"
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                >
                   {program.name}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
