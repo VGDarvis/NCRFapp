@@ -67,24 +67,19 @@ export const RotatingLogoCircle = () => {
   const navigate = useNavigate();
 
   const handleProgramSelect = (program: Program) => {
-    setSelectedProgram(program.id);
-    setIsRotating(false);
-    
-    // Navigate after animation
-    setTimeout(() => {
-      navigate(program.route);
-    }, 1000);
+    // Navigate immediately without any delays or visual changes
+    navigate(program.route);
   };
 
-  const circleRadius = 160; // Desktop radius
-  const mobileRadius = 120; // Mobile radius
+  const circleRadius = 180; // Desktop radius
+  const mobileRadius = 130; // Mobile radius
 
   return (
     <div className="relative">
       {/* Desktop Circle */}
       <div className="hidden md:block">
         <motion.div
-          className="relative w-80 h-80"
+          className="relative w-96 h-96"
           animate={isRotating ? { rotate: 360 } : {}}
           transition={isRotating ? {
             duration: 20,
@@ -104,24 +99,20 @@ export const RotatingLogoCircle = () => {
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
-                whileHover={{ 
-                  filter: "brightness(1.2) drop-shadow(0 0 25px currentColor)",
-                  zIndex: 10
-                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleProgramSelect(program)}
               >
                 <motion.div
-                  className="w-24 h-24 rounded-full cyber-card p-4 logo-glow"
+                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow"
                   style={{
-                    boxShadow: `0 0 20px ${program.color}40, 0 0 40px ${program.color}20`
+                    boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
                   }}
                   animate={selectedProgram === program.id ? {
                     scale: [1, 1.5, 1],
                     boxShadow: [
-                      `0 0 20px ${program.color}40`,
-                      `0 0 60px ${program.color}80`,
-                      `0 0 20px ${program.color}40`
+                      `0 0 25px ${program.color}40`,
+                      `0 0 75px ${program.color}80`,
+                      `0 0 25px ${program.color}40`
                     ]
                   } : {}}
                   transition={{ duration: 0.5, repeat: selectedProgram === program.id ? Infinity : 0 }}
@@ -152,7 +143,7 @@ export const RotatingLogoCircle = () => {
       {/* Mobile Circle */}
       <div className="md:hidden">
         <motion.div
-          className="relative w-60 h-60"
+          className="relative w-72 h-72"
           animate={isRotating ? { rotate: 360 } : {}}
           transition={isRotating ? {
             duration: 20,
@@ -172,24 +163,20 @@ export const RotatingLogoCircle = () => {
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
-                whileHover={{ 
-                  filter: "brightness(1.2) drop-shadow(0 0 20px currentColor)",
-                  zIndex: 10
-                }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => handleProgramSelect(program)}
               >
                 <motion.div
-                  className="w-16 h-16 rounded-full cyber-card p-2 logo-glow"
+                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow"
                   style={{
-                    boxShadow: `0 0 15px ${program.color}40, 0 0 30px ${program.color}20`
+                    boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
                   }}
                   animate={selectedProgram === program.id ? {
                     scale: [1, 1.4, 1],
                     boxShadow: [
-                      `0 0 15px ${program.color}40`,
-                      `0 0 45px ${program.color}80`,
-                      `0 0 15px ${program.color}40`
+                      `0 0 18px ${program.color}40`,
+                      `0 0 54px ${program.color}80`,
+                      `0 0 18px ${program.color}40`
                     ]
                   } : {}}
                   transition={{ duration: 0.5, repeat: selectedProgram === program.id ? Infinity : 0 }}
