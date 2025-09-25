@@ -4,65 +4,37 @@ import { RotatingLogoCircle } from './RotatingLogoCircle';
 
 export const LogoSelectionLanding = () => {
   return (
-    <div className="min-h-screen relative overflow-hidden onyx-royale-gradient">
+    <div className="min-h-screen relative overflow-hidden cyber-gradient">
       <ParticleBackground />
       
       {/* Main Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4">
-        {/* Headline */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+        {/* Title */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-6"
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-center mb-12"
         >
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white luxury-text-shadow leading-tight">
-            National College Resources Foundation
+          <h1 className="text-4xl md:text-6xl font-display font-bold cyber-text-glow mb-4">
+            NCRF Programs
           </h1>
-        </motion.div>
-
-        {/* Subtext Line 1 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          className="text-center mb-4"
-        >
-          <p className="text-2xl md:text-3xl font-sans font-medium text-[#E5E5E5] tracking-wide">
-            Programs That Power Your Future
-          </p>
-        </motion.div>
-
-        {/* Subtext Line 2 */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6, ease: "easeOut" }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <p className="text-lg md:text-xl font-sans italic text-[#B0B0B0] max-w-3xl mx-auto leading-relaxed">
-            Select your path and begin your journey into Esports, STEM, and beyond.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Select your program to begin your journey
           </p>
         </motion.div>
 
         {/* Rotating Logo Circle */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.9, ease: "easeOut" }}
-          className="my-8 md:my-12"
-        >
-          <RotatingLogoCircle />
-        </motion.div>
+        <RotatingLogoCircle />
 
         {/* Instructions */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1.4, ease: "easeOut" }}
-          className="text-center mt-8 md:mt-12"
+          transition={{ duration: 0.8, delay: 1.5 }}
+          className="text-center mt-12"
         >
-          <p className="text-sm text-[#B0B0B0] font-sans tracking-wide">
+          <p className="text-sm text-muted-foreground">
             Touch or click a program logo to get started
           </p>
         </motion.div>

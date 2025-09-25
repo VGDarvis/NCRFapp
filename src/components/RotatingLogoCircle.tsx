@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 // Import logo assets
@@ -61,27 +62,35 @@ const programs: Program[] = [
 ];
 
 export const RotatingLogoCircle = () => {
+  const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
+  const [isRotating, setIsRotating] = useState(true);
   const navigate = useNavigate();
 
   const handleProgramSelect = (program: Program) => {
-    navigate(program.route);
+    setSelectedProgram(program.id);
+    setIsRotating(false);
+    
+    // Navigate after animation
+    setTimeout(() => {
+      navigate(program.route);
+    }, 1000);
   };
 
-  const circleRadius = 180; // Desktop radius
-  const mobileRadius = 130; // Mobile radius
+  const circleRadius = 160; // Desktop radius
+  const mobileRadius = 120; // Mobile radius
 
   return (
     <div className="relative">
       {/* Desktop Circle */}
       <div className="hidden md:block">
         <motion.div
-          className="relative w-96 h-96"
-          animate={{ rotate: 360 }}
-          transition={{
+          className="relative w-80 h-80"
+          animate={isRotating ? { rotate: 360 } : {}}
+          transition={isRotating ? {
             duration: 20,
             repeat: Infinity,
             ease: "linear"
-          }}
+          } : {}}
         >
           {programs.map((program) => {
             const radian = (program.angle * Math.PI) / 180;
@@ -89,32 +98,49 @@ export const RotatingLogoCircle = () => {
             const y = Math.sin(radian) * circleRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
-                className="absolute cursor-pointer"
+                className="absolute top-1/2 left-1/2 cursor-pointer"
                 style={{
-                  left: `calc(50% + ${x}px)`,
-                  top: `calc(50% + ${y}px)`,
-                  transform: 'translate(-50%, -50%)'
+                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <div
-                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
+                <motion.div
+                  className="w-24 h-24 rounded-full cyber-card p-4 logo-glow"
                   style={{
-                    boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
+                    boxShadow: `0 0 20px ${program.color}40, 0 0 40px ${program.color}20`
                   }}
+                  animate={selectedProgram === program.id ? {
+                    scale: [1, 1.5, 1],
+                    boxShadow: [
+                      `0 0 20px ${program.color}40`,
+                      `0 0 60px ${program.color}80`,
+                      `0 0 20px ${program.color}40`
+                    ]
+                  } : {}}
+                  transition={{ duration: 0.5, repeat: selectedProgram === program.id ? Infinity : 0 }}
                 >
                   <img
                     src={program.logo}
                     alt={program.name}
                     className="w-full h-full object-contain"
                   />
-                </div>
-                <p className="text-xs text-center mt-2 text-foreground font-medium">
+                </motion.div>
+                <motion.p
+                  className="text-xs text-center mt-2 text-foreground font-medium"
+                  animate={isRotating ? { rotate: -360 } : {}}
+                  transition={isRotating ? {
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                  } : {}}
+                >
                   {program.name}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
             );
           })}
         </motion.div>
@@ -123,13 +149,13 @@ export const RotatingLogoCircle = () => {
       {/* Mobile Circle */}
       <div className="md:hidden">
         <motion.div
-          className="relative w-72 h-72"
-          animate={{ rotate: 360 }}
-          transition={{
+          className="relative w-60 h-60"
+          animate={isRotating ? { rotate: 360 } : {}}
+          transition={isRotating ? {
             duration: 20,
             repeat: Infinity,
             ease: "linear"
-          }}
+          } : {}}
         >
           {programs.map((program) => {
             const radian = (program.angle * Math.PI) / 180;
@@ -137,36 +163,79 @@ export const RotatingLogoCircle = () => {
             const y = Math.sin(radian) * mobileRadius;
             
             return (
-              <div
+              <motion.div
                 key={program.id}
-                className="absolute cursor-pointer"
+                className="absolute top-1/2 left-1/2 cursor-pointer"
                 style={{
-                  left: `calc(50% + ${x}px)`,
-                  top: `calc(50% + ${y}px)`,
-                  transform: 'translate(-50%, -50%)'
+                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <div
-                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
+                <motion.div
+                  className="w-16 h-16 rounded-full cyber-card p-2 logo-glow"
                   style={{
-                    boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
+                    boxShadow: `0 0 15px ${program.color}40, 0 0 30px ${program.color}20`
                   }}
+                  animate={selectedProgram === program.id ? {
+                    scale: [1, 1.4, 1],
+                    boxShadow: [
+                      `0 0 15px ${program.color}40`,
+                      `0 0 45px ${program.color}80`,
+                      `0 0 15px ${program.color}40`
+                    ]
+                  } : {}}
+                  transition={{ duration: 0.5, repeat: selectedProgram === program.id ? Infinity : 0 }}
                 >
                   <img
                     src={program.logo}
                     alt={program.name}
                     className="w-full h-full object-contain"
                   />
-                </div>
-                <p className="text-[10px] text-center mt-1 text-foreground font-medium">
+                </motion.div>
+                <motion.p
+                  className="text-[10px] text-center mt-1 text-foreground font-medium"
+                  animate={isRotating ? { rotate: -360 } : {}}
+                  transition={isRotating ? {
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                  } : {}}
+                >
                   {program.name}
-                </p>
-              </div>
+                </motion.p>
+              </motion.div>
             );
           })}
         </motion.div>
       </div>
+
+      {/* Selection Overlay */}
+      <AnimatePresence>
+        {selectedProgram && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              className="text-center"
+            >
+              <div className="text-2xl md:text-4xl font-display font-bold cyber-text-glow mb-2">
+                {programs.find(p => p.id === selectedProgram)?.name}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Loading program...
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
