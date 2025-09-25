@@ -22,7 +22,7 @@ const programs: Program[] = [
     name: 'Esports',
     logo: logoEsports,
     route: '/auth/esports',
-    color: 'hsl(194 100% 50%)',
+    color: 'hsl(194 100% 50%)', // Neon Blue
     angle: 0
   },
   {
@@ -30,7 +30,7 @@ const programs: Program[] = [
     name: 'Green & Clean',
     logo: logoGreenClean,
     route: '/auth/green-clean',
-    color: 'hsl(154 100% 50%)',
+    color: 'hsl(154 100% 50%)', // Cyber Green
     angle: 72
   },
   {
@@ -38,7 +38,7 @@ const programs: Program[] = [
     name: 'STEaM',
     logo: logoSteam,
     route: '/auth/steam',
-    color: 'hsl(280 100% 60%)',
+    color: 'hsl(280 100% 60%)', // Purple
     angle: 144
   },
   {
@@ -46,7 +46,7 @@ const programs: Program[] = [
     name: 'Movement Enrichment',
     logo: logoMovement,
     route: '/auth/movement',
-    color: 'hsl(330 100% 60%)',
+    color: 'hsl(330 100% 60%)', // Pink
     angle: 216
   },
   {
@@ -54,7 +54,7 @@ const programs: Program[] = [
     name: 'Student Athlete',
     logo: logoAthlete,
     route: '/auth/athlete',
-    color: 'hsl(60 100% 50%)',
+    color: 'hsl(60 100% 50%)', // Yellow
     angle: 288
   }
 ];
@@ -66,8 +66,8 @@ export const RotatingLogoCircle = () => {
     navigate(program.route);
   };
 
-  const circleRadius = 180;
-  const mobileRadius = 130;
+  const circleRadius = 180; // Desktop radius
+  const mobileRadius = 130; // Mobile radius
 
   return (
     <div className="relative">
@@ -82,7 +82,7 @@ export const RotatingLogoCircle = () => {
             return (
               <div
                 key={program.id}
-                className="absolute top-1/2 left-1/2 cursor-pointer transition-transform duration-200 hover:scale-105"
+                className="absolute top-1/2 left-1/2 cursor-pointer transition-transform hover:scale-105"
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
@@ -120,7 +120,7 @@ export const RotatingLogoCircle = () => {
             return (
               <div
                 key={program.id}
-                className="absolute top-1/2 left-1/2 cursor-pointer transition-transform duration-200 hover:scale-105"
+                className="absolute top-1/2 left-1/2 cursor-pointer transition-transform hover:scale-105"
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
