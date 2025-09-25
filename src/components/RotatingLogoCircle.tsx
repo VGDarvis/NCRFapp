@@ -104,7 +104,10 @@ export const RotatingLogoCircle = () => {
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
-                whileHover={{ scale: 1.2 }}
+                whileHover={{ 
+                  filter: "brightness(1.2) drop-shadow(0 0 25px currentColor)",
+                  zIndex: 10
+                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleProgramSelect(program)}
               >
@@ -169,7 +172,10 @@ export const RotatingLogoCircle = () => {
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
                 }}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ 
+                  filter: "brightness(1.2) drop-shadow(0 0 20px currentColor)",
+                  zIndex: 10
+                }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => handleProgramSelect(program)}
               >
