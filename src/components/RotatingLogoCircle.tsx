@@ -67,13 +67,8 @@ export const RotatingLogoCircle = () => {
   const navigate = useNavigate();
 
   const handleProgramSelect = (program: Program) => {
-    setSelectedProgram(program.id);
-    setIsRotating(false);
-    
-    // Navigate after animation
-    setTimeout(() => {
-      navigate(program.route);
-    }, 1000);
+    // Navigate immediately without any delays or visual changes
+    navigate(program.route);
   };
 
   const circleRadius = 180; // Desktop radius
