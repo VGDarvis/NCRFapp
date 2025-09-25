@@ -91,14 +91,16 @@ export const RotatingLogoCircle = () => {
             return (
               <motion.div
                 key={program.id}
-                className="absolute top-1/2 left-1/2 cursor-pointer"
+                className="absolute cursor-pointer"
                 style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: 'translate(-50%, -50%)'
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
                 <motion.div
-                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105"
+                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
                   }}
@@ -151,14 +153,16 @@ export const RotatingLogoCircle = () => {
             return (
               <motion.div
                 key={program.id}
-                className="absolute top-1/2 left-1/2 cursor-pointer"
+                className="absolute cursor-pointer"
                 style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`
+                  left: `calc(50% + ${x}px)`,
+                  top: `calc(50% + ${y}px)`,
+                  transform: 'translate(-50%, -50%)'
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
                 <motion.div
-                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105"
+                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
                   }}
