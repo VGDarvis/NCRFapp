@@ -97,13 +97,13 @@ export const RotatingLogoCircle = () => {
                   top: `calc(50% + ${y}px)`,
                   transform: 'translate(-50%, -50%)'
                 }}
-                onClick={() => handleProgramSelect(program)}
                 animate={{ rotate: -360 }}
                 transition={{
                   duration: 20,
                   repeat: Infinity,
                   ease: "linear"
                 }}
+                onClick={() => handleProgramSelect(program)}
               >
                 <div
                   className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
@@ -151,13 +151,13 @@ export const RotatingLogoCircle = () => {
                   top: `calc(50% + ${y}px)`,
                   transform: 'translate(-50%, -50%)'
                 }}
-                onClick={() => handleProgramSelect(program)}
                 animate={{ rotate: -360 }}
                 transition={{
                   duration: 20,
                   repeat: Infinity,
                   ease: "linear"
                 }}
+                onClick={() => handleProgramSelect(program)}
               >
                 <div
                   className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
