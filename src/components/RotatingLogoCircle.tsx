@@ -74,7 +74,15 @@ export const RotatingLogoCircle = () => {
     <div className="relative">
       {/* Desktop Circle */}
       <div className="hidden md:block">
-        <div className="relative w-96 h-96">
+        <motion.div
+          className="relative w-96 h-96"
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
           {programs.map((program) => {
             const radian = (program.angle * Math.PI) / 180;
             const x = Math.cos(radian) * circleRadius;
@@ -109,12 +117,20 @@ export const RotatingLogoCircle = () => {
               </div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
 
       {/* Mobile Circle */}
       <div className="md:hidden">
-        <div className="relative w-72 h-72">
+        <motion.div
+          className="relative w-72 h-72"
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
           {programs.map((program) => {
             const radian = (program.angle * Math.PI) / 180;
             const x = Math.cos(radian) * mobileRadius;
@@ -149,7 +165,7 @@ export const RotatingLogoCircle = () => {
               </div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
