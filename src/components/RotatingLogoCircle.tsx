@@ -102,6 +102,12 @@ export const RotatingLogoCircle = () => {
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
                   }}
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
                 >
                   <img
                     src={program.logo}
@@ -155,6 +161,12 @@ export const RotatingLogoCircle = () => {
                   className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105"
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
+                  }}
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear"
                   }}
                 >
                   <img
