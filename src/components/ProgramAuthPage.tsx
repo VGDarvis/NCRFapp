@@ -208,6 +208,7 @@ export const ProgramAuthPage = () => {
                 ) : (
                   <LoginForm 
                     onSuccess={handleAuthSuccess}
+                    program={program}
                   />
                 )}
               </div>

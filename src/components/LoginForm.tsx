@@ -18,9 +18,10 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   onSuccess: () => void;
+  program?: string;
 }
 
-export const LoginForm = ({ onSuccess }: LoginFormProps) => {
+export const LoginForm = ({ onSuccess, program }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -50,9 +51,20 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         return;
       }
 
+      // If logging in via a specific program, update user metadata
+      if (program) {
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { program: program }
+        });
+        
+        if (updateError) {
+          console.warn('Failed to update user program metadata:', updateError);
+        }
+      }
+
       toast({
         title: "Welcome back! 🎮",
-        description: "Successfully signed in to HBCU Esports League",
+        description: `Successfully signed in to ${program === 'esports' ? 'HBCU Esports League' : 'NCRF Programs'}`,
       });
       
       onSuccess();
@@ -72,7 +84,10 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            program: program || 'default'
+          }
         }
       });
 
