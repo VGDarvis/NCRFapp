@@ -76,11 +76,12 @@ export const Dashboard = () => {
     );
   }
 
-  // Check if this is a guest route or if user signed up for esports program
-  const isEsportsProgram = program === 'esports' || 
-    user?.user_metadata?.program === 'esports' || 
-    (program && program !== 'esports'); // For now, show esports dashboard for any program
-
+  // For now, default to esports dashboard for all authenticated users
+  // Later this can be customized based on user preferences or program selection
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata);
+  
+  const isEsportsProgram = true; // Default to esports dashboard
+  
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
     return <EsportsDashboard />;
