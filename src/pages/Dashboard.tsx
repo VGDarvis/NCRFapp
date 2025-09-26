@@ -76,11 +76,14 @@ export const Dashboard = () => {
     );
   }
 
-  // For now, default to esports dashboard for all authenticated users
-  // Later this can be customized based on user preferences or program selection
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata);
-  
-  const isEsportsProgram = true; // Default to esports dashboard
+  // Check if this is an esports user based on their signup metadata
+  const isEsportsProgram = program === 'esports' || 
+    // Check for esports-specific metadata fields that are unique to esports signups
+    (user?.user_metadata?.attends_college !== undefined) ||
+    (user?.user_metadata?.on_esports_team !== undefined) ||
+    (user?.user_metadata?.game_preferences !== undefined);
+
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram);
   
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
