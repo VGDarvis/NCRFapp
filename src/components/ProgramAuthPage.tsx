@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { ParticleBackground } from './ParticleBackground';
 import { SignUpForm } from './SignUpForm';
+import { EsportsSignUpForm } from './EsportsSignUpForm';
 import { LoginForm } from './LoginForm';
 import { FuturisticButton } from './FuturisticButton';
 
@@ -194,10 +195,16 @@ export const ProgramAuthPage = () => {
                 </div>
 
                 {authMode === 'signup' ? (
-                  <SignUpForm 
-                    role={programConfig.id as 'player' | 'coach' | 'admin'}
-                    onSuccess={handleAuthSuccess}
-                  />
+                  programConfig.id === 'esports' ? (
+                    <EsportsSignUpForm 
+                      onSuccess={handleAuthSuccess}
+                    />
+                  ) : (
+                    <SignUpForm 
+                      role={programConfig.id as 'player' | 'coach' | 'admin'}
+                      onSuccess={handleAuthSuccess}
+                    />
+                  )
                 ) : (
                   <LoginForm 
                     onSuccess={handleAuthSuccess}
