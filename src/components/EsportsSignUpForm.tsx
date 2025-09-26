@@ -147,9 +147,11 @@ export const EsportsSignUpForm = ({ onSuccess }: EsportsSignUpFormProps) => {
         email: data.email,
         password: data.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
             display_name: data.displayName,
             role: 'player',
+            program: 'esports', // Key field to identify esports users
             // Esports-specific metadata
             attends_college: data.attendsCollege,
             college_name: data.collegeName || null,
@@ -191,6 +193,8 @@ export const EsportsSignUpForm = ({ onSuccess }: EsportsSignUpFormProps) => {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
+            // Add program metadata for Google OAuth users
+            program: 'esports',
           },
         },
       });

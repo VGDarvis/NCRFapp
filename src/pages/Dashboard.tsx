@@ -76,9 +76,10 @@ export const Dashboard = () => {
     );
   }
 
-  // Check if this is an esports user based on their signup metadata
+  // Check if this is an esports user - prioritize program field in metadata
   const isEsportsProgram = program === 'esports' || 
-    // Check for esports-specific metadata fields that are unique to esports signups
+    user?.user_metadata?.program === 'esports' ||
+    // Fallback: Check for esports-specific metadata fields that are unique to esports signups
     (user?.user_metadata?.attends_college !== undefined) ||
     (user?.user_metadata?.on_esports_team !== undefined) ||
     (user?.user_metadata?.game_preferences !== undefined);
