@@ -33,7 +33,7 @@ const esportsSignUpSchema = z.object({
   // College Information
   attendsCollege: z.boolean(),
   collegeName: z.string().optional(),
-  planningCollege: z.enum(['yes', 'no', 'unsure']).optional(),
+  planningCollege: z.enum(['yes', 'no', 'maybe']).optional(),
   
   // Esports Team Status
   onEsportsTeam: z.enum(['yes', 'no', 'no-team']),
@@ -419,7 +419,7 @@ export const EsportsSignUpForm = ({ onSuccess }: EsportsSignUpFormProps) => {
                         <button
                           key={option.value}
                           type="button"
-                          onClick={() => setValue('planningCollege', option.value as 'yes' | 'no' | 'unsure')}
+                          onClick={() => setValue('planningCollege', option.value as 'yes' | 'no' | 'maybe')}
                           className={`glass-light p-2 rounded-lg border-2 transition-all duration-300 text-sm ${
                             watchedValues.planningCollege === option.value
                               ? 'border-primary bg-primary/10 text-primary'
