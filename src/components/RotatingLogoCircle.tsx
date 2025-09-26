@@ -100,7 +100,7 @@ export const RotatingLogoCircle = () => {
                 onClick={() => handleProgramSelect(program)}
               >
                 <div
-                  className="w-32 h-32 rounded-full cyber-card p-3 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
+                  className="w-32 h-32 rounded-full glass-premium p-3 logo-glow glass-hover glass-glow transition-all duration-300 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
                   }}
@@ -148,7 +148,7 @@ export const RotatingLogoCircle = () => {
                 onClick={() => handleProgramSelect(program)}
               >
                 <div
-                  className="w-20 h-20 rounded-full cyber-card p-1.5 logo-glow transition-transform hover:scale-105 flex items-center justify-center"
+                  className="w-20 h-20 rounded-full glass-premium p-1.5 logo-glow glass-hover glass-glow transition-all duration-300 flex items-center justify-center"
                   style={{
                     boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
                   }}
