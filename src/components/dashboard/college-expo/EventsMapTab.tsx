@@ -4,8 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Navigation, CheckCircle2, Trophy, Sparkles, GraduationCap, FileText, Users } from 'lucide-react';
+import { MapPin, Calendar, Navigation, CheckCircle2, Trophy, Sparkles, GraduationCap, FileText, Users, Info, Map } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { InteractiveEventsMap } from '@/components/InteractiveEventsMap';
+import { EventDetailDialog } from '@/components/EventDetailDialog';
 
 interface EventsMapTabProps {
   user: User | null;
@@ -14,6 +16,9 @@ interface EventsMapTabProps {
 
 export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
   const [events, setEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showEventDialog, setShowEventDialog] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,10 +44,9 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
     fetchEvents();
   }, [toast]);
 
-  const getDirections = (address: string, city: string, state: string) => {
-    const fullAddress = `${address}, ${city}, ${state}`;
-    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(fullAddress)}`;
-    window.open(mapsUrl, '_blank');
+  const handleEventClick = (event: any) => {
+    setSelectedEvent(event);
+    setShowEventDialog(true);
   };
 
   const registerForEvent = async (eventId: string) => {
@@ -113,6 +117,23 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
         <p className="text-muted-foreground mb-6">
           Your one-stop shop for college expo success - find events, prepare, and get accepted!
         </p>
+        
+        <div className="flex justify-center mb-6">
+          <Button
+            variant={showMap ? "default" : "outline"}
+            onClick={() => setShowMap(!showMap)}
+          >
+            <Map className="w-4 h-4 mr-2" />
+            {showMap ? "Hide Map" : "Show Interactive Map"}
+          </Button>
+        </div>
+
+        {/* Interactive Map */}
+        {showMap && events.length > 0 && (
+          <div className="mb-8">
+            <InteractiveEventsMap events={events} onEventClick={handleEventClick} />
+          </div>
+        )}
 
         {/* Benefits Showcase */}
         <Card className="p-6 glass-premium border-primary/20 mb-8">
@@ -224,15 +245,15 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
 
               <div className="flex gap-3">
                 <Button
+                  variant="outline"
                   className="flex-1"
-                  onClick={() => getDirections(event.address, event.city, event.state)}
+                  onClick={() => handleEventClick(event)}
                 >
-                  <Navigation className="h-4 w-4 mr-2" />
-                  Get Directions
+                  <Info className="h-4 w-4 mr-2" />
+                  View Details
                 </Button>
                 {event.registration_required && (
                   <Button
-                    variant="outline"
                     className="flex-1"
                     onClick={() => registerForEvent(event.id)}
                     disabled={isGuest}
@@ -251,6 +272,15 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
           </Card>
         )}
       </div>
+
+      {/* Event Detail Dialog */}
+      <EventDetailDialog
+        event={selectedEvent}
+        open={showEventDialog}
+        onOpenChange={setShowEventDialog}
+        onRegister={registerForEvent}
+        isGuest={isGuest}
+      />
     </div>
   );
 };
