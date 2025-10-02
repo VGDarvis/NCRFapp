@@ -154,7 +154,7 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {[...Array(6)].map((_, i) => (
           <Card key={i} className="animate-pulse border-2">
-            <div className="h-64 md:h-72 bg-muted" />
+            <div className="aspect-[2/3] w-full bg-muted" />
             <CardHeader>
               <div className="h-7 bg-muted rounded mb-2" />
               <div className="h-4 bg-muted rounded w-3/4" />
@@ -203,7 +203,7 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
             </Button>
 
             {/* Cover Image */}
-            <div className="relative h-64 md:h-72 overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-border">
+            <div className="relative aspect-[2/3] w-full overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 border-b-2 border-border">
               {booklet.cover_image_url ? (
                 <img
                   src={booklet.cover_image_url}
