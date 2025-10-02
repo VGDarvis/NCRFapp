@@ -9,9 +9,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface HomeTabProps {
   user: User | null;
+  isGuest?: boolean;
 }
 
-export const HomeTab = ({ user }: HomeTabProps) => {
+export const HomeTab = ({ user, isGuest = false }: HomeTabProps) => {
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({
     upcomingTournaments: 0,
@@ -156,15 +157,25 @@ export const HomeTab = ({ user }: HomeTabProps) => {
         </div>
       </div>
 
-      {/* Sign Out */}
+      {/* Sign Out / Return */}
       <div className="pt-4">
-        <Button 
-          onClick={handleSignOut} 
-          variant="outline" 
-          className="w-full glass-light border-destructive/20 text-destructive hover:bg-destructive/10"
-        >
-          Sign Out
-        </Button>
+        {isGuest ? (
+          <Button 
+            onClick={() => navigate('/')} 
+            variant="outline" 
+            className="w-full glass-light border-primary/20"
+          >
+            Return to Programs
+          </Button>
+        ) : (
+          <Button 
+            onClick={handleSignOut} 
+            variant="outline" 
+            className="w-full glass-light border-destructive/20 text-destructive hover:bg-destructive/10"
+          >
+            Sign Out
+          </Button>
+        )}
       </div>
     </div>
   );

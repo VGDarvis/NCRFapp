@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,19 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { program } = useParams();
+  const location = useLocation();
+  
+  // Check if this is a guest user (accessing via /guest/:program)
+  const isGuest = location.pathname.startsWith('/guest/');
 
   useEffect(() => {
     const getUser = async () => {
+      // Skip authentication check for guest users
+      if (isGuest) {
+        setLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       const currentUser = session?.user ?? null;
       setUser(currentUser);
@@ -39,6 +49,11 @@ export const Dashboard = () => {
 
     getUser();
 
+    // Skip auth state change listener for guest users
+    if (isGuest) {
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
@@ -49,7 +64,7 @@ export const Dashboard = () => {
     );
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, isGuest]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -88,7 +103,7 @@ export const Dashboard = () => {
   
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
-    return <EsportsDashboard />;
+    return <EsportsDashboard isGuest={isGuest} />;
   }
 
   // Default dashboard for other users
@@ -120,9 +135,15 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <Button onClick={handleSignOut} variant="outline" className="glass-light border-primary/20">
-            Sign Out
-          </Button>
+          {isGuest ? (
+            <Button onClick={() => navigate('/')} variant="outline" className="glass-light border-primary/20">
+              Return to Programs
+            </Button>
+          ) : (
+            <Button onClick={handleSignOut} variant="outline" className="glass-light border-primary/20">
+              Sign Out
+            </Button>
+          )}
         </div>
       </div>
     </div>

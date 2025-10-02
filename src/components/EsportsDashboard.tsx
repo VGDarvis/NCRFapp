@@ -8,7 +8,11 @@ import { StatsTab } from './dashboard/StatsTab';
 import { ShopTab } from './dashboard/ShopTab';
 import { Home, Trophy, Users, BarChart3, ShoppingBag } from 'lucide-react';
 
-export const EsportsDashboard = () => {
+interface EsportsDashboardProps {
+  isGuest?: boolean;
+}
+
+export const EsportsDashboard = ({ isGuest = false }: EsportsDashboardProps) => {
   const [activeTab, setActiveTab] = useState('home');
   const [user, setUser] = useState<User | null>(null);
 
@@ -34,7 +38,7 @@ export const EsportsDashboard = () => {
     <div className="min-h-screen bg-gradient-primary flex flex-col">
       {/* Main Content */}
       <div className="flex-1 pb-20 overflow-y-auto">
-        <ActiveComponent user={user} />
+        <ActiveComponent user={user} isGuest={isGuest} />
       </div>
 
       {/* Mobile Bottom Navigation */}
