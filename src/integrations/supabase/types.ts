@@ -128,6 +128,96 @@ export type Database = {
         }
         Relationships: []
       }
+      athlete_profiles: {
+        Row: {
+          act_score: number | null
+          athletic_stats: Json | null
+          created_at: string
+          gpa: number | null
+          graduation_year: number | null
+          height: string | null
+          highlight_reel_url: string | null
+          id: string
+          position: string | null
+          sat_score: number | null
+          sport: string
+          updated_at: string
+          user_id: string
+          weight: string | null
+        }
+        Insert: {
+          act_score?: number | null
+          athletic_stats?: Json | null
+          created_at?: string
+          gpa?: number | null
+          graduation_year?: number | null
+          height?: string | null
+          highlight_reel_url?: string | null
+          id?: string
+          position?: string | null
+          sat_score?: number | null
+          sport: string
+          updated_at?: string
+          user_id: string
+          weight?: string | null
+        }
+        Update: {
+          act_score?: number | null
+          athletic_stats?: Json | null
+          created_at?: string
+          gpa?: number | null
+          graduation_year?: number | null
+          height?: string | null
+          highlight_reel_url?: string | null
+          id?: string
+          position?: string | null
+          sat_score?: number | null
+          sport?: string
+          updated_at?: string
+          user_id?: string
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      athletic_achievements: {
+        Row: {
+          achievement_date: string | null
+          achievement_type: string
+          certificate_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          organization: string | null
+          sport: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          achievement_date?: string | null
+          achievement_type: string
+          certificate_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          organization?: string | null
+          sport: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          achievement_date?: string | null
+          achievement_type?: string
+          certificate_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          organization?: string | null
+          sport?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coach_applications: {
         Row: {
           admin_notes: string | null
@@ -167,6 +257,54 @@ export type Database = {
           team_name?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      college_connections: {
+        Row: {
+          athlete_user_id: string
+          coach_email: string | null
+          coach_name: string | null
+          coach_phone: string | null
+          college_name: string
+          contact_date: string | null
+          created_at: string
+          id: string
+          interest_level: string | null
+          notes: string | null
+          sport: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          athlete_user_id: string
+          coach_email?: string | null
+          coach_name?: string | null
+          coach_phone?: string | null
+          college_name: string
+          contact_date?: string | null
+          created_at?: string
+          id?: string
+          interest_level?: string | null
+          notes?: string | null
+          sport: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          athlete_user_id?: string
+          coach_email?: string | null
+          coach_name?: string | null
+          coach_phone?: string | null
+          college_name?: string
+          contact_date?: string | null
+          created_at?: string
+          id?: string
+          interest_level?: string | null
+          notes?: string | null
+          sport?: string
+          status?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -550,6 +688,54 @@ export type Database = {
           updated_at?: string
           user_id?: string
           xp_balance?: number | null
+        }
+        Relationships: []
+      }
+      recruitment_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_type: string
+          id: string
+          is_virtual: boolean | null
+          location: string | null
+          max_participants: number | null
+          registration_deadline: string | null
+          scheduled_at: string
+          sport: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_type: string
+          id?: string
+          is_virtual?: boolean | null
+          location?: string | null
+          max_participants?: number | null
+          registration_deadline?: string | null
+          scheduled_at: string
+          sport?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_type?: string
+          id?: string
+          is_virtual?: boolean | null
+          location?: string | null
+          max_participants?: number | null
+          registration_deadline?: string | null
+          scheduled_at?: string
+          sport?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1184,6 +1370,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      workshop_attendance: {
+        Row: {
+          attendance_date: string | null
+          attended: boolean | null
+          completion_certificate_url: string | null
+          event_id: string
+          id: string
+          notes: string | null
+          registration_date: string
+          user_id: string
+        }
+        Insert: {
+          attendance_date?: string | null
+          attended?: boolean | null
+          completion_certificate_url?: string | null
+          event_id: string
+          id?: string
+          notes?: string | null
+          registration_date?: string
+          user_id: string
+        }
+        Update: {
+          attendance_date?: string | null
+          attended?: boolean | null
+          completion_certificate_url?: string | null
+          event_id?: string
+          id?: string
+          notes?: string | null
+          registration_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_attendance_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "recruitment_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       xp_transactions: {
         Row: {

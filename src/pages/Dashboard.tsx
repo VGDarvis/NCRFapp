@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { EsportsDashboard } from '@/components/EsportsDashboard';
 import { SteamDashboard } from '@/components/SteamDashboard';
 import { MovementDashboard } from '@/components/MovementDashboard';
+import { AthleteDashboard } from '@/components/AthleteDashboard';
 
 export const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -109,7 +110,11 @@ export const Dashboard = () => {
   const isMovementProgram = program === 'movement' || 
     user?.user_metadata?.program === 'movement';
 
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram);
+  // Check if this is an Athlete (SAP) user
+  const isAthleteProgram = program === 'athlete' || 
+    user?.user_metadata?.program === 'athlete';
+
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram);
   
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
@@ -124,6 +129,11 @@ export const Dashboard = () => {
   // Show MovementDashboard for Movement program users
   if (isMovementProgram) {
     return <MovementDashboard isGuest={isGuest} />;
+  }
+
+  // Show AthleteDashboard for Athlete (SAP) program users
+  if (isAthleteProgram) {
+    return <AthleteDashboard />;
   }
 
   // Default dashboard for other users
