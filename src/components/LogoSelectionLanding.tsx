@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ParticleBackground } from './ParticleBackground';
 import { RotatingLogoCircle } from './RotatingLogoCircle';
+import { VideoSection } from './VideoSection';
 
 export const LogoSelectionLanding = () => {
   return (
@@ -23,6 +24,9 @@ export const LogoSelectionLanding = () => {
             Select your program to begin your journey
           </p>
         </motion.div>
+
+        {/* Video Section */}
+        <VideoSection />
 
         {/* Rotating Logo Circle with Glass Container */}
         <div className="my-8 md:my-12">
