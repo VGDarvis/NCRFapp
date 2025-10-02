@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { ParticleBackground } from './ParticleBackground';
 import { SignUpForm } from './SignUpForm';
-import { EsportsSignUpForm } from './EsportsSignUpForm';
+import { CollegeExpoSignUpForm } from './CollegeExpoSignUpForm';
 import { LoginForm } from './LoginForm';
 import { FuturisticButton } from './FuturisticButton';
 
@@ -26,14 +26,14 @@ interface ProgramConfig {
 }
 
 const programConfigs: Record<string, ProgramConfig> = {
-  esports: {
-    id: 'esports',
-    name: 'Esports',
-    fullName: 'NCRF Esports Program',
+  'college-expo': {
+    id: 'college-expo',
+    name: 'College Expo',
+    fullName: 'NCRF College Expo Program',
     logo: logoEsports,
-    description: 'Competitive gaming and digital sports excellence',
-    color: 'hsl(194 100% 50%)',
-    gradient: 'from-blue-500 to-cyan-400'
+    description: 'Navigate your college journey with expert guidance and resources',
+    color: 'hsl(210 100% 56%)',
+    gradient: 'from-blue-600 to-blue-400'
   },
   'internships-career': {
     id: 'internships-career',
@@ -195,8 +195,8 @@ export const ProgramAuthPage = () => {
                 </div>
 
                 {authMode === 'signup' ? (
-                  programConfig.id === 'esports' ? (
-                    <EsportsSignUpForm 
+                  programConfig.id === 'college-expo' ? (
+                    <CollegeExpoSignUpForm 
                       onSuccess={handleAuthSuccess}
                     />
                   ) : (

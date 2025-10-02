@@ -419,6 +419,63 @@ export type Database = {
         }
         Relationships: []
       }
+      college_prep_resources: {
+        Row: {
+          category: string
+          content_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          difficulty_level: string | null
+          estimated_time_minutes: number | null
+          file_url: string | null
+          id: string
+          is_featured: boolean | null
+          resource_type: string
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          category: string
+          content_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          estimated_time_minutes?: number | null
+          file_url?: string | null
+          id?: string
+          is_featured?: boolean | null
+          resource_type: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          category?: string
+          content_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          estimated_time_minutes?: number | null
+          file_url?: string | null
+          id?: string
+          is_featured?: boolean | null
+          resource_type?: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           accused_team_id: string
@@ -482,6 +539,206 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      donor_information: {
+        Row: {
+          created_at: string
+          donation_start_date: string
+          donor_email: string
+          donor_name: string
+          donor_type: string | null
+          id: string
+          is_active: boolean | null
+          last_donation_date: string | null
+          monthly_amount: number
+          next_billing_date: string | null
+          public_recognition: boolean | null
+          recognition_level: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          total_contributed: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          donation_start_date: string
+          donor_email: string
+          donor_name: string
+          donor_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_donation_date?: string | null
+          monthly_amount: number
+          next_billing_date?: string | null
+          public_recognition?: boolean | null
+          recognition_level?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          total_contributed?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          donation_start_date?: string
+          donor_email?: string
+          donor_name?: string
+          donor_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_donation_date?: string | null
+          monthly_amount?: number
+          next_billing_date?: string | null
+          public_recognition?: boolean | null
+          recognition_level?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          total_contributed?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      event_attendance: {
+        Row: {
+          attendance_date: string | null
+          attended: boolean | null
+          check_in_method: string | null
+          colleges_visited: string[] | null
+          created_at: string
+          event_id: string
+          feedback_rating: number | null
+          feedback_text: string | null
+          id: string
+          registration_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attendance_date?: string | null
+          attended?: boolean | null
+          check_in_method?: string | null
+          colleges_visited?: string[] | null
+          created_at?: string
+          event_id: string
+          feedback_rating?: number | null
+          feedback_text?: string | null
+          id?: string
+          registration_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attendance_date?: string | null
+          attended?: boolean | null
+          check_in_method?: string | null
+          colleges_visited?: string[] | null
+          created_at?: string
+          event_id?: string
+          feedback_rating?: number | null
+          feedback_text?: string | null
+          id?: string
+          registration_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendance_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "expo_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expo_events: {
+        Row: {
+          accessibility_info: string | null
+          address: string
+          city: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          event_date: string
+          event_type: string
+          featured_colleges: string[] | null
+          id: string
+          is_virtual: boolean | null
+          latitude: number | null
+          location_name: string
+          longitude: number | null
+          max_attendees: number | null
+          parking_info: string | null
+          registration_deadline: string | null
+          registration_required: boolean | null
+          state: string
+          title: string
+          updated_at: string
+          virtual_link: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          accessibility_info?: string | null
+          address: string
+          city: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_date: string
+          event_type?: string
+          featured_colleges?: string[] | null
+          id?: string
+          is_virtual?: boolean | null
+          latitude?: number | null
+          location_name: string
+          longitude?: number | null
+          max_attendees?: number | null
+          parking_info?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          state: string
+          title: string
+          updated_at?: string
+          virtual_link?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          accessibility_info?: string | null
+          address?: string
+          city?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          event_date?: string
+          event_type?: string
+          featured_colleges?: string[] | null
+          id?: string
+          is_virtual?: boolean | null
+          latitude?: number | null
+          location_name?: string
+          longitude?: number | null
+          max_attendees?: number | null
+          parking_info?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          state?: string
+          title?: string
+          updated_at?: string
+          virtual_link?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
       }
       job_applications: {
         Row: {
@@ -950,6 +1207,137 @@ export type Database = {
           registration_deadline?: string | null
           scheduled_at?: string
           sport?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scholarship_applications: {
+        Row: {
+          application_date: string | null
+          award_amount: number | null
+          created_at: string
+          decision_date: string | null
+          id: string
+          notes: string | null
+          reminder_sent: boolean | null
+          scholarship_id: string
+          status: string
+          submission_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_date?: string | null
+          award_amount?: number | null
+          created_at?: string
+          decision_date?: string | null
+          id?: string
+          notes?: string | null
+          reminder_sent?: boolean | null
+          scholarship_id: string
+          status?: string
+          submission_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_date?: string | null
+          award_amount?: number | null
+          created_at?: string
+          decision_date?: string | null
+          id?: string
+          notes?: string | null
+          reminder_sent?: boolean | null
+          scholarship_id?: string
+          status?: string
+          submission_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scholarship_applications_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarship_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scholarship_opportunities: {
+        Row: {
+          academic_requirements: string | null
+          amount_max: number | null
+          amount_min: number | null
+          application_url: string
+          auto_discovered: boolean | null
+          created_at: string
+          deadline: string
+          demographic_requirements: string[] | null
+          description: string | null
+          eligibility_criteria: string | null
+          essay_required: boolean | null
+          geographic_restrictions: string[] | null
+          gpa_requirement: number | null
+          id: string
+          last_verified: string | null
+          major_restrictions: string[] | null
+          provider_name: string
+          provider_url: string | null
+          recommendation_letters_required: number | null
+          source_url: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          academic_requirements?: string | null
+          amount_max?: number | null
+          amount_min?: number | null
+          application_url: string
+          auto_discovered?: boolean | null
+          created_at?: string
+          deadline: string
+          demographic_requirements?: string[] | null
+          description?: string | null
+          eligibility_criteria?: string | null
+          essay_required?: boolean | null
+          geographic_restrictions?: string[] | null
+          gpa_requirement?: number | null
+          id?: string
+          last_verified?: string | null
+          major_restrictions?: string[] | null
+          provider_name: string
+          provider_url?: string | null
+          recommendation_letters_required?: number | null
+          source_url?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          academic_requirements?: string | null
+          amount_max?: number | null
+          amount_min?: number | null
+          application_url?: string
+          auto_discovered?: boolean | null
+          created_at?: string
+          deadline?: string
+          demographic_requirements?: string[] | null
+          description?: string | null
+          eligibility_criteria?: string | null
+          essay_required?: boolean | null
+          geographic_restrictions?: string[] | null
+          gpa_requirement?: number | null
+          id?: string
+          last_verified?: string | null
+          major_restrictions?: string[] | null
+          provider_name?: string
+          provider_url?: string | null
+          recommendation_letters_required?: number | null
+          source_url?: string | null
+          status?: string | null
           title?: string
           updated_at?: string
         }

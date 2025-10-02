@@ -1,42 +1,42 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Users, Shield } from "lucide-react";
+import { ArrowLeft, GraduationCap, BookOpen, MapPin } from "lucide-react";
 import { GoldButton, GlassButton } from "@/components/ui/button-variants";
 
 const roles = [
   {
-    id: "player",
-    title: "Player",
-    icon: User,
-    description: "Compete in tournaments, earn XP, and convert your gaming skills into real rewards.",
-    features: ["Tournament Entry", "XP → USD Conversion", "Team Formation", "Skill Rankings"],
+    id: "student",
+    title: "Student",
+    icon: GraduationCap,
+    description: "Access college expo events, discover scholarships, and prepare for your college journey.",
+    features: ["Event Registration", "Scholarship Search", "College Prep Resources", "Application Tracking"],
     gradient: "from-blue-600 to-cyan-500"
   },
   {
-    id: "coach", 
-    title: "Coach",
-    icon: Users,
-    description: "Lead teams to victory, develop strategies, and mentor the next generation of esports athletes.",
-    features: ["Team Management", "Strategy Development", "Player Mentoring", "Performance Analytics"],
+    id: "parent", 
+    title: "Parent/Guardian",
+    icon: BookOpen,
+    description: "Support your student's college journey with resources, event information, and financial aid guidance.",
+    features: ["Event Updates", "Financial Aid Info", "College Resources", "Student Progress"],
     gradient: "from-green-600 to-emerald-500"
   },
   {
-    id: "admin",
-    title: "Administrator", 
-    icon: Shield,
-    description: "Manage tournaments, oversee operations, and help build the future of HBCU esports.",
-    features: ["Tournament Management", "Platform Oversight", "Community Building", "Data Analytics"],
+    id: "counselor",
+    title: "Counselor", 
+    icon: MapPin,
+    description: "Guide students through the college application process with our comprehensive tools and resources.",
+    features: ["Student Management", "Resource Sharing", "Event Planning", "Progress Tracking"],
     gradient: "from-primary to-amber-500"
   }
 ];
 
-export const JoinEsports = () => {
+const JoinCollegeExpo = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleContinue = () => {
     if (selectedRole) {
-      navigate(`/auth?role=${selectedRole}`);
+      navigate(`/auth/college-expo?role=${selectedRole}`);
     }
   };
 
@@ -63,14 +63,14 @@ export const JoinEsports = () => {
           {/* Section Header */}
           <div className="text-center mb-16">
             <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-primary via-primary/80 to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-xl border-2 border-primary/30 shadow-lg">
-              ES
+              CE
             </div>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-              Join the <span className="text-primary">HBCU Esports League</span>
+              Join <span className="text-primary">College Expo</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Choose your role in the National HBCU Esports League. Compete in tournaments, 
-              earn rewards, and represent your school in the ultimate gaming competition.
+              Choose your role in the College Expo program. Access college preparation resources,
+              discover scholarship opportunities, and navigate your path to higher education.
             </p>
           </div>
 
@@ -142,20 +142,20 @@ export const JoinEsports = () => {
           <div className="mt-16 text-center">
             <div className="max-w-3xl mx-auto luxury-card p-8 rounded-lg">
               <h3 className="text-xl font-bold text-foreground mb-4">
-                Why Join the HBCU Esports League?
+                Why Join College Expo?
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary mb-2">$50K+</div>
-                  <div className="text-sm text-muted-foreground">Prize Pool</div>
+                  <div className="text-2xl font-bold text-primary mb-2">500+</div>
+                  <div className="text-sm text-muted-foreground">Scholarships</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary mb-2">107</div>
-                  <div className="text-sm text-muted-foreground">HBCU Partners</div>
+                  <div className="text-2xl font-bold text-primary mb-2">50+</div>
+                  <div className="text-sm text-muted-foreground">Expo Events</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary mb-2">5</div>
-                  <div className="text-sm text-muted-foreground">Game Titles</div>
+                  <div className="text-2xl font-bold text-primary mb-2">1000+</div>
+                  <div className="text-sm text-muted-foreground">Resources</div>
                 </div>
               </div>
             </div>
@@ -165,3 +165,5 @@ export const JoinEsports = () => {
     </div>
   );
 };
+
+export default JoinCollegeExpo;

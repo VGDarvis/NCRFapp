@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { EsportsDashboard } from '@/components/EsportsDashboard';
+import { CollegeExpoDashboard } from '@/components/CollegeExpoDashboard';
 import { SteamDashboard } from '@/components/SteamDashboard';
 import { MovementDashboard } from '@/components/MovementDashboard';
 import { AthleteDashboard } from '@/components/AthleteDashboard';
@@ -95,13 +95,12 @@ export const Dashboard = () => {
     );
   }
 
-  // Check if this is an esports user - prioritize program field in metadata
-  const isEsportsProgram = program === 'esports' || 
-    user?.user_metadata?.program === 'esports' ||
-    // Fallback: Check for esports-specific metadata fields that are unique to esports signups
-    (user?.user_metadata?.attends_college !== undefined) ||
-    (user?.user_metadata?.on_esports_team !== undefined) ||
-    (user?.user_metadata?.game_preferences !== undefined);
+  // Check if this is a college expo user
+  const isCollegeExpoProgram = program === 'college-expo' || 
+    user?.user_metadata?.program === 'college-expo' ||
+    (user?.user_metadata?.grade_level !== undefined) ||
+    (user?.user_metadata?.intended_major !== undefined) ||
+    (user?.user_metadata?.college_interests !== undefined);
 
   // Check if this is a STEAM user
   const isSteamProgram = program === 'steam' || 
@@ -119,11 +118,11 @@ export const Dashboard = () => {
   const isInternshipsCareerProgram = program === 'internships-career' || 
     user?.user_metadata?.program === 'internships-career';
 
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram, 'Is Internships:', isInternshipsCareerProgram);
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is College Expo:', isCollegeExpoProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram, 'Is Internships:', isInternshipsCareerProgram);
   
-  // Show EsportsDashboard for esports program users
-  if (isEsportsProgram) {
-    return <EsportsDashboard isGuest={isGuest} />;
+  // Show CollegeExpoDashboard for college expo program users
+  if (isCollegeExpoProgram) {
+    return <CollegeExpoDashboard isGuest={isGuest} />;
   }
 
   // Show SteamDashboard for STEAM program users

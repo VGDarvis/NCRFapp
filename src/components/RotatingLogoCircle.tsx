@@ -19,11 +19,11 @@ interface Program {
 
 const programs: Program[] = [
   {
-    id: 'esports',
-    name: 'Esports',
+    id: 'college-expo',
+    name: 'College Expo',
     logo: logoEsports,
-    route: '/auth/esports',
-    color: 'hsl(194 100% 50%)', // Neon Blue
+    route: '/auth/college-expo',
+    color: 'hsl(210 100% 56%)', // Professional Blue
     angle: 0
   },
   {
