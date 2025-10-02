@@ -26,7 +26,7 @@ export const BookletViewerDialog = ({ booklet, open, onOpenChange }: BookletView
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[100vw] md:max-w-[95vw] w-full h-screen md:max-h-[95vh] md:h-[95vh] p-0 inset-0 md:inset-auto md:left-[50%] md:top-[50%] md:translate-x-[-50%] md:translate-y-[-50%] flex flex-col">
+      <DialogContent className="!max-w-none !w-screen !h-screen !inset-0 !translate-x-0 !translate-y-0 !m-0 md:!max-w-[95vw] md:!w-auto md:!h-[95vh] md:!inset-auto md:!left-[50%] md:!top-[50%] md:!translate-x-[-50%] md:!translate-y-[-50%] p-0 flex flex-col rounded-none md:rounded-lg">
         <DialogHeader className="px-4 md:px-6 pt-3 md:pt-6 pb-2 border-b flex-shrink-0">
           <div className="flex items-center justify-between gap-2 md:gap-4">
             <DialogTitle className="text-base md:text-lg font-semibold line-clamp-1">
