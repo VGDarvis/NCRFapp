@@ -59,6 +59,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_audit_logs: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          target_id: string | null
+          target_table: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          target_id?: string | null
+          target_table?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          target_id?: string | null
+          target_table?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_preferences: {
         Row: {
           created_at: string
@@ -82,6 +121,39 @@ export type Database = {
           notifications_enabled?: boolean | null
           theme?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      admin_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          last_activity: string
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          last_activity?: string
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          last_activity?: string
+          session_token?: string
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -657,7 +729,9 @@ export type Database = {
         Row: {
           accessibility_info: string | null
           address: string
+          attendee_count: number | null
           city: string
+          colleges_attended: string[] | null
           contact_email: string | null
           contact_phone: string | null
           created_at: string
@@ -665,6 +739,8 @@ export type Database = {
           description: string | null
           end_date: string | null
           event_date: string
+          event_photos: string[] | null
+          event_recap: string | null
           event_type: string
           featured_colleges: string[] | null
           id: string
@@ -677,6 +753,7 @@ export type Database = {
           registration_deadline: string | null
           registration_required: boolean | null
           state: string
+          status: string | null
           title: string
           updated_at: string
           virtual_link: string | null
@@ -685,7 +762,9 @@ export type Database = {
         Insert: {
           accessibility_info?: string | null
           address: string
+          attendee_count?: number | null
           city: string
+          colleges_attended?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
@@ -693,6 +772,8 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           event_date: string
+          event_photos?: string[] | null
+          event_recap?: string | null
           event_type?: string
           featured_colleges?: string[] | null
           id?: string
@@ -705,6 +786,7 @@ export type Database = {
           registration_deadline?: string | null
           registration_required?: boolean | null
           state: string
+          status?: string | null
           title: string
           updated_at?: string
           virtual_link?: string | null
@@ -713,7 +795,9 @@ export type Database = {
         Update: {
           accessibility_info?: string | null
           address?: string
+          attendee_count?: number | null
           city?: string
+          colleges_attended?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
@@ -721,6 +805,8 @@ export type Database = {
           description?: string | null
           end_date?: string | null
           event_date?: string
+          event_photos?: string[] | null
+          event_recap?: string | null
           event_type?: string
           featured_colleges?: string[] | null
           id?: string
@@ -733,6 +819,7 @@ export type Database = {
           registration_deadline?: string | null
           registration_required?: boolean | null
           state?: string
+          status?: string | null
           title?: string
           updated_at?: string
           virtual_link?: string | null
@@ -1466,6 +1553,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       team_chat_messages: {
         Row: {
           created_at: string
@@ -2103,6 +2220,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          p_action: string
+          p_new_values?: Json
+          p_old_values?: Json
+          p_target_id?: string
+          p_target_table?: string
+        }
+        Returns: undefined
       }
       log_database_error: {
         Args: {
