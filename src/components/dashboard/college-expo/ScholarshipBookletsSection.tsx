@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, BookOpen, Eye, Sparkles } from "lucide-react";
+import { Download, BookOpen, Eye, Sparkles, Award, DollarSign, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BookletDetailDialog } from "./BookletDetailDialog";
 import { BookletViewerDialog } from "./BookletViewerDialog";
@@ -151,14 +151,17 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {[...Array(6)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <div className="h-48 bg-muted" />
+          <Card key={i} className="animate-pulse border-2">
+            <div className="h-64 md:h-72 bg-muted" />
             <CardHeader>
-              <div className="h-6 bg-muted rounded mb-2" />
+              <div className="h-7 bg-muted rounded mb-2" />
               <div className="h-4 bg-muted rounded w-3/4" />
             </CardHeader>
+            <CardContent>
+              <div className="h-24 bg-muted rounded" />
+            </CardContent>
           </Card>
         ))}
       </div>
@@ -183,77 +186,94 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
       </div>
 
       {/* Booklets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredBooklets.map((booklet) => (
-          <Card key={booklet.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          <Card 
+            key={booklet.id} 
+            className="group overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/30 relative"
+          >
+            {/* Download Button - Top Right Floating */}
+            <Button
+              size="icon"
+              onClick={() => handleDownload(booklet)}
+              disabled={!booklet.pdf_url}
+              className="absolute top-4 right-4 z-10 bg-background/95 backdrop-blur-sm shadow-lg hover:scale-110 transition-transform"
+            >
+              <Download className="w-4 h-4" />
+            </Button>
+
             {/* Cover Image */}
-            <div className="relative h-48 bg-gradient-to-br from-primary/20 to-primary/5">
+            <div className="relative h-64 md:h-72 overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 border-2 border-border">
               {booklet.cover_image_url ? (
                 <img
                   src={booklet.cover_image_url}
-                  alt={booklet.title}
-                  className="w-full h-full object-cover"
+                  alt={`${booklet.title} cover`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 shadow-inner"
                 />
               ) : (
-                <div className="flex items-center justify-center h-full">
-                  <BookOpen className="w-20 h-20 text-primary/30" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <BookOpen className="w-16 h-16 text-muted-foreground" />
                 </div>
               )}
+              
               {booklet.featured && (
-                <Badge className="absolute top-2 right-2 bg-accent">
-                  <Sparkles className="w-3 h-3 mr-1" />
+                <Badge className="absolute top-0 right-0 bg-accent text-accent-foreground px-4 py-1 rounded-bl-lg shadow-lg border-l border-b border-accent-foreground/20">
+                  <Sparkles className="w-3 h-3 mr-1 animate-pulse" />
                   Featured
                 </Badge>
               )}
             </div>
 
-            <CardHeader>
-              <div className="flex justify-between items-start gap-2">
-                <CardTitle className="text-lg line-clamp-2">{booklet.title}</CardTitle>
+            <CardHeader className="bg-background/95 backdrop-blur-sm border-t-2 border-primary/10 pb-4 relative">
+              <div className="absolute top-4 right-4 flex gap-2">
+                <Badge className="bg-primary text-primary-foreground capitalize">
+                  {booklet.category}
+                </Badge>
+                {booklet.academic_year && (
+                  <Badge variant="outline" className="bg-accent/10">
+                    {booklet.academic_year}
+                  </Badge>
+                )}
               </div>
-              <CardDescription className="line-clamp-2">
+              <CardTitle className="text-xl md:text-2xl font-bold pr-32 line-clamp-2">{booklet.title}</CardTitle>
+              <CardDescription className="line-clamp-2 leading-relaxed">
                 {booklet.description}
               </CardDescription>
             </CardHeader>
 
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Scholarships:</span>
-                  <span className="font-semibold">{booklet.total_scholarships}</span>
+            <CardContent className="space-y-4 pt-6">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-primary/5 rounded-lg p-3 text-center group/stat hover:bg-primary/10 transition-colors">
+                  <Award className="w-5 h-5 mx-auto mb-1 text-primary" />
+                  <div className="text-2xl font-bold text-foreground">{booklet.total_scholarships}</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Scholarships</div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Total Value:</span>
-                  <span className="font-semibold text-primary">
-                    {formatCurrency(booklet.total_value)}
-                  </span>
+                <div className="bg-primary/5 rounded-lg p-3 text-center group/stat hover:bg-primary/10 transition-colors">
+                  <DollarSign className="w-5 h-5 mx-auto mb-1 text-primary" />
+                  <div className="text-2xl font-bold text-foreground">{formatCurrency(booklet.total_value)}</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Total Value</div>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Downloads:</span>
-                  <span className="font-semibold">{booklet.download_count}</span>
+                <div className="bg-primary/5 rounded-lg p-3 text-center group/stat hover:bg-primary/10 transition-colors">
+                  <Download className="w-5 h-5 mx-auto mb-1 text-primary" />
+                  <div className="text-2xl font-bold text-foreground">{booklet.download_count}</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Downloads</div>
                 </div>
-                <Badge variant="outline" className="capitalize">
-                  {booklet.category}
-                </Badge>
+                <div className="bg-primary/5 rounded-lg p-3 text-center group/stat hover:bg-primary/10 transition-colors">
+                  <Calendar className="w-5 h-5 mx-auto mb-1 text-primary" />
+                  <div className="text-2xl font-bold text-foreground">{booklet.download_count}</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Views</div>
+                </div>
               </div>
             </CardContent>
 
-            <CardFooter className="flex gap-2">
+            <CardFooter className="pt-0 pb-6">
               <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setSelectedBooklet(booklet)}
+                className="w-full btn-gold hover:scale-105 transition-transform font-semibold"
+                onClick={() => handleViewBooklet(booklet)}
               >
                 <Eye className="w-4 h-4 mr-2" />
-                View Details
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={() => handleDownload(booklet)}
-                disabled={!booklet.pdf_url}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
+                Read Now
               </Button>
             </CardFooter>
           </Card>
