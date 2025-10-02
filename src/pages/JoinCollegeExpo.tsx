@@ -30,7 +30,7 @@ const roles = [
   }
 ];
 
-const JoinCollegeExpo = () => {
+const JoinCollegeExpo: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
