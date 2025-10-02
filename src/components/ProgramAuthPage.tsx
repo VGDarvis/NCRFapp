@@ -10,7 +10,7 @@ import { FuturisticButton } from './FuturisticButton';
 
 // Import logo assets
 import logoEsports from '@/assets/logo-esports.png';
-import logoGreenClean from '@/assets/logo-green-clean.png';
+import logoInternshipsCareer from '@/assets/logo-internships-career.png';
 import logoSteam from '@/assets/logo-steam.png';
 import logoMovement from '@/assets/logo-movement.png';
 import logoAthlete from '@/assets/logo-athlete.png';
@@ -35,14 +35,14 @@ const programConfigs: Record<string, ProgramConfig> = {
     color: 'hsl(194 100% 50%)',
     gradient: 'from-blue-500 to-cyan-400'
   },
-  'green-clean': {
-    id: 'green-clean',
-    name: 'Green & Clean',
-    fullName: 'Green & Clean Initiative',
-    logo: logoGreenClean,
-    description: 'Environmental sustainability and community impact',
-    color: 'hsl(154 100% 50%)',
-    gradient: 'from-green-500 to-emerald-400'
+  'internships-career': {
+    id: 'internships-career',
+    name: 'Internships & Career',
+    fullName: 'Internships & Career Development',
+    logo: logoInternshipsCareer,
+    description: 'Professional development and career advancement',
+    color: 'hsl(210 100% 56%)',
+    gradient: 'from-blue-600 to-blue-400'
   },
   steam: {
     id: 'steam',

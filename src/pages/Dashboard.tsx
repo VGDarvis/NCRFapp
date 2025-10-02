@@ -8,6 +8,7 @@ import { EsportsDashboard } from '@/components/EsportsDashboard';
 import { SteamDashboard } from '@/components/SteamDashboard';
 import { MovementDashboard } from '@/components/MovementDashboard';
 import { AthleteDashboard } from '@/components/AthleteDashboard';
+import { InternshipsDashboard } from '@/components/InternshipsDashboard';
 
 export const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -114,7 +115,11 @@ export const Dashboard = () => {
   const isAthleteProgram = program === 'athlete' || 
     user?.user_metadata?.program === 'athlete';
 
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram);
+  // Check if this is an Internships & Career user
+  const isInternshipsCareerProgram = program === 'internships-career' || 
+    user?.user_metadata?.program === 'internships-career';
+
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram, 'Is Internships:', isInternshipsCareerProgram);
   
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
@@ -134,6 +139,11 @@ export const Dashboard = () => {
   // Show AthleteDashboard for Athlete (SAP) program users
   if (isAthleteProgram) {
     return <AthleteDashboard />;
+  }
+
+  // Show InternshipsDashboard for Internships & Career program users
+  if (isInternshipsCareerProgram) {
+    return <InternshipsDashboard />;
   }
 
   // Default dashboard for other users
