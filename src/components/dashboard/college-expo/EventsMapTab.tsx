@@ -24,6 +24,7 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
   const [showEventDialog, setShowEventDialog] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [eventStatusFilter, setEventStatusFilter] = useState<'upcoming' | 'all' | 'past'>('upcoming');
   const [filters, setFilters] = useState<EventFiltersState>({
     searchQuery: '',
     distanceRadius: 100,
@@ -36,11 +37,11 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
 
   useEffect(() => {
     const fetchEvents = async () => {
+      // Fetch all events (not just upcoming) to support past events view
       const { data, error } = await supabase
         .from('expo_events')
         .select('*')
-        .gte('event_date', new Date().toISOString())
-        .order('event_date', { ascending: true });
+        .order('event_date', { ascending: false });
 
       if (error) {
         toast({
@@ -78,6 +79,14 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
 
   const getFilteredEvents = () => {
     let filtered = [...events];
+    
+    // Filter by status (upcoming/all/past)
+    const now = new Date();
+    if (eventStatusFilter === 'upcoming') {
+      filtered = filtered.filter(event => new Date(event.event_date) >= now);
+    } else if (eventStatusFilter === 'past') {
+      filtered = filtered.filter(event => new Date(event.event_date) < now);
+    }
 
     // Search filter
     if (filters.searchQuery) {
@@ -209,12 +218,50 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="font-display text-4xl font-bold text-foreground mb-2">
-          College Expo <span className="text-primary">Events & Expos</span>
-        </h1>
-        <p className="text-muted-foreground mb-6">
-          Your one-stop shop for college expo success - find events, prepare, and get accepted!
-        </p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="font-display text-4xl font-bold text-foreground mb-2">
+              College Expo <span className="text-primary">Events & Expos</span>
+            </h1>
+            <p className="text-muted-foreground">
+              Your one-stop shop for college expo success - find events, prepare, and get accepted!
+            </p>
+          </div>
+          
+          {/* Status Filter Tabs */}
+          <div className="flex gap-2 glass-premium p-1 rounded-lg">
+            <button
+              onClick={() => setEventStatusFilter('upcoming')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                eventStatusFilter === 'upcoming'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Upcoming
+            </button>
+            <button
+              onClick={() => setEventStatusFilter('all')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                eventStatusFilter === 'all'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              All Events
+            </button>
+            <button
+              onClick={() => setEventStatusFilter('past')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                eventStatusFilter === 'past'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Past Events
+            </button>
+          </div>
+        </div>
         
         <div className="flex justify-center gap-3 mb-6">
           {!userLocation && (

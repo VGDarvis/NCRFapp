@@ -8,6 +8,7 @@ import { MovementMentorsTab } from './dashboard/movement/MentorsTab';
 import { MovementReviewsTab } from './dashboard/movement/ReviewsTab';
 import { MovementProgressTab } from './dashboard/movement/ProgressTab';
 import { MovementCommunityTab } from './dashboard/movement/CommunityTab';
+import { DashboardHeader } from './DashboardHeader';
 import movementLogo from '@/assets/logo-movement.png';
 
 interface MovementDashboardProps {
@@ -40,15 +41,12 @@ export function MovementDashboard({ isGuest = false }: MovementDashboardProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-500/10 via-rose-500/5 to-background flex flex-col">
       {/* Movement Logo Header */}
-      <header className="sticky top-0 z-40 glass-premium border-b border-pink-500/20 backdrop-blur-lg">
-        <div className="container mx-auto px-4 py-4 flex justify-center">
-          <img 
-            src={movementLogo} 
-            alt="NCRF Movement Enrichment Program" 
-            className="h-16 md:h-20 w-auto object-contain logo-glow"
-          />
-        </div>
-      </header>
+      <DashboardHeader
+        logo={movementLogo}
+        logoAlt="NCRF Movement Enrichment Program"
+        title="Movement Enrichment"
+        subtitle="Tutoring, Mentorship & Wellness"
+      />
 
       {/* Main Content */}
       <div className="flex-1 pb-20 overflow-y-auto">

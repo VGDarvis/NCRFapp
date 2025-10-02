@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LogOut, Briefcase, FileText, Search, Users, BookOpen, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { DashboardHeader } from './DashboardHeader';
 import logoInternshipsCareer from '@/assets/logo-internships-career.png';
 
 export const InternshipsDashboard = () => {
@@ -33,21 +34,21 @@ export const InternshipsDashboard = () => {
   return (
     <div className="min-h-screen cyber-gradient">
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <img src={logoInternshipsCareer} alt="Internships & Career" className="w-12 h-12" />
-            <div>
-              <h1 className="text-2xl font-display font-bold cyber-text-glow">Internships & Career</h1>
-              <p className="text-sm text-muted-foreground">Professional Development Hub</p>
-            </div>
-          </div>
+          <DashboardHeader
+            logo={logoInternshipsCareer}
+            logoAlt="Internships & Career"
+            title="Internships & Career"
+            subtitle="Professional Development Hub"
+            showBackButton={false}
+          />
           <Button variant="outline" onClick={handleSignOut} className="gap-2">
             <LogOut className="w-4 h-4" />
             Sign Out
           </Button>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

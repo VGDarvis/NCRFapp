@@ -8,6 +8,8 @@ import { ScholarshipsTab } from './dashboard/college-expo/ScholarshipsTab';
 import { CollegePrepTab } from './dashboard/college-expo/CollegePrepTab';
 import { ResourcesTab } from './dashboard/college-expo/ResourcesTab';
 import { DonorsTab } from './dashboard/college-expo/DonorsTab';
+import { DashboardHeader } from './DashboardHeader';
+import logoGreenClean from '@/assets/logo-green-clean.png';
 
 interface CollegeExpoDashboardProps {
   isGuest?: boolean;
@@ -65,8 +67,19 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || CollegeExpoHomeTab;
 
   return (
-    <div className="min-h-screen bg-gradient-primary pb-20 md:pb-8">
-      <ActiveComponent user={user} isGuest={isGuest} />
+    <div className="min-h-screen bg-gradient-to-br from-emerald-500/10 via-green-500/5 to-background flex flex-col">
+      {/* Header */}
+      <DashboardHeader
+        logo={logoGreenClean}
+        logoAlt="NCRF College Expo & Preparation"
+        title="College Expo & Preparation"
+        subtitle="Your Journey to Higher Education"
+      />
+      
+      {/* Main Content */}
+      <div className="flex-1 pb-20 md:pb-8">
+        <ActiveComponent user={user} isGuest={isGuest} />
+      </div>
       
       {/* Bottom Navigation for Mobile */}
       <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border md:hidden z-50">

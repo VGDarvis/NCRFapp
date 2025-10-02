@@ -7,6 +7,7 @@ import RecruitmentTab from "./dashboard/athlete/RecruitmentTab";
 import WorkshopsTab from "./dashboard/athlete/WorkshopsTab";
 import StatsTab from "./dashboard/athlete/StatsTab";
 import CommunityTab from "./dashboard/athlete/CommunityTab";
+import { DashboardHeader } from "./DashboardHeader";
 import logoAthlete from "@/assets/logo-athlete.png";
 
 export function AthleteDashboard() {
@@ -15,17 +16,12 @@ export function AthleteDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-background">
       {/* Header */}
-      <header className="glass-premium border-b border-primary/20 backdrop-blur-lg p-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logoAthlete} alt="SAP Logo" className="h-12 w-12" />
-            <div>
-              <h1 className="text-white font-bold text-xl">Student Athlete Program</h1>
-              <p className="text-white/80 text-sm">Your Path to College Sports</p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        logo={logoAthlete}
+        logoAlt="Student Athlete Program"
+        title="Student Athlete Program"
+        subtitle="Your Path to College Sports"
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-4 pb-24 md:pb-4">

@@ -6,6 +6,7 @@ import { ProjectsTab } from './dashboard/steam/ProjectsTab';
 import { LearningTab } from './dashboard/steam/LearningTab';
 import { LabsTab } from './dashboard/steam/LabsTab';
 import { CommunityTab } from './dashboard/steam/CommunityTab';
+import { DashboardHeader } from './DashboardHeader';
 import { Home, FlaskConical, BookOpen, Microscope, Users } from 'lucide-react';
 import steamLogo from '@/assets/logo-steam.png';
 
@@ -38,15 +39,12 @@ export const SteamDashboard = ({ isGuest = false }: SteamDashboardProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-500/10 via-violet-500/5 to-background flex flex-col">
       {/* STEAM Logo Header */}
-      <header className="sticky top-0 z-40 glass-premium border-b border-primary/20 backdrop-blur-lg">
-        <div className="container mx-auto px-4 py-4 flex justify-center">
-          <img 
-            src={steamLogo} 
-            alt="NCRF STEAM Program" 
-            className="h-16 md:h-20 w-auto object-contain logo-glow"
-          />
-        </div>
-      </header>
+      <DashboardHeader
+        logo={steamLogo}
+        logoAlt="NCRF STEAM Program"
+        title="STEAM Program"
+        subtitle="Science, Technology, Engineering, Arts & Math"
+      />
 
       {/* Main Content */}
       <div className="flex-1 pb-20 overflow-y-auto">

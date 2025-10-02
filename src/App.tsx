@@ -9,6 +9,8 @@ import { Dashboard } from "./pages/Dashboard";
 import { ProgramAuthPage } from "./components/ProgramAuthPage";
 import SignOut from "./pages/SignOut";
 import JoinCollegeExpo from "./pages/JoinCollegeExpo";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,8 @@ function App() {
             <Route path="/guest/:program" element={<Dashboard />} />
             <Route path="/college-expo" element={<JoinCollegeExpo />} />
             <Route path="/signout" element={<SignOut />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
