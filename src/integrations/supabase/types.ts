@@ -311,6 +311,54 @@ export type Database = {
           },
         ]
       }
+      movement_tutors: {
+        Row: {
+          availability: Json | null
+          avatar_url: string | null
+          bio: string | null
+          certifications: string[] | null
+          created_at: string
+          display_name: string
+          hourly_rate: number | null
+          id: string
+          is_active: boolean | null
+          specializations: string[] | null
+          updated_at: string
+          user_id: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          availability?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          display_name: string
+          hourly_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          specializations?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          availability?: Json | null
+          avatar_url?: string | null
+          bio?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          display_name?: string
+          hourly_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          specializations?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       payouts: {
         Row: {
           amount_usd: number
@@ -877,6 +925,115 @@ export type Database = {
         }
         Relationships: []
       }
+      tutor_reviews: {
+        Row: {
+          communication_rating: number | null
+          created_at: string
+          effectiveness_rating: number | null
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          parent_user_id: string
+          punctuality_rating: number | null
+          rating: number
+          review_text: string | null
+          status: string
+          student_name: string | null
+          tutor_id: string
+          updated_at: string
+        }
+        Insert: {
+          communication_rating?: number | null
+          created_at?: string
+          effectiveness_rating?: number | null
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          parent_user_id: string
+          punctuality_rating?: number | null
+          rating: number
+          review_text?: string | null
+          status?: string
+          student_name?: string | null
+          tutor_id: string
+          updated_at?: string
+        }
+        Update: {
+          communication_rating?: number | null
+          created_at?: string
+          effectiveness_rating?: number | null
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          parent_user_id?: string
+          punctuality_rating?: number | null
+          rating?: number
+          review_text?: string | null
+          status?: string
+          student_name?: string | null
+          tutor_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutor_reviews_tutor_id_fkey"
+            columns: ["tutor_id"]
+            isOneToOne: false
+            referencedRelation: "movement_tutors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tutor_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          notes: string | null
+          parent_user_id: string | null
+          scheduled_at: string
+          session_type: string
+          status: string
+          student_user_id: string
+          tutor_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          parent_user_id?: string | null
+          scheduled_at: string
+          session_type: string
+          status?: string
+          student_user_id: string
+          tutor_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          parent_user_id?: string | null
+          scheduled_at?: string
+          session_type?: string
+          status?: string
+          student_user_id?: string
+          tutor_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutor_sessions_tutor_id_fkey"
+            columns: ["tutor_id"]
+            isOneToOne: false
+            referencedRelation: "movement_tutors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_purchases: {
         Row: {
           created_at: string
@@ -988,6 +1145,42 @@ export type Database = {
           theme_preference?: string | null
           timezone?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wellness_progress: {
+        Row: {
+          activity_type: string
+          created_at: string
+          goal_value: number | null
+          id: string
+          notes: string | null
+          progress_value: number
+          recorded_at: string
+          unit: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          goal_value?: number | null
+          id?: string
+          notes?: string | null
+          progress_value: number
+          recorded_at?: string
+          unit?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          goal_value?: number | null
+          id?: string
+          notes?: string | null
+          progress_value?: number
+          recorded_at?: string
+          unit?: string | null
           user_id?: string
         }
         Relationships: []

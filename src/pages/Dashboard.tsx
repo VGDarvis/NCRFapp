@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { EsportsDashboard } from '@/components/EsportsDashboard';
 import { SteamDashboard } from '@/components/SteamDashboard';
+import { MovementDashboard } from '@/components/MovementDashboard';
 
 export const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -104,7 +105,11 @@ export const Dashboard = () => {
   const isSteamProgram = program === 'steam' || 
     user?.user_metadata?.program === 'steam';
 
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram);
+  // Check if this is a Movement user
+  const isMovementProgram = program === 'movement' || 
+    user?.user_metadata?.program === 'movement';
+
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram);
   
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
@@ -114,6 +119,11 @@ export const Dashboard = () => {
   // Show SteamDashboard for STEAM program users
   if (isSteamProgram) {
     return <SteamDashboard isGuest={isGuest} />;
+  }
+
+  // Show MovementDashboard for Movement program users
+  if (isMovementProgram) {
+    return <MovementDashboard isGuest={isGuest} />;
   }
 
   // Default dashboard for other users
