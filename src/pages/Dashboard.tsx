@@ -5,6 +5,7 @@ import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { EsportsDashboard } from '@/components/EsportsDashboard';
+import { SteamDashboard } from '@/components/SteamDashboard';
 
 export const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -99,11 +100,20 @@ export const Dashboard = () => {
     (user?.user_metadata?.on_esports_team !== undefined) ||
     (user?.user_metadata?.game_preferences !== undefined);
 
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram);
+  // Check if this is a STEAM user
+  const isSteamProgram = program === 'steam' || 
+    user?.user_metadata?.program === 'steam';
+
+  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is Esports:', isEsportsProgram, 'Is STEAM:', isSteamProgram);
   
   // Show EsportsDashboard for esports program users
   if (isEsportsProgram) {
     return <EsportsDashboard isGuest={isGuest} />;
+  }
+
+  // Show SteamDashboard for STEAM program users
+  if (isSteamProgram) {
+    return <SteamDashboard isGuest={isGuest} />;
   }
 
   // Default dashboard for other users
