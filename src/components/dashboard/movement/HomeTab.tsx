@@ -1,5 +1,7 @@
 import { User } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Heart, Activity, Target, TrendingUp } from 'lucide-react';
 
 interface HomeTabProps {
@@ -8,6 +10,7 @@ interface HomeTabProps {
 }
 
 export function MovementHomeTab({ user, isGuest }: HomeTabProps) {
+  const navigate = useNavigate();
   const displayName = isGuest ? 'Guest' : user?.user_metadata?.display_name || 'Student';
 
   return (
@@ -153,6 +156,26 @@ export function MovementHomeTab({ user, isGuest }: HomeTabProps) {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex justify-center">
+        {isGuest ? (
+          <Button 
+            onClick={() => navigate('/')} 
+            variant="outline" 
+            className="w-full max-w-md glass-light border-primary/20"
+          >
+            Return to Programs
+          </Button>
+        ) : (
+          <Button 
+            onClick={() => navigate('/signout')} 
+            variant="outline" 
+            className="w-full max-w-md glass-light border-destructive/20 text-destructive hover:bg-destructive/10"
+          >
+            Sign Out →
+          </Button>
+        )}
       </div>
     </div>
   );

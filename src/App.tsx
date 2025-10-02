@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { Dashboard } from "./pages/Dashboard";
 import { ProgramAuthPage } from "./components/ProgramAuthPage";
+import SignOut from "./pages/SignOut";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/auth/:program" element={<ProgramAuthPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/guest/:program" element={<Dashboard />} />
+            <Route path="/signout" element={<SignOut />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -41,22 +41,6 @@ export const HomeTab = ({ user, isGuest = false }: HomeTabProps) => {
     }
   }, [user, isGuest]);
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Signed out successfully! 👋",
-        description: "Keep exploring STEAM!",
-      });
-      navigate('/');
-    }
-  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -191,11 +175,11 @@ export const HomeTab = ({ user, isGuest = false }: HomeTabProps) => {
           </Button>
         ) : (
           <Button 
-            onClick={handleSignOut} 
+            onClick={() => navigate('/signout')} 
             variant="outline" 
             className="w-full glass-light border-destructive/20 text-destructive hover:bg-destructive/10"
           >
-            Sign Out
+            Sign Out →
           </Button>
         )}
       </div>
