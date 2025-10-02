@@ -32,7 +32,7 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
     },
     {
       id: 'events',
-      label: 'Events & Maps',
+      label: 'Events & Expos',
       icon: MapPin,
       component: EventsMapTab
     },
