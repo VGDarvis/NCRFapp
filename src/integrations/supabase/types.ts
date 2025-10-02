@@ -1443,6 +1443,7 @@ export type Database = {
           total_scholarships: number | null
           total_value: number | null
           updated_at: string
+          viewer_url: string | null
         }
         Insert: {
           academic_year: string
@@ -1460,6 +1461,7 @@ export type Database = {
           total_scholarships?: number | null
           total_value?: number | null
           updated_at?: string
+          viewer_url?: string | null
         }
         Update: {
           academic_year?: string
@@ -1477,6 +1479,7 @@ export type Database = {
           total_scholarships?: number | null
           total_value?: number | null
           updated_at?: string
+          viewer_url?: string | null
         }
         Relationships: []
       }

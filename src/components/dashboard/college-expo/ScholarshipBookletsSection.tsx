@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Download, BookOpen, Eye, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BookletDetailDialog } from "./BookletDetailDialog";
+import { BookletViewerDialog } from "./BookletViewerDialog";
 import type { User } from "@supabase/supabase-js";
 
 interface Booklet {
@@ -14,6 +15,7 @@ interface Booklet {
   description: string | null;
   cover_image_url: string | null;
   pdf_url: string | null;
+  viewer_url: string | null;
   category: string;
   academic_year: string;
   total_scholarships: number;
@@ -30,6 +32,7 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
   const [booklets, setBooklets] = useState<Booklet[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooklet, setSelectedBooklet] = useState<Booklet | null>(null);
+  const [viewerBooklet, setViewerBooklet] = useState<Booklet | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const { toast } = useToast();
 
@@ -95,6 +98,39 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
       toast({
         title: "Error",
         description: "Failed to download booklet",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleViewBooklet = async (booklet: Booklet) => {
+    if (!booklet.viewer_url) return;
+
+    try {
+      // Track view
+      await supabase.from("booklet_downloads").insert({
+        booklet_id: booklet.id,
+        user_id: user?.id || null,
+      });
+
+      // Update view count
+      await supabase
+        .from("scholarship_booklets")
+        .update({ download_count: booklet.download_count + 1 })
+        .eq("id", booklet.id);
+
+      setBooklets(booklets.map(b => 
+        b.id === booklet.id 
+          ? { ...b, download_count: b.download_count + 1 }
+          : b
+      ));
+
+      setViewerBooklet(booklet);
+    } catch (error) {
+      console.error("Error opening viewer:", error);
+      toast({
+        title: "Error",
+        description: "Failed to open booklet viewer",
         variant: "destructive",
       });
     }
@@ -241,9 +277,17 @@ export function ScholarshipBookletsSection({ user }: ScholarshipBookletsSectionP
           open={!!selectedBooklet}
           onOpenChange={(open) => !open && setSelectedBooklet(null)}
           onDownload={() => handleDownload(selectedBooklet)}
+          onViewBooklet={() => handleViewBooklet(selectedBooklet)}
           user={user}
         />
       )}
+
+      {/* Viewer Dialog */}
+      <BookletViewerDialog
+        booklet={viewerBooklet}
+        open={!!viewerBooklet}
+        onOpenChange={(open) => !open && setViewerBooklet(null)}
+      />
     </div>
   );
 }

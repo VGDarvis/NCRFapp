@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Download, ExternalLink, Calendar, DollarSign } from "lucide-react";
+import { Download, ExternalLink, Calendar, DollarSign, BookOpen } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Booklet {
@@ -23,6 +23,7 @@ interface Booklet {
   total_scholarships: number;
   total_value: number;
   pdf_url: string | null;
+  viewer_url: string | null;
 }
 
 interface Scholarship {
@@ -40,6 +41,7 @@ interface BookletDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDownload: () => void;
+  onViewBooklet: () => void;
   user: User | null;
 }
 
@@ -48,6 +50,7 @@ export function BookletDetailDialog({
   open,
   onOpenChange,
   onDownload,
+  onViewBooklet,
   user,
 }: BookletDetailDialogProps) {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -197,7 +200,13 @@ export function BookletDetailDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button onClick={onDownload} disabled={!booklet.pdf_url}>
+          {booklet.viewer_url && (
+            <Button onClick={onViewBooklet}>
+              <BookOpen className="w-4 h-4 mr-2" />
+              View Booklet
+            </Button>
+          )}
+          <Button onClick={onDownload} disabled={!booklet.pdf_url} variant="secondary">
             <Download className="w-4 h-4 mr-2" />
             Download PDF
           </Button>
