@@ -218,6 +218,117 @@ export type Database = {
         }
         Relationships: []
       }
+      career_profiles: {
+        Row: {
+          availability_date: string | null
+          career_goals: string | null
+          career_interests: string[] | null
+          created_at: string
+          education_level: string | null
+          geographic_preferences: string[] | null
+          id: string
+          industry_preferences: string[] | null
+          is_seeking_fulltime: boolean | null
+          is_seeking_internship: boolean | null
+          linkedin_url: string | null
+          portfolio_url: string | null
+          resume_url: string | null
+          skills: string[] | null
+          updated_at: string
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          availability_date?: string | null
+          career_goals?: string | null
+          career_interests?: string[] | null
+          created_at?: string
+          education_level?: string | null
+          geographic_preferences?: string[] | null
+          id?: string
+          industry_preferences?: string[] | null
+          is_seeking_fulltime?: boolean | null
+          is_seeking_internship?: boolean | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          resume_url?: string | null
+          skills?: string[] | null
+          updated_at?: string
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          availability_date?: string | null
+          career_goals?: string | null
+          career_interests?: string[] | null
+          created_at?: string
+          education_level?: string | null
+          geographic_preferences?: string[] | null
+          id?: string
+          industry_preferences?: string[] | null
+          is_seeking_fulltime?: boolean | null
+          is_seeking_internship?: boolean | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          resume_url?: string | null
+          skills?: string[] | null
+          updated_at?: string
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
+      career_resources: {
+        Row: {
+          category: string
+          content_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          difficulty_level: string | null
+          estimated_time_minutes: number | null
+          id: string
+          is_featured: boolean | null
+          resource_type: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          category: string
+          content_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          estimated_time_minutes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          resource_type: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          category?: string
+          content_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          estimated_time_minutes?: number | null
+          id?: string
+          is_featured?: boolean | null
+          resource_type?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       coach_applications: {
         Row: {
           admin_notes: string | null
@@ -372,6 +483,69 @@ export type Database = {
           },
         ]
       }
+      job_applications: {
+        Row: {
+          application_date: string
+          application_url: string | null
+          company_name: string
+          contact_email: string | null
+          contact_person: string | null
+          created_at: string
+          id: string
+          interview_date: string | null
+          job_type: string
+          location: string | null
+          notes: string | null
+          offer_received_date: string | null
+          position_title: string
+          response_deadline: string | null
+          salary_range: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_date?: string
+          application_url?: string | null
+          company_name: string
+          contact_email?: string | null
+          contact_person?: string | null
+          created_at?: string
+          id?: string
+          interview_date?: string | null
+          job_type: string
+          location?: string | null
+          notes?: string | null
+          offer_received_date?: string | null
+          position_title: string
+          response_deadline?: string | null
+          salary_range?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_date?: string
+          application_url?: string | null
+          company_name?: string
+          contact_email?: string | null
+          contact_person?: string | null
+          created_at?: string
+          id?: string
+          interview_date?: string | null
+          job_type?: string
+          location?: string | null
+          notes?: string | null
+          offer_received_date?: string | null
+          position_title?: string
+          response_deadline?: string | null
+          salary_range?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       match_results: {
         Row: {
           completed_at: string | null
@@ -448,6 +622,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mentor_connections: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          focus_areas: string[] | null
+          id: string
+          meeting_frequency: string | null
+          mentee_user_id: string
+          mentor_user_id: string
+          notes: string | null
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          focus_areas?: string[] | null
+          id?: string
+          meeting_frequency?: string | null
+          mentee_user_id: string
+          mentor_user_id: string
+          notes?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          focus_areas?: string[] | null
+          id?: string
+          meeting_frequency?: string | null
+          mentee_user_id?: string
+          mentor_user_id?: string
+          notes?: string | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       movement_tutors: {
         Row: {
@@ -817,6 +1033,48 @@ export type Database = {
           price_xp?: number | null
           rarity?: Database["public"]["Enums"]["item_rarity"] | null
           stock_quantity?: number | null
+        }
+        Relationships: []
+      }
+      skills_assessments: {
+        Row: {
+          assessment_date: string
+          created_at: string
+          id: string
+          notes: string | null
+          proficiency_level: number
+          skill_category: string
+          skill_name: string
+          updated_at: string
+          user_id: string
+          verification_source: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          assessment_date?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          proficiency_level: number
+          skill_category: string
+          skill_name: string
+          updated_at?: string
+          user_id: string
+          verification_source?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          assessment_date?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          proficiency_level?: number
+          skill_category?: string
+          skill_name?: string
+          updated_at?: string
+          user_id?: string
+          verification_source?: string | null
+          verified?: boolean | null
         }
         Relationships: []
       }
