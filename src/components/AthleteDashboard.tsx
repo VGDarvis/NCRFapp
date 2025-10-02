@@ -13,9 +13,9 @@ export function AthleteDashboard() {
   const [activeTab, setActiveTab] = useState("home");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-500 to-amber-400">
+    <div className="min-h-screen bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-background">
       {/* Header */}
-      <header className="bg-black/20 backdrop-blur-sm border-b border-white/10 p-4">
+      <header className="glass-premium border-b border-primary/20 backdrop-blur-lg p-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={logoAthlete} alt="SAP Logo" className="h-12 w-12" />
@@ -31,28 +31,28 @@ export function AthleteDashboard() {
       <div className="max-w-7xl mx-auto p-4 pb-24 md:pb-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Desktop Navigation */}
-          <TabsList className="hidden md:grid w-full grid-cols-6 bg-black/20 backdrop-blur-sm border border-white/10 mb-6">
-            <TabsTrigger value="home" className="data-[state=active]:bg-white data-[state=active]:text-amber-600">
+          <TabsList className="hidden md:grid w-full grid-cols-6 glass-premium border border-primary/20 mb-6">
+            <TabsTrigger value="home" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <Trophy className="mr-2 h-4 w-4" />
               Home
             </TabsTrigger>
-            <TabsTrigger value="sports" className="data-[state=active]:bg-white data-[state=active]:text-amber-600">
+            <TabsTrigger value="sports" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <Target className="mr-2 h-4 w-4" />
               Sports
             </TabsTrigger>
-            <TabsTrigger value="recruitment" className="data-[state=active]:bg-white data-[state=active]:text-amber-600">
+            <TabsTrigger value="recruitment" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <GraduationCap className="mr-2 h-4 w-4" />
               Recruitment
             </TabsTrigger>
-            <TabsTrigger value="workshops" className="data-[state=active]:bg-white data-[state=active]:text-amber-600">
+            <TabsTrigger value="workshops" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <Calendar className="mr-2 h-4 w-4" />
               Workshops
             </TabsTrigger>
-            <TabsTrigger value="stats" className="data-[state=active]:bg-white data-[state=active]:text-amber-600">
+            <TabsTrigger value="stats" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <BarChart3 className="mr-2 h-4 w-4" />
               Stats
             </TabsTrigger>
-            <TabsTrigger value="community" className="data-[state=active]:bg-white data-[state=active]:text-amber-600">
+            <TabsTrigger value="community" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <Users className="mr-2 h-4 w-4" />
               Community
             </TabsTrigger>
@@ -81,12 +81,12 @@ export function AthleteDashboard() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-white/10 backdrop-blur-lg">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 glass-premium border-t border-primary/20 backdrop-blur-lg">
         <div className="grid grid-cols-6 gap-1 p-2">
           <button
             onClick={() => setActiveTab("home")}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors ${
-              activeTab === "home" ? "bg-amber-500 text-white" : "text-white/70"
+              activeTab === "home" ? "bg-primary/30 text-primary" : "text-muted-foreground"
             }`}
           >
             <Trophy className="h-5 w-5 mb-1" />
@@ -95,7 +95,7 @@ export function AthleteDashboard() {
           <button
             onClick={() => setActiveTab("sports")}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors ${
-              activeTab === "sports" ? "bg-amber-500 text-white" : "text-white/70"
+              activeTab === "sports" ? "bg-primary/30 text-primary" : "text-muted-foreground"
             }`}
           >
             <Target className="h-5 w-5 mb-1" />
@@ -104,7 +104,7 @@ export function AthleteDashboard() {
           <button
             onClick={() => setActiveTab("recruitment")}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors ${
-              activeTab === "recruitment" ? "bg-amber-500 text-white" : "text-white/70"
+              activeTab === "recruitment" ? "bg-primary/30 text-primary" : "text-muted-foreground"
             }`}
           >
             <GraduationCap className="h-5 w-5 mb-1" />
@@ -113,7 +113,7 @@ export function AthleteDashboard() {
           <button
             onClick={() => setActiveTab("workshops")}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors ${
-              activeTab === "workshops" ? "bg-amber-500 text-white" : "text-white/70"
+              activeTab === "workshops" ? "bg-primary/30 text-primary" : "text-muted-foreground"
             }`}
           >
             <Calendar className="h-5 w-5 mb-1" />
@@ -122,7 +122,7 @@ export function AthleteDashboard() {
           <button
             onClick={() => setActiveTab("stats")}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors ${
-              activeTab === "stats" ? "bg-amber-500 text-white" : "text-white/70"
+              activeTab === "stats" ? "bg-primary/30 text-primary" : "text-muted-foreground"
             }`}
           >
             <BarChart3 className="h-5 w-5 mb-1" />
@@ -131,7 +131,7 @@ export function AthleteDashboard() {
           <button
             onClick={() => setActiveTab("community")}
             className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors ${
-              activeTab === "community" ? "bg-amber-500 text-white" : "text-white/70"
+              activeTab === "community" ? "bg-primary/30 text-primary" : "text-muted-foreground"
             }`}
           >
             <Users className="h-5 w-5 mb-1" />
