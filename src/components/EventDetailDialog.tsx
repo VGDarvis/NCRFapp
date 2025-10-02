@@ -1,10 +1,18 @@
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, MapPin, Clock, Navigation, Download, Users, Info } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Clock, Navigation, Download, Users, Info, Share2 } from "lucide-react";
 import { format } from "date-fns";
 import { downloadICSFile, getGoogleCalendarUrl, type CalendarEvent } from "@/lib/calendar-utils";
 import { openNavigation, type NavigationDestination } from "@/lib/navigation-utils";
+import { calculateDistance, formatDistance } from '@/lib/geolocation-utils';
+import { getCapacityPercentage } from '@/lib/event-status-utils';
+import { Progress } from '@/components/ui/progress';
+import { ShareEventDialog } from './ShareEventDialog';
+import { EventCountdownBadge } from './EventCountdownBadge';
+import { EventStatusBadge } from './EventStatusBadge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +39,8 @@ interface Event {
   max_attendees: number | null;
   registration_deadline: string | null;
   featured_colleges: string[] | null;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface EventDetailDialogProps {
@@ -39,6 +49,7 @@ interface EventDetailDialogProps {
   onOpenChange: (open: boolean) => void;
   onRegister: (eventId: string) => void;
   isGuest: boolean;
+  userLocation?: { latitude: number; longitude: number } | null;
 }
 
 export const EventDetailDialog = ({
@@ -47,8 +58,17 @@ export const EventDetailDialog = ({
   onOpenChange,
   onRegister,
   isGuest,
+  userLocation,
 }: EventDetailDialogProps) => {
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  
   if (!event) return null;
+
+  const distance = userLocation && event.latitude && event.longitude
+    ? calculateDistance(userLocation.latitude, userLocation.longitude, event.latitude, event.longitude)
+    : null;
+
+  const capacityPercentage = getCapacityPercentage(event.max_attendees, 0);
 
   const handleAddToCalendar = (type: 'google' | 'apple' | 'outlook') => {
     const calendarEvent: CalendarEvent = {
@@ -77,17 +97,40 @@ export const EventDetailDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{event.title}</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-start justify-between">
+              <DialogTitle className="text-2xl font-bold pr-8">{event.title}</DialogTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowShareDialog(true)}
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <EventCountdownBadge eventDate={new Date(event.event_date)} />
+              <EventStatusBadge
+                registrationDeadline={event.registration_deadline ? new Date(event.registration_deadline) : undefined}
+                maxAttendees={event.max_attendees || undefined}
+              />
+              {distance && (
+                <Badge variant="outline">
+                  <MapPin className="h-3 w-3 mr-1" />
+                  {formatDistance(distance)}
+                </Badge>
+              )}
+            </div>
+          </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Event Type Badge */}
-          <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
-            {event.event_type.replace('_', ' ').toUpperCase()}
-          </div>
+          <div className="space-y-6">
+            {/* Event Type Badge */}
+            <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+              {event.event_type.replace('_', ' ').toUpperCase()}
+            </div>
 
           {/* Description */}
           {event.description && (
@@ -182,6 +225,17 @@ export const EventDetailDialog = ({
             </div>
           )}
 
+          {/* Capacity Indicator */}
+          {event.max_attendees && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-medium">Event Capacity</span>
+                <span className="text-muted-foreground">{Math.round(capacityPercentage)}% full</span>
+              </div>
+              <Progress value={capacityPercentage} />
+            </div>
+          )}
+
           <Separator />
 
           {/* Action Buttons */}
@@ -235,7 +289,19 @@ export const EventDetailDialog = ({
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      
+      <ShareEventDialog
+        isOpen={showShareDialog}
+        onClose={() => setShowShareDialog(false)}
+        event={{
+          id: event.id,
+          title: event.title,
+          location_name: event.location_name,
+          event_date: event.event_date,
+        }}
+      />
+    </>
   );
 };

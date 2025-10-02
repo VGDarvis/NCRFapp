@@ -8,6 +8,10 @@ import { MapPin, Calendar, Navigation, CheckCircle2, Trophy, Sparkles, Graduatio
 import { useToast } from '@/hooks/use-toast';
 import { InteractiveEventsMap } from '@/components/InteractiveEventsMap';
 import { EventDetailDialog } from '@/components/EventDetailDialog';
+import { EventFilters, EventFiltersState } from '@/components/EventFilters';
+import { EventCountdownBadge } from '@/components/EventCountdownBadge';
+import { EventStatusBadge } from '@/components/EventStatusBadge';
+import { getUserLocation, sortEventsByDistance, calculateDistance, formatDistance } from '@/lib/geolocation-utils';
 
 interface EventsMapTabProps {
   user: User | null;
@@ -19,6 +23,15 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showEventDialog, setShowEventDialog] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [filters, setFilters] = useState<EventFiltersState>({
+    searchQuery: '',
+    distanceRadius: 100,
+    dateRange: 'all',
+    eventType: 'all',
+    state: 'all',
+    sortBy: 'date',
+  });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,12 +55,97 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
     };
 
     fetchEvents();
+    requestUserLocation();
   }, [toast]);
+
+  const requestUserLocation = async () => {
+    try {
+      const location = await getUserLocation();
+      setUserLocation(location);
+      toast({
+        title: 'Location enabled',
+        description: 'Showing distances to events',
+      });
+    } catch (error) {
+      console.log('Location access denied or unavailable');
+    }
+  };
 
   const handleEventClick = (event: any) => {
     setSelectedEvent(event);
     setShowEventDialog(true);
   };
+
+  const getFilteredEvents = () => {
+    let filtered = [...events];
+
+    // Search filter
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.city.toLowerCase().includes(query) ||
+          event.location_name.toLowerCase().includes(query) ||
+          event.featured_colleges?.some((college: string) => college.toLowerCase().includes(query))
+      );
+    }
+
+    // Date range filter
+    if (filters.dateRange !== 'all') {
+      const now = new Date();
+      const endDate = new Date();
+      if (filters.dateRange === 'thisMonth') {
+        endDate.setMonth(now.getMonth() + 1);
+      } else if (filters.dateRange === 'next3Months') {
+        endDate.setMonth(now.getMonth() + 3);
+      } else if (filters.dateRange === 'thisYear') {
+        endDate.setFullYear(now.getFullYear() + 1);
+      }
+      filtered = filtered.filter((event) => {
+        const eventDate = new Date(event.event_date);
+        return eventDate >= now && eventDate <= endDate;
+      });
+    }
+
+    // Event type filter
+    if (filters.eventType !== 'all') {
+      filtered = filtered.filter((event) => event.event_type === filters.eventType);
+    }
+
+    // State filter
+    if (filters.state !== 'all') {
+      filtered = filtered.filter((event) => event.state === filters.state);
+    }
+
+    // Distance filter
+    if (userLocation && filters.distanceRadius < 100) {
+      filtered = filtered.filter((event) => {
+        if (!event.latitude || !event.longitude) return false;
+        const distance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          event.latitude,
+          event.longitude
+        );
+        return distance <= filters.distanceRadius;
+      });
+    }
+
+    // Sorting
+    if (filters.sortBy === 'distance' && userLocation) {
+      filtered = sortEventsByDistance(filtered, userLocation);
+    } else if (filters.sortBy === 'name') {
+      filtered.sort((a, b) => a.title.localeCompare(b.title));
+    } else {
+      filtered.sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+    }
+
+    return filtered;
+  };
+
+  const filteredEvents = getFilteredEvents();
+  const availableStates = Array.from(new Set(events.map((e) => e.state))).sort();
 
   const registerForEvent = async (eventId: string) => {
     if (!user) {
@@ -118,7 +216,13 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
           Your one-stop shop for college expo success - find events, prepare, and get accepted!
         </p>
         
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center gap-3 mb-6">
+          {!userLocation && (
+            <Button variant="outline" onClick={requestUserLocation}>
+              <Navigation className="w-4 h-4 mr-2" />
+              Enable Location
+            </Button>
+          )}
           <Button
             variant={showMap ? "default" : "outline"}
             onClick={() => setShowMap(!showMap)}
@@ -128,11 +232,38 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
           </Button>
         </div>
 
+        <EventFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          userLocation={userLocation}
+          availableStates={availableStates}
+        />
+
         {/* Interactive Map */}
-        {showMap && events.length > 0 && (
+        {showMap && filteredEvents.length > 0 && (
           <div className="mb-8">
-            <InteractiveEventsMap events={events} onEventClick={handleEventClick} />
+            <InteractiveEventsMap events={filteredEvents} onEventClick={handleEventClick} />
           </div>
+        )}
+
+        {filteredEvents.length === 0 && (
+          <Card className="p-8 glass-light border-primary/20 mb-8">
+            <p className="text-center text-muted-foreground">
+              No events found matching your filters.
+            </p>
+            <div className="flex justify-center mt-4">
+              <Button variant="outline" onClick={() => setFilters({
+                searchQuery: '',
+                distanceRadius: 100,
+                dateRange: 'all',
+                eventType: 'all',
+                state: 'all',
+                sortBy: 'date',
+              })}>
+                Clear Filters
+              </Button>
+            </div>
+          </Card>
         )}
 
         {/* Benefits Showcase */}
@@ -169,49 +300,64 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
       </div>
 
       {/* Events Grid */}
-      <h2 className="text-2xl font-bold text-foreground mb-4">Upcoming Events</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {events.length > 0 ? (
-          events.map((event) => (
-            <Card key={event.id} className="p-6 glass-premium border-primary/20 hover:border-primary/40 transition-all">
-              <div className="mb-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-xl font-bold text-foreground">{event.title}</h3>
-                  <Badge variant="secondary" className="ml-2">
-                    {event.event_type === 'college_fair' ? 'College Fair' : 'Special Event'}
-                  </Badge>
-                </div>
+      {filteredEvents.length > 0 && (
+        <>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Upcoming Events</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredEvents.map((event) => {
+              const distance = userLocation && event.latitude && event.longitude
+                ? calculateDistance(userLocation.latitude, userLocation.longitude, event.latitude, event.longitude)
+                : null;
+              
+              return (
+                <Card key={event.id} className="p-6 glass-premium border-primary/20 hover:border-primary/40 transition-all">
+                  <div className="mb-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-xl font-bold text-foreground">{event.title}</h3>
+                      <div className="flex flex-col gap-1 ml-2">
+                        <EventCountdownBadge eventDate={new Date(event.event_date)} />
+                        <EventStatusBadge
+                          registrationDeadline={event.registration_deadline ? new Date(event.registration_deadline) : undefined}
+                          maxAttendees={event.max_attendees || undefined}
+                        />
+                      </div>
+                    </div>
                 <p className="text-muted-foreground mb-4">{event.description}</p>
               </div>
 
-              <div className="space-y-3 mb-4">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-foreground">{event.location_name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {event.address}, {event.city}, {event.state} {event.zip_code}
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{event.location_name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {event.address}, {event.city}, {event.state} {event.zip_code}
+                      </p>
+                      {distance && (
+                        <Badge variant="outline" className="mt-1">
+                          {formatDistance(distance)}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
+                    <p className="text-sm text-foreground">
+                      {new Date(event.event_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
-                  <p className="text-sm text-foreground">
-                    {new Date(event.event_date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              {/* What to Expect Section */}
-              <div className="bg-background/50 p-4 rounded-lg mb-4">
+                {/* What to Expect Section */}
+                <div className="bg-background/50 p-4 rounded-lg mb-4">
                 <p className="text-sm font-semibold text-foreground mb-2">What to Expect:</p>
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground flex items-center gap-2">
@@ -229,21 +375,21 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
                 </div>
               </div>
 
-              {event.parking_info && (
+                {event.parking_info && (
                 <div className="bg-background/50 p-3 rounded-lg mb-4">
                   <p className="text-sm font-medium text-foreground mb-1">Parking Info:</p>
                   <p className="text-sm text-muted-foreground">{event.parking_info}</p>
                 </div>
               )}
 
-              {event.accessibility_info && (
+                {event.accessibility_info && (
                 <div className="bg-background/50 p-3 rounded-lg mb-4">
                   <p className="text-sm font-medium text-foreground mb-1">Accessibility:</p>
                   <p className="text-sm text-muted-foreground">{event.accessibility_info}</p>
                 </div>
               )}
 
-              <div className="flex gap-3">
+                <div className="flex gap-3">
                 <Button
                   variant="outline"
                   className="flex-1"
@@ -261,17 +407,13 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
                     Register Now
                   </Button>
                 )}
-              </div>
-            </Card>
-          ))
-        ) : (
-          <Card className="p-8 glass-light border-primary/20 col-span-2">
-            <p className="text-center text-muted-foreground">
-              No upcoming events at this time. Check back soon for new college expo events!
-            </p>
-          </Card>
-        )}
-      </div>
+                </div>
+                </Card>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {/* Event Detail Dialog */}
       <EventDetailDialog
@@ -280,6 +422,7 @@ export const EventsMapTab = ({ user, isGuest }: EventsMapTabProps) => {
         onOpenChange={setShowEventDialog}
         onRegister={registerForEvent}
         isGuest={isGuest}
+        userLocation={userLocation}
       />
     </div>
   );
