@@ -5,6 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useSessionManager } from '@/hooks/useSessionManager';
+import { SessionWarningDialog } from '@/components/SessionWarningDialog';
 import { 
   Shield, 
   LogOut, 
@@ -14,7 +16,9 @@ import {
   FileText, 
   DollarSign,
   Activity,
-  Database
+  Database,
+  ArrowLeft,
+  User
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -23,6 +27,7 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const { showWarning, userEmail, resetActivity, dismissWarning } = useSessionManager();
 
   useEffect(() => {
     checkAdminAccess();
@@ -95,27 +100,55 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Header */}
-      <header className="glass-premium border-b border-primary/20 backdrop-blur-lg sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <Shield className="w-6 h-6 text-primary" />
+    <>
+      <SessionWarningDialog 
+        open={showWarning} 
+        onContinue={() => {
+          resetActivity();
+          dismissWarning();
+        }} 
+      />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        {/* Header */}
+        <header className="glass-premium border-b border-primary/20 backdrop-blur-lg sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Admin Dashboard</h1>
+                  <p className="text-sm text-muted-foreground">NCRF Foundation Management</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Admin Dashboard</h1>
-                <p className="text-sm text-muted-foreground">NCRF Foundation Management</p>
+              
+              <div className="flex items-center gap-4">
+                {userEmail && (
+                  <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+                    <User className="w-4 h-4" />
+                    <span>{userEmail}</span>
+                  </div>
+                )}
+                
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/')}
+                  className="gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Back to Programs</span>
+                </Button>
+                
+                <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </Button>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -293,5 +326,6 @@ export default function AdminDashboard() {
         </Tabs>
       </main>
     </div>
+    </>
   );
 }

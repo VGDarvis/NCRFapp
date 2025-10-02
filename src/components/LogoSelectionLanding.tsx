@@ -2,11 +2,34 @@ import { motion } from 'framer-motion';
 import { ParticleBackground } from './ParticleBackground';
 import { RotatingLogoCircle } from './RotatingLogoCircle';
 import { VideoSection } from './VideoSection';
+import { Button } from './ui/button';
+import { Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const LogoSelectionLanding = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen relative overflow-hidden cyber-gradient">
       <ParticleBackground />
+      
+      {/* Admin Access Button */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="absolute top-4 right-4 z-50"
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/admin/login')}
+          className="gap-2 glass-premium border-primary/30 hover:border-primary/60"
+        >
+          <Shield className="w-4 h-4" />
+          <span className="hidden sm:inline">Admin</span>
+        </Button>
+      </motion.div>
       
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
