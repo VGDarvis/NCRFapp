@@ -290,6 +290,80 @@ export type Database = {
         }
         Relationships: []
       }
+      booklet_downloads: {
+        Row: {
+          booklet_id: string
+          downloaded_at: string
+          id: string
+          ip_address: string | null
+          user_id: string | null
+        }
+        Insert: {
+          booklet_id: string
+          downloaded_at?: string
+          id?: string
+          ip_address?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          booklet_id?: string
+          downloaded_at?: string
+          id?: string
+          ip_address?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booklet_downloads_booklet_id_fkey"
+            columns: ["booklet_id"]
+            isOneToOne: false
+            referencedRelation: "scholarship_booklets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booklet_scholarships: {
+        Row: {
+          booklet_id: string
+          created_at: string
+          display_order: number | null
+          id: string
+          page_number: number | null
+          scholarship_id: string
+        }
+        Insert: {
+          booklet_id: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          page_number?: number | null
+          scholarship_id: string
+        }
+        Update: {
+          booklet_id?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          page_number?: number | null
+          scholarship_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booklet_scholarships_booklet_id_fkey"
+            columns: ["booklet_id"]
+            isOneToOne: false
+            referencedRelation: "scholarship_booklets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booklet_scholarships_scholarship_id_fkey"
+            columns: ["scholarship_id"]
+            isOneToOne: false
+            referencedRelation: "scholarship_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       career_profiles: {
         Row: {
           availability_date: string | null
@@ -1352,6 +1426,60 @@ export type Database = {
           },
         ]
       }
+      scholarship_booklets: {
+        Row: {
+          academic_year: string
+          category: string
+          cover_image_url: string | null
+          created_at: string
+          description: string | null
+          download_count: number | null
+          featured: boolean | null
+          id: string
+          pdf_url: string | null
+          published_date: string | null
+          status: string | null
+          title: string
+          total_scholarships: number | null
+          total_value: number | null
+          updated_at: string
+        }
+        Insert: {
+          academic_year: string
+          category: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          download_count?: number | null
+          featured?: boolean | null
+          id?: string
+          pdf_url?: string | null
+          published_date?: string | null
+          status?: string | null
+          title: string
+          total_scholarships?: number | null
+          total_value?: number | null
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: string
+          category?: string
+          cover_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          download_count?: number | null
+          featured?: boolean | null
+          id?: string
+          pdf_url?: string | null
+          published_date?: string | null
+          status?: string | null
+          title?: string
+          total_scholarships?: number | null
+          total_value?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scholarship_opportunities: {
         Row: {
           academic_requirements: string | null
@@ -1425,6 +1553,39 @@ export type Database = {
           recommendation_letters_required?: number | null
           source_url?: string | null
           status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scholarship_tips: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          display_order: number | null
+          icon_name: string | null
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          display_order?: number | null
+          icon_name?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          display_order?: number | null
+          icon_name?: string | null
+          id?: string
           title?: string
           updated_at?: string
         }

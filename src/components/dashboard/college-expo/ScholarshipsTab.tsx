@@ -4,8 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, Calendar, ExternalLink, BookmarkPlus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DollarSign, Calendar, ExternalLink, BookmarkPlus, BookOpen, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ScholarshipBookletsSection } from './ScholarshipBookletsSection';
+import { ScholarshipTipsSection } from './ScholarshipTipsSection';
 
 interface ScholarshipsTabProps {
   user: User | null;
@@ -91,13 +94,30 @@ export const ScholarshipsTab = ({ user, isGuest }: ScholarshipsTabProps) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="font-display text-4xl font-bold text-foreground mb-2">
-        Scholarship <span className="text-primary">Opportunities</span>
+        Scholarship <span className="text-primary">Resources</span>
       </h1>
       <p className="text-muted-foreground mb-8">
-        Discover and track scholarship opportunities to fund your education
+        Explore opportunities, download booklets, and get expert tips for success
       </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Tabs defaultValue="opportunities" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsTrigger value="opportunities">
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Opportunities
+          </TabsTrigger>
+          <TabsTrigger value="booklets">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Booklets
+          </TabsTrigger>
+          <TabsTrigger value="tips">
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Tips & Resources
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="opportunities">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {scholarships.length > 0 ? (
           scholarships.map((scholarship) => (
             <Card key={scholarship.id} className="p-6 glass-premium border-primary/20">
@@ -164,7 +184,17 @@ export const ScholarshipsTab = ({ user, isGuest }: ScholarshipsTabProps) => {
             </p>
           </Card>
         )}
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="booklets">
+          <ScholarshipBookletsSection user={user} />
+        </TabsContent>
+
+        <TabsContent value="tips">
+          <ScholarshipTipsSection />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
