@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Calendar, GraduationCap, MapPin, TrendingUp } from 'lucide-react';
+import { CollegeExpoVideo } from './CollegeExpoVideo';
+import { ExpoFlyersGallery } from './ExpoFlyersGallery';
 
 interface CollegeExpoHomeTabProps {
   user: User | null;
@@ -74,6 +76,9 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
         )}
       </div>
 
+      {/* Video Section */}
+      <CollegeExpoVideo />
+
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6 glass-premium border-primary/20">
@@ -112,6 +117,9 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
           </div>
         </Card>
       </div>
+
+      {/* Expo Flyers Gallery */}
+      <ExpoFlyersGallery />
 
       {/* Upcoming Events */}
       <div className="mb-8">
