@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { program } = useParams();
+  const { program: guestProgram } = useParams<{ program: string }>();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
   
   // Check if this is a guest user (accessing via /guest/:program)
@@ -95,30 +96,30 @@ export const Dashboard = () => {
     );
   }
 
+  // Determine the active program - prioritize URL param, then user metadata
+  const activeProgram = isGuest 
+    ? guestProgram 
+    : searchParams.get('program') || user?.user_metadata?.program;
+
   // Check if this is a college expo user
-  const isCollegeExpoProgram = program === 'college-expo' || 
-    user?.user_metadata?.program === 'college-expo' ||
+  const isCollegeExpoProgram = activeProgram === 'college-expo' || 
     (user?.user_metadata?.grade_level !== undefined) ||
     (user?.user_metadata?.intended_major !== undefined) ||
     (user?.user_metadata?.college_interests !== undefined);
 
   // Check if this is a STEAM user
-  const isSteamProgram = program === 'steam' || 
-    user?.user_metadata?.program === 'steam';
+  const isSteamProgram = activeProgram === 'steam';
 
   // Check if this is a Movement user
-  const isMovementProgram = program === 'movement' || 
-    user?.user_metadata?.program === 'movement';
+  const isMovementProgram = activeProgram === 'movement';
 
   // Check if this is an Athlete (SAP) user
-  const isAthleteProgram = program === 'athlete' || 
-    user?.user_metadata?.program === 'athlete';
+  const isAthleteProgram = activeProgram === 'athlete';
 
   // Check if this is an Internships & Career user
-  const isInternshipsCareerProgram = program === 'internships-career' || 
-    user?.user_metadata?.program === 'internships-career';
+  const isInternshipsCareerProgram = activeProgram === 'internships-career';
 
-  console.log('Dashboard Debug - Program:', program, 'User metadata:', user?.user_metadata, 'Is College Expo:', isCollegeExpoProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram, 'Is Internships:', isInternshipsCareerProgram);
+  console.log('Dashboard Debug - Active Program:', activeProgram, 'User metadata:', user?.user_metadata, 'Is College Expo:', isCollegeExpoProgram, 'Is STEAM:', isSteamProgram, 'Is Movement:', isMovementProgram, 'Is Athlete:', isAthleteProgram, 'Is Internships:', isInternshipsCareerProgram);
   
   // Show CollegeExpoDashboard for college expo program users
   if (isCollegeExpoProgram) {

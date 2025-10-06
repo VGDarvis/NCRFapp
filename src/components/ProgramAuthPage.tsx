@@ -7,6 +7,7 @@ import { SignUpForm } from './SignUpForm';
 import { CollegeExpoSignUpForm } from './CollegeExpoSignUpForm';
 import { LoginForm } from './LoginForm';
 import { FuturisticButton } from './FuturisticButton';
+import { supabase } from '@/integrations/supabase/client';
 
 // Import logo assets
 import logoEsports from '@/assets/logo-esports.png';
@@ -78,6 +79,7 @@ export const ProgramAuthPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [isChecking, setIsChecking] = useState(true);
   
   const programConfig = program ? programConfigs[program] : null;
   const guestMode = searchParams.get('guest') === 'true';
@@ -85,8 +87,28 @@ export const ProgramAuthPage = () => {
   useEffect(() => {
     if (!programConfig) {
       navigate('/');
+      return;
     }
-  }, [programConfig, navigate]);
+
+    // Check if user is already authenticated
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // User is already logged in - update their program preference
+        await supabase.auth.updateUser({
+          data: { program: program }
+        });
+        
+        // Redirect directly to dashboard with program
+        navigate(`/dashboard?program=${program}`);
+      } else {
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, [programConfig, navigate, program]);
 
   const handleAuthSuccess = () => {
     navigate('/dashboard');
@@ -100,7 +122,7 @@ export const ProgramAuthPage = () => {
     navigate('/');
   };
 
-  if (!programConfig) {
+  if (!programConfig || isChecking) {
     return null;
   }
 
