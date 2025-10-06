@@ -14,14 +14,14 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 
 // Import logo assets
-import logoGreenClean from '@/assets/logo-green-clean.png';
+import logoEsports from '@/assets/logo-esports.png';
 import logoInternshipsCareer from '@/assets/logo-internships-career.png';
 import logoSteam from '@/assets/logo-steam.png';
 import logoMovement from '@/assets/logo-movement.png';
 import logoAthlete from '@/assets/logo-athlete.png';
 
 const programs = [
-  { id: 'college-expo', name: 'College Expo', logo: logoGreenClean },
+  { id: 'college-expo', name: 'College Expo', logo: logoEsports },
   { id: 'internships-career', name: 'Internships & Career', logo: logoInternshipsCareer },
   { id: 'steam', name: 'STEaM', logo: logoSteam },
   { id: 'movement', name: 'Movement Enrichment', logo: logoMovement },

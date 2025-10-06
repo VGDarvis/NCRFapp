@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 // Import logo assets
-import logoGreenClean from '@/assets/logo-green-clean.png';
+import logoEsports from '@/assets/logo-esports.png';
 import logoInternshipsCareer from '@/assets/logo-internships-career.png';
 import logoSteam from '@/assets/logo-steam.png';
 import logoMovement from '@/assets/logo-movement.png';
@@ -21,7 +21,7 @@ const programs: Program[] = [
   {
     id: 'college-expo',
     name: 'College Expo',
-    logo: logoGreenClean,
+    logo: logoEsports,
     route: '/auth/college-expo',
     color: 'hsl(210 100% 56%)', // Professional Blue
     angle: 0
