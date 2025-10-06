@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Calendar, GraduationCap, TrendingUp, LogOut } from "lucide-react";
+import { EventHero } from './EventHero';
+import { EventSchedule } from './EventSchedule';
+import { EventActivities } from './EventActivities';
 
 export default function HomeTab() {
   const navigate = useNavigate();
@@ -19,115 +22,104 @@ export default function HomeTab() {
     fetchUser();
   }, []);
 
+  const featuredEvent = {
+    title: "Virtual Recruiting Seminars",
+    eventDate: "2024-11-03T15:00:00-08:00",
+    locationName: "Virtual Event (Zoom)",
+    description: "Your journey to playing at the collegiate level. Join our comprehensive 4-part workshop series designed to guide student athletes through every step of the recruiting process. Learn from expert coaches and recruiters about NCAA eligibility, building your recruiting profile, connecting with college programs, and successfully navigating scholarship opportunities.",
+    registrationLink: "https://ncrfoundation.org",
+    isFree: true,
+  };
+
+  const workshopSchedule = [
+    { time: "Nov 3rd, 3pm-5pm PST", activity: "SESSION 1: Beginning your recruiting journey" },
+    { time: "Dec 8th, 3pm-5pm PST", activity: "SESSION 2: Are you a '5 star athlete?'" },
+    { time: "Jan 5th, 3pm-5pm PST", activity: "SESSION 3: Are you prepared: eligibility & academics" },
+    { time: "Feb 9th, 3pm-5pm PST", activity: "SESSION 4: Sealing the deal: Advocate for yourself" },
+  ];
+
+  const eventActivities = [
+    "Virtual Workshops",
+    "NCAA Eligibility Guidance",
+    "Recruiting Resources",
+    "College Planning Support",
+  ];
+
   if (loading) {
     return <div className="text-white text-center py-8">Loading...</div>;
   }
 
   return (
     <div className="space-y-6">
+      {/* Featured Event Hero */}
+      <EventHero event={featuredEvent} />
+
+      {/* Event Details Grid */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <EventSchedule schedule={workshopSchedule} eventDate={featuredEvent.eventDate} />
+        <EventActivities activities={eventActivities} />
+      </div>
+
       {/* Welcome Section */}
       <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome to SAP, {user?.email?.split('@')[0] || 'Athlete'}!</CardTitle>
+          <CardTitle className="text-xl">Welcome to SAP, {user?.email?.split('@')[0] || 'Athlete'}!</CardTitle>
           <CardDescription className="text-white/80">
             Your journey to college sports recruitment starts here
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-white/90">
-            The Student Athlete Program provides comprehensive support for athletes pursuing college sports opportunities.
-            Track your progress, connect with coaches, and prepare for your future.
-          </p>
-        </CardContent>
       </Card>
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white/80 flex items-center gap-2">
               <Trophy className="h-4 w-4" />
-              Profile Status
+              Profile
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">60%</div>
-            <p className="text-xs text-white/70 mt-1">Complete your profile</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white/80 flex items-center gap-2">
               <GraduationCap className="h-4 w-4" />
-              College Contacts
+              Contacts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">0</div>
-            <p className="text-xs text-white/70 mt-1">Start building connections</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white/80 flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Upcoming Events
+              Events
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">4</div>
-            <p className="text-xs text-white/70 mt-1">Virtual workshops available</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-white/80 flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              GPA Tracker
+              GPA
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">--</div>
-            <p className="text-xs text-white/70 mt-1">Add your academic info</p>
           </CardContent>
         </Card>
       </div>
-
-      {/* Next Steps */}
-      <Card className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
-        <CardHeader>
-          <CardTitle>Next Steps</CardTitle>
-          <CardDescription className="text-white/80">
-            Recommended actions to boost your recruitment profile
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold">1</div>
-            <div className="flex-1">
-              <h4 className="font-semibold">Complete Your Athletic Profile</h4>
-              <p className="text-sm text-white/70">Add your sport, position, stats, and highlight reel</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold">2</div>
-            <div className="flex-1">
-              <h4 className="font-semibold">Register for Virtual Workshop</h4>
-              <p className="text-sm text-white/70">Join "Beginning your recruiting journey" on Nov 3rd</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold">3</div>
-            <div className="flex-1">
-              <h4 className="font-semibold">Build Your College List</h4>
-              <p className="text-sm text-white/70">Research and add target schools to your recruitment tracker</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Sign Out Button */}
       <div className="flex justify-center">
