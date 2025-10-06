@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Calendar, GraduationCap, MapPin, TrendingUp } from 'lucide-react';
 import { CollegeExpoVideo } from './CollegeExpoVideo';
 import { ExpoFlyersGallery } from './ExpoFlyersGallery';
+import { calculateBookletScholarshipTotals, formatCurrency } from '@/lib/scholarship-utils';
 
 interface CollegeExpoHomeTabProps {
   user: User | null;
@@ -17,6 +18,7 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
   const navigate = useNavigate();
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [scholarshipCount, setScholarshipCount] = useState(0);
+  const [scholarshipValue, setScholarshipValue] = useState(0);
   const [applicationCount, setApplicationCount] = useState(0);
 
   useEffect(() => {
@@ -31,13 +33,10 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
       
       if (events) setUpcomingEvents(events);
 
-      // Fetch active scholarships count
-      const { count: scholarships } = await supabase
-        .from('scholarship_opportunities')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
-      
-      if (scholarships) setScholarshipCount(scholarships);
+      // Fetch total scholarships from booklets
+      const { totalScholarships, totalValue } = await calculateBookletScholarshipTotals();
+      setScholarshipCount(totalScholarships);
+      setScholarshipValue(totalValue);
 
       // Fetch user's applications count if logged in
       if (user) {
@@ -99,8 +98,8 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
               <GraduationCap className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{scholarshipCount}</p>
-              <p className="text-sm text-muted-foreground">Active Scholarships</p>
+              <p className="text-2xl font-bold text-foreground">{scholarshipCount}+</p>
+              <p className="text-sm text-muted-foreground">Worth {formatCurrency(scholarshipValue)}+</p>
             </div>
           </div>
         </Card>
