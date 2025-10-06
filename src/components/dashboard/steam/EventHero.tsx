@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, DollarSign, ExternalLink, Share2, Download } from 'lucide-react';
+import { Calendar, MapPin, DollarSign, ExternalLink, Share2, Download, Navigation } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { downloadICSFile } from '@/lib/calendar-utils';
+import { openNavigation, type NavigationDestination } from '@/lib/navigation-utils';
 import tournamentFlyer from '@/assets/steam-smash-bros-tournament.jpg';
 
 interface EventHeroProps {
@@ -18,6 +19,9 @@ interface EventHeroProps {
     address: string;
     city: string;
     state: string;
+    zip_code?: string;
+    latitude?: number;
+    longitude?: number;
     prize_pool?: string;
     admission_fee?: string;
     registration_link?: string;
@@ -39,22 +43,42 @@ export const EventHero = ({ event }: EventHeroProps) => {
     toast.success('Event saved to calendar!');
   };
 
+  const handleGetDirections = () => {
+    const destination: NavigationDestination = {
+      address: event.address,
+      city: event.city,
+      state: event.state,
+      zipCode: event.zip_code,
+      latitude: event.latitude,
+      longitude: event.longitude,
+    };
+    
+    openNavigation(destination);
+    toast.success('Opening directions...');
+  };
+
   const handleShare = async () => {
+    const eventUrl = `${window.location.origin}/dashboard?program=steam&event=${event.id}`;
+    
     const shareData = {
       title: event.title,
-      text: `Join us for ${event.title}!`,
-      url: window.location.href,
+      text: `🎮 ${event.title}\n📅 ${format(new Date(event.event_date), 'EEEE, MMMM dd, yyyy')}\n📍 ${event.location_name}, ${event.city}, ${event.state}\n💰 ${event.prize_pool || 'Free Entry'}\n\nJoin us for an amazing STEAM event!`,
+      url: eventUrl,
     };
 
     if (navigator.share) {
       try {
         await navigator.share(shareData);
+        toast.success('Event shared successfully!');
       } catch (err) {
-        // User cancelled share
+        if (err instanceof Error && err.name !== 'AbortError') {
+          navigator.clipboard.writeText(eventUrl);
+          toast.success('Link copied to clipboard!');
+        }
       }
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
+      navigator.clipboard.writeText(eventUrl);
+      toast.success('Event link copied! Share it with friends and family.');
     }
   };
 
@@ -153,6 +177,15 @@ export const EventHero = ({ event }: EventHeroProps) => {
           </Button>
         )}
         
+        <Button 
+          onClick={handleGetDirections}
+          variant="outline"
+          className="glass-light border-blue-500/20"
+        >
+          <Navigation className="w-4 h-4 mr-2" />
+          Get Directions
+        </Button>
+
         <Button 
           onClick={handleSaveToCalendar}
           variant="outline"
