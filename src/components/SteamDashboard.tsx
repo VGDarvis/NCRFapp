@@ -44,6 +44,7 @@ export const SteamDashboard = ({ isGuest = false }: SteamDashboardProps) => {
         logoAlt="NCRF STEAM Program"
         title="STEAM Program"
         subtitle="Science, Technology, Engineering, Arts & Math"
+        isGuest={isGuest}
       />
 
       {/* Main Content */}

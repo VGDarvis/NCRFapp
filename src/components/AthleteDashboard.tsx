@@ -10,7 +10,11 @@ import CommunityTab from "./dashboard/athlete/CommunityTab";
 import { DashboardHeader } from "./DashboardHeader";
 import logoAthlete from "@/assets/logo-athlete.png";
 
-export function AthleteDashboard() {
+interface AthleteDashboardProps {
+  isGuest?: boolean;
+}
+
+export function AthleteDashboard({ isGuest = false }: AthleteDashboardProps) {
   const [activeTab, setActiveTab] = useState("home");
 
   return (
@@ -21,6 +25,7 @@ export function AthleteDashboard() {
         logoAlt="Student Athlete Program"
         title="Student Athlete Program"
         subtitle="Your Path to College Sports"
+        isGuest={isGuest}
       />
 
       {/* Main Content */}

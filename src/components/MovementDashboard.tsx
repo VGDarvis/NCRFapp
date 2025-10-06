@@ -46,6 +46,7 @@ export function MovementDashboard({ isGuest = false }: MovementDashboardProps) {
         logoAlt="NCRF Movement Enrichment Program"
         title="Movement Enrichment"
         subtitle="Tutoring, Mentorship & Wellness"
+        isGuest={isGuest}
       />
 
       {/* Main Content */}

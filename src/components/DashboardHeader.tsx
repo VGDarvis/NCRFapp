@@ -34,6 +34,7 @@ interface DashboardHeaderProps {
   title: string;
   subtitle?: string;
   showBackButton?: boolean;
+  isGuest?: boolean;
 }
 
 export function DashboardHeader({ 
@@ -41,20 +42,24 @@ export function DashboardHeader({
   logoAlt, 
   title, 
   subtitle,
-  showBackButton = true 
+  showBackButton = true,
+  isGuest = false
 }: DashboardHeaderProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { showWarning, userEmail, resetActivity, dismissWarning } = useSessionManager();
 
   const handleProgramSwitch = async (programId: string) => {
-    // Update user metadata
-    await supabase.auth.updateUser({
-      data: { program: programId }
-    });
-    
-    // Navigate to dashboard with new program
-    navigate(`/dashboard?program=${programId}`);
+    if (isGuest) {
+      // Guest users: navigate to guest route
+      navigate(`/guest/${programId}`);
+    } else {
+      // Authenticated users: update metadata and navigate
+      await supabase.auth.updateUser({
+        data: { program: programId }
+      });
+      navigate(`/dashboard?program=${programId}`);
+    }
   };
 
   return (

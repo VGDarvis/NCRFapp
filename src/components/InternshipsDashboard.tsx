@@ -46,6 +46,7 @@ export const InternshipsDashboard = ({ isGuest = false }: InternshipsDashboardPr
         logoAlt="Internships & Career"
         title="Internships & Career"
         subtitle="Professional Development Hub"
+        isGuest={isGuest}
       />
 
       {/* Main Content */}

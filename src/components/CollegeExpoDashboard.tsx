@@ -74,6 +74,7 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
         logoAlt="NCRF College Expo & Preparation"
         title="College Expo & Preparation"
         subtitle="Your Journey to Higher Education"
+        isGuest={isGuest}
       />
       
       {/* Main Content */}
