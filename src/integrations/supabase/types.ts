@@ -802,7 +802,9 @@ export type Database = {
       expo_events: {
         Row: {
           accessibility_info: string | null
+          activities: Json | null
           address: string
+          admission_fee: string | null
           attendee_count: number | null
           city: string
           colleges_attended: string[] | null
@@ -811,21 +813,27 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string | null
+          discord_link: string | null
           end_date: string | null
           event_date: string
+          event_flyer_url: string | null
           event_photos: string[] | null
           event_recap: string | null
           event_type: string
           featured_colleges: string[] | null
           id: string
+          is_featured: boolean | null
           is_virtual: boolean | null
           latitude: number | null
           location_name: string
           longitude: number | null
           max_attendees: number | null
           parking_info: string | null
+          prize_pool: string | null
           registration_deadline: string | null
+          registration_link: string | null
           registration_required: boolean | null
+          schedule: Json | null
           state: string
           status: string | null
           title: string
@@ -835,7 +843,9 @@ export type Database = {
         }
         Insert: {
           accessibility_info?: string | null
+          activities?: Json | null
           address: string
+          admission_fee?: string | null
           attendee_count?: number | null
           city: string
           colleges_attended?: string[] | null
@@ -844,21 +854,27 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          discord_link?: string | null
           end_date?: string | null
           event_date: string
+          event_flyer_url?: string | null
           event_photos?: string[] | null
           event_recap?: string | null
           event_type?: string
           featured_colleges?: string[] | null
           id?: string
+          is_featured?: boolean | null
           is_virtual?: boolean | null
           latitude?: number | null
           location_name: string
           longitude?: number | null
           max_attendees?: number | null
           parking_info?: string | null
+          prize_pool?: string | null
           registration_deadline?: string | null
+          registration_link?: string | null
           registration_required?: boolean | null
+          schedule?: Json | null
           state: string
           status?: string | null
           title: string
@@ -868,7 +884,9 @@ export type Database = {
         }
         Update: {
           accessibility_info?: string | null
+          activities?: Json | null
           address?: string
+          admission_fee?: string | null
           attendee_count?: number | null
           city?: string
           colleges_attended?: string[] | null
@@ -877,21 +895,27 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          discord_link?: string | null
           end_date?: string | null
           event_date?: string
+          event_flyer_url?: string | null
           event_photos?: string[] | null
           event_recap?: string | null
           event_type?: string
           featured_colleges?: string[] | null
           id?: string
+          is_featured?: boolean | null
           is_virtual?: boolean | null
           latitude?: number | null
           location_name?: string
           longitude?: number | null
           max_attendees?: number | null
           parking_info?: string | null
+          prize_pool?: string | null
           registration_deadline?: string | null
+          registration_link?: string | null
           registration_required?: boolean | null
+          schedule?: Json | null
           state?: string
           status?: string | null
           title?: string
