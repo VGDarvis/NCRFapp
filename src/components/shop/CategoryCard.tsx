@@ -19,23 +19,22 @@ export function CategoryCard({ category }: CategoryCardProps) {
     <motion.div
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
-      className="glass rounded-xl overflow-hidden cursor-pointer group"
+      className="glass-dark rounded-xl overflow-hidden cursor-pointer group border border-gray-800/50 hover:border-primary/30 transition-all"
       onClick={() => navigate(`/shop/category/${category.id}`)}
     >
-      <div className={`h-48 bg-gradient-to-br ${category.color} relative overflow-hidden`}>
-        <div className="absolute inset-0 bg-black/20" />
+      <div className="h-48 bg-gray-900/50 relative overflow-hidden">
         <img
           src={category.image}
           alt={category.name}
-          className="w-full h-full object-contain p-4 transform group-hover:scale-110 transition-transform duration-300"
+          className="w-full h-full object-contain p-4 transform group-hover:scale-110 transition-transform duration-300 product-glow"
         />
       </div>
       
       <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-primary transition-colors">
           {category.name}
         </h3>
-        <p className="text-muted-foreground text-sm mb-4">
+        <p className="text-gray-400 text-sm mb-4">
           {category.description}
         </p>
         
