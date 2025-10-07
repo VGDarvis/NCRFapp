@@ -11,6 +11,7 @@ import SignOut from "./pages/SignOut";
 import JoinCollegeExpo from "./pages/JoinCollegeExpo";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminProcessImages from "./pages/AdminProcessImages";
 import Shop from "./pages/Shop";
 import ShopCategory from "./pages/ShopCategory";
 import ProductDetail from "./pages/ProductDetail";
@@ -34,6 +35,7 @@ function App() {
             <Route path="/signout" element={<SignOut />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/process-images" element={<AdminProcessImages />} />
             
             {/* Shop Routes */}
             <Route path="/shop" element={<Shop />} />
