@@ -8,8 +8,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 interface CartItem {
@@ -120,31 +122,48 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-lg">
+      <SheetContent className="w-full sm:max-w-lg bg-gradient-to-b from-gray-950 via-black to-gray-900 border-white/10">
         <SheetHeader>
-          <SheetTitle>Shopping Cart</SheetTitle>
-          <SheetDescription>
+          <SheetTitle className="text-white">Shopping Cart</SheetTitle>
+          <SheetDescription className="text-gray-400">
             {cartItems.length} {cartItems.length === 1 ? "item" : "items"} in your cart
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col h-full mt-6">
           {loading ? (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            <div className="flex-1 space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-4 glass-dark p-4 rounded-lg">
+                  <Skeleton className="w-20 h-20 rounded bg-white/5" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/4 bg-white/5" />
+                    <Skeleton className="h-3 w-1/2 bg-white/5" />
+                    <Skeleton className="h-7 w-32 bg-white/5" />
+                  </div>
+                  <Skeleton className="h-4 w-16 bg-white/5" />
+                </div>
+              ))}
             </div>
           ) : cartItems.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
-              <ShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Your cart is empty</h3>
-              <p className="text-muted-foreground mb-6">
-                Add some items to get started!
+              <div className="relative mb-6">
+                <ShoppingBag className="h-24 w-24 text-gray-600" />
+                <Sparkles className="h-8 w-8 text-gold-400 absolute -top-2 -right-2 animate-pulse" />
+              </div>
+              <h3 className="text-xl font-bold mb-2 text-white">Your cart is empty</h3>
+              <p className="text-gray-400 mb-8 max-w-xs">
+                Start shopping and add items to your cart to get amazing apparel!
               </p>
-              <Button onClick={() => {
-                onOpenChange(false);
-                navigate("/shop");
-              }}>
-                Continue Shopping
+              <Button 
+                className="btn-gold"
+                size="lg"
+                onClick={() => {
+                  onOpenChange(false);
+                  navigate("/shop");
+                }}
+              >
+                Explore Shop
               </Button>
             </div>
           ) : (
@@ -154,38 +173,45 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   {cartItems.map((item) => {
                     const image = item.shop_items.images?.front || Object.values(item.shop_items.images || {})[0] || "";
                     return (
-                      <div key={item.id} className="flex gap-4 glass p-4 rounded-lg">
-                        <img
-                          src={image}
-                          alt={item.shop_items.name}
-                          className="w-20 h-20 object-cover rounded"
-                        />
+                      <div 
+                        key={item.id} 
+                        className="flex gap-4 glass-dark p-4 rounded-lg transition-all duration-300 hover:bg-white/10 animate-fade-in"
+                      >
+                        <div className="relative group">
+                          <img
+                            src={image}
+                            alt={item.shop_items.name}
+                            className="w-20 h-20 object-cover rounded transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 rounded bg-gold-400/0 group-hover:bg-gold-400/10 transition-colors duration-300" />
+                        </div>
                         
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-sm line-clamp-2">
+                          <h4 className="font-semibold text-sm line-clamp-2 text-white">
                             {item.shop_items.name}
                           </h4>
-                          <p className="text-xs text-muted-foreground mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             {item.selected_color} • {item.selected_size}
                           </p>
                           
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-between mt-3">
+                            <div className="flex items-center gap-2 touch-manipulation">
                               <Button
                                 variant="outline"
                                 size="icon"
-                                className="h-7 w-7"
+                                className="h-8 w-8 sm:h-7 sm:w-7 border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 active:scale-95"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={item.quantity === 1}
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
-                              <span className="text-sm font-medium w-8 text-center">
+                              <span className="text-sm font-medium w-8 text-center text-white">
                                 {item.quantity}
                               </span>
                               <Button
                                 variant="outline"
                                 size="icon"
-                                className="h-7 w-7"
+                                className="h-8 w-8 sm:h-7 sm:w-7 border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 active:scale-95"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               >
                                 <Plus className="h-3 w-3" />
@@ -195,7 +221,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              className="h-8 w-8 sm:h-7 sm:w-7 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-200 active:scale-95"
                               onClick={() => removeItem(item.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -204,7 +230,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                         </div>
                         
                         <div className="text-right">
-                          <p className="font-semibold">
+                          <p className="font-semibold text-white">
                             ${(item.shop_items.price_usd * item.quantity).toFixed(2)}
                           </p>
                         </div>
@@ -214,27 +240,43 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                 </div>
               </div>
 
-              <div className="border-t pt-4 space-y-2">
+              <div className="border-t border-white/10 pt-4 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-white">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
+                  <span className="text-gray-400">Shipping</span>
+                  <span className="text-white font-medium">
+                    {shipping === 0 ? (
+                      <span className="text-gold-400">FREE ✨</span>
+                    ) : (
+                      `$${shipping.toFixed(2)}`
+                    )}
+                  </span>
                 </div>
                 {subtotal < 50 && subtotal > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Add ${(50 - subtotal).toFixed(2)} more for free shipping!
-                  </p>
+                  <div className="space-y-2 py-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">Free shipping progress</span>
+                      <span className="text-gray-400">${subtotal.toFixed(2)} / $50.00</span>
+                    </div>
+                    <Progress 
+                      value={(subtotal / 50) * 100} 
+                      className="h-2 bg-white/5"
+                    />
+                    <p className="text-xs text-gold-400">
+                      Add ${(50 - subtotal).toFixed(2)} more for free shipping! 🚚
+                    </p>
+                  </div>
                 )}
-                <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                  <span>Total</span>
-                  <span className="text-primary">${total.toFixed(2)}</span>
+                <div className="flex justify-between font-bold text-lg pt-2 border-t border-white/10">
+                  <span className="text-white">Total</span>
+                  <span className="text-gold-400">${total.toFixed(2)}</span>
                 </div>
                 
                 <Button
-                  className="w-full btn-gold mt-4"
+                  className="w-full btn-gold mt-4 touch-manipulation"
                   size="lg"
                   onClick={() => {
                     onOpenChange(false);
