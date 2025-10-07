@@ -3,8 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { CartIcon } from "@/components/shop/CartIcon";
-import { ShoppingBag, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Home, ShoppingBag } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import {
   Select,
   SelectContent,
@@ -81,16 +87,41 @@ export default function ShopCategory() {
       {/* Header */}
       <div className="sticky top-0 z-40 glass-dark border-b border-gray-800/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate("/shop")}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              ← Back to Categories
-            </button>
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-bold text-white">{categoryTitle}</h1>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
+                aria-label="Go to home"
+              >
+                <Home className="h-5 w-5" />
+                <span className="sr-only">Home</span>
+              </button>
+              <div className="hidden sm:flex items-center">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <button onClick={() => navigate("/")} className="text-gray-400 hover:text-white transition-colors">
+                        Home
+                      </button>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <button onClick={() => navigate("/shop")} className="text-gray-400 hover:text-white transition-colors">
+                        Shop
+                      </button>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-white">{categoryTitle}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-1 justify-center sm:justify-start">
+              <ShoppingBag className="h-5 w-5 text-primary" />
+              <h1 className="text-base sm:text-xl font-bold text-white truncate">{categoryTitle}</h1>
             </div>
             <CartIcon />
           </div>

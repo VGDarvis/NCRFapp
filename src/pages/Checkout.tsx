@@ -7,7 +7,14 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { CheckCircle2, Package, Truck } from "lucide-react";
+import { CheckCircle2, Home, Package, Truck } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface CartItem {
   id: string;
@@ -175,7 +182,7 @@ export default function Checkout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
       </div>
     );
@@ -183,11 +190,11 @@ export default function Checkout() {
 
   if (step === 3) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center p-4">
-        <div className="max-w-md w-full glass p-8 rounded-xl text-center space-y-6">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900 flex items-center justify-center p-4">
+        <div className="max-w-md w-full glass-dark p-8 rounded-xl text-center space-y-6">
           <CheckCircle2 className="h-20 w-20 text-primary mx-auto" />
-          <h2 className="text-2xl font-bold">Order Confirmed!</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold text-white">Order Confirmed!</h2>
+          <p className="text-gray-300">
             Thank you for your order. We've sent a confirmation email to {formData.email}.
           </p>
           <Button onClick={() => navigate("/shop")} className="w-full btn-gold">
@@ -199,11 +206,44 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900">
       {/* Header */}
-      <div className="glass border-b border-border/40 backdrop-blur-xl">
+      <div className="glass-dark border-b border-gray-800/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold">Checkout</h1>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
+                aria-label="Go to home"
+              >
+                <Home className="h-5 w-5" />
+                <span className="sr-only">Home</span>
+              </button>
+              <div className="hidden sm:flex items-center">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <button onClick={() => navigate("/")} className="text-gray-400 hover:text-white transition-colors">
+                        Home
+                      </button>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <button onClick={() => navigate("/shop")} className="text-gray-400 hover:text-white transition-colors">
+                        Shop
+                      </button>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-white">Checkout</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Checkout</h1>
+          </div>
         </div>
       </div>
 
@@ -213,8 +253,8 @@ export default function Checkout() {
           <div className="lg:col-span-2 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Shipping Information */}
-              <div className="glass p-6 rounded-xl space-y-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">
+              <div className="glass-dark p-6 rounded-xl space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
                   <Package className="h-5 w-5 text-primary" />
                   Shipping Information
                 </h2>
@@ -294,8 +334,8 @@ export default function Checkout() {
               </div>
 
               {/* Shipping Method */}
-              <div className="glass p-6 rounded-xl space-y-4">
-                <h2 className="text-xl font-bold flex items-center gap-2">
+              <div className="glass-dark p-6 rounded-xl space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
                   <Truck className="h-5 w-5 text-primary" />
                   Shipping Method
                 </h2>
@@ -350,8 +390,8 @@ export default function Checkout() {
 
           {/* Right: Order Summary */}
           <div className="lg:col-span-1">
-            <div className="glass p-6 rounded-xl sticky top-24 space-y-4">
-              <h2 className="text-xl font-bold">Order Summary</h2>
+            <div className="glass-dark p-6 rounded-xl sticky top-24 space-y-4">
+              <h2 className="text-xl font-bold text-white">Order Summary</h2>
               
               <div className="space-y-3">
                 {cartItems.map((item) => {
@@ -364,13 +404,13 @@ export default function Checkout() {
                         className="w-16 h-16 object-cover rounded"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium line-clamp-2">
+                        <p className="text-sm font-medium line-clamp-2 text-white">
                           {item.shop_items.name}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-gray-400">
                           {item.selected_color} • {item.selected_size} • Qty: {item.quantity}
                         </p>
-                        <p className="text-sm font-semibold">
+                        <p className="text-sm font-semibold text-white">
                           ${(item.shop_items.price_usd * item.quantity).toFixed(2)}
                         </p>
                       </div>
@@ -383,23 +423,23 @@ export default function Checkout() {
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-white">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
+                  <span className="text-gray-400">Shipping</span>
+                  <span className="text-white">{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span className="text-gray-400">Tax</span>
+                  <span className="text-white">${tax.toFixed(2)}</span>
                 </div>
               </div>
 
               <Separator />
 
               <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
+                <span className="text-white">Total</span>
                 <span className="text-primary">${total.toFixed(2)}</span>
               </div>
             </div>

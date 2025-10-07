@@ -1,6 +1,12 @@
 import { CategoryCard } from "@/components/shop/CategoryCard";
-import { ShoppingBag } from "lucide-react";
+import { Home, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 
 const categories = [
   {
@@ -57,18 +63,33 @@ export default function Shop() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => navigate(-1)}
-              className="text-gray-400 hover:text-white transition-colors"
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
+              aria-label="Go to home"
             >
-              ← Back
+              <Home className="h-5 w-5" />
+              <span className="hidden sm:inline">Home</span>
             </button>
+            <div className="hidden sm:flex items-center">
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <button onClick={() => navigate("/")} className="text-gray-400 hover:text-white transition-colors">
+                      Home
+                    </button>
+                  </BreadcrumbItem>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="text-white">Shop</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
             <div className="flex items-center gap-2">
               <ShoppingBag className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Shop
               </h1>
             </div>
-            <div className="w-16" /> {/* Spacer for alignment */}
           </div>
         </div>
       </div>

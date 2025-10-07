@@ -7,9 +7,16 @@ import { SizeSelector } from "@/components/shop/SizeSelector";
 import { CartIcon } from "@/components/shop/CartIcon";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Minus, Plus, Package, Truck, RotateCcw, Ruler } from "lucide-react";
+import { Home, ShoppingCart, Minus, Plus, Package, Truck, RotateCcw, Ruler } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function ProductDetail() {
   const { productId } = useParams();
@@ -127,14 +134,40 @@ export default function ProductDetail() {
       {/* Header */}
       <div className="sticky top-0 z-40 glass-dark border-b border-gray-800/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate(-1)}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              ← Back
-            </button>
-            <h1 className="text-lg font-bold text-white">Product Details</h1>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <button
+                onClick={() => navigate("/")}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group flex-shrink-0"
+                aria-label="Go to home"
+              >
+                <Home className="h-5 w-5" />
+                <span className="sr-only">Home</span>
+              </button>
+              <div className="hidden sm:flex items-center min-w-0">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <button onClick={() => navigate("/")} className="text-gray-400 hover:text-white transition-colors">
+                        Home
+                      </button>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <button onClick={() => navigate("/shop")} className="text-gray-400 hover:text-white transition-colors">
+                        Shop
+                      </button>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-white truncate max-w-[200px]">
+                        {product.name}
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </div>
             <CartIcon />
           </div>
         </div>
