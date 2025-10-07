@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, User, Grid3x3 } from 'lucide-react';
+import { ArrowLeft, User, Grid3x3, ShoppingBag } from 'lucide-react';
 import { useSessionManager } from '@/hooks/useSessionManager';
 import { SessionWarningDialog } from './SessionWarningDialog';
 import {
@@ -95,6 +95,17 @@ export function DashboardHeader({
                 <span>{userEmail}</span>
               </div>
             )}
+
+            {/* Shop Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/shop')}
+              className="gap-2"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span className="hidden sm:inline">Shop</span>
+            </Button>
 
             {/* Program Switcher */}
             <DropdownMenu>

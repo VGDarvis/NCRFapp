@@ -3,7 +3,7 @@ import { ParticleBackground } from './ParticleBackground';
 import { RotatingLogoCircle } from './RotatingLogoCircle';
 import { VideoSection } from './VideoSection';
 import { Button } from './ui/button';
-import { Shield } from 'lucide-react';
+import { Shield, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const LogoSelectionLanding = () => {
@@ -13,13 +13,22 @@ export const LogoSelectionLanding = () => {
     <div className="min-h-screen relative overflow-hidden cyber-gradient">
       <ParticleBackground />
       
-      {/* Admin Access Button */}
+      {/* Top Navigation Buttons */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="absolute top-4 right-4 z-50"
+        className="absolute top-4 right-4 z-50 flex gap-2"
       >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate('/shop')}
+          className="gap-2 glass-premium border-primary/30 hover:border-primary/60"
+        >
+          <ShoppingBag className="w-4 h-4" />
+          <span className="hidden sm:inline">Shop</span>
+        </Button>
         <Button
           variant="outline"
           size="sm"

@@ -11,6 +11,10 @@ import SignOut from "./pages/SignOut";
 import JoinCollegeExpo from "./pages/JoinCollegeExpo";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Shop from "./pages/Shop";
+import ShopCategory from "./pages/ShopCategory";
+import ProductDetail from "./pages/ProductDetail";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,13 @@ function App() {
             <Route path="/signout" element={<SignOut />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            
+            {/* Shop Routes */}
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/shop/category/:categoryName" element={<ShopCategory />} />
+            <Route path="/shop/product/:productId" element={<ProductDetail />} />
+            <Route path="/shop/checkout" element={<Checkout />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

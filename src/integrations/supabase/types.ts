@@ -475,6 +475,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          selected_color: string | null
+          selected_size: string | null
+          session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_applications: {
         Row: {
           admin_notes: string | null
@@ -1155,6 +1199,126 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string | null
+          product_image: string | null
+          product_name: string
+          quantity: number
+          selected_color: string | null
+          selected_size: string | null
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id?: string | null
+          product_image?: string | null
+          product_name: string
+          quantity: number
+          selected_color?: string | null
+          selected_size?: string | null
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string | null
+          product_image?: string | null
+          product_name?: string
+          quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          order_number: string
+          payment_status: string | null
+          shipping_address: Json
+          shipping_cost: number
+          shipping_method: string
+          status: string
+          stripe_payment_intent_id: string | null
+          subtotal: number
+          tax: number | null
+          total: number
+          tracking_number: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          order_number: string
+          payment_status?: string | null
+          shipping_address: Json
+          shipping_cost?: number
+          shipping_method: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          subtotal: number
+          tax?: number | null
+          total: number
+          tracking_number?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          order_number?: string
+          payment_status?: string | null
+          shipping_address?: Json
+          shipping_cost?: number
+          shipping_method?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          subtotal?: number
+          tax?: number | null
+          total?: number
+          tracking_number?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payouts: {
         Row: {
           amount_usd: number
@@ -1657,44 +1821,65 @@ export type Database = {
       shop_items: {
         Row: {
           category: string | null
+          colors: Json | null
           created_at: string
           description: string | null
           id: string
           image_url: string | null
+          images: Json | null
           is_active: boolean | null
           is_limited: boolean | null
+          material_info: string | null
           name: string
           price_usd: number | null
           price_xp: number | null
+          product_type: string | null
           rarity: Database["public"]["Enums"]["item_rarity"] | null
+          shipping_info: string | null
+          sizes: string[] | null
+          sizing_chart: Json | null
           stock_quantity: number | null
         }
         Insert: {
           category?: string | null
+          colors?: Json | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: Json | null
           is_active?: boolean | null
           is_limited?: boolean | null
+          material_info?: string | null
           name: string
           price_usd?: number | null
           price_xp?: number | null
+          product_type?: string | null
           rarity?: Database["public"]["Enums"]["item_rarity"] | null
+          shipping_info?: string | null
+          sizes?: string[] | null
+          sizing_chart?: Json | null
           stock_quantity?: number | null
         }
         Update: {
           category?: string | null
+          colors?: Json | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: Json | null
           is_active?: boolean | null
           is_limited?: boolean | null
+          material_info?: string | null
           name?: string
           price_usd?: number | null
           price_xp?: number | null
+          product_type?: string | null
           rarity?: Database["public"]["Enums"]["item_rarity"] | null
+          shipping_info?: string | null
+          sizes?: string[] | null
+          sizing_chart?: Json | null
           stock_quantity?: number | null
         }
         Relationships: []
