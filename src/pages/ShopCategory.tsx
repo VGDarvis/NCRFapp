@@ -77,20 +77,20 @@ export default function ShopCategory() {
     : `${categoryName?.toUpperCase()} Products`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900">
       {/* Header */}
-      <div className="sticky top-0 z-40 glass border-b border-border/40 backdrop-blur-xl">
+      <div className="sticky top-0 z-40 glass-dark border-b border-gray-800/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate("/shop")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-gray-400 hover:text-white transition-colors"
             >
               ← Back to Categories
             </button>
             <div className="flex items-center gap-2">
               <ShoppingBag className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-bold">{categoryTitle}</h1>
+              <h1 className="text-xl font-bold text-white">{categoryTitle}</h1>
             </div>
             <CartIcon />
           </div>
@@ -100,7 +100,7 @@ export default function ShopCategory() {
       {/* Filters & Sort */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <p className="text-muted-foreground">
+          <p className="text-gray-300">
             {products.length} products found
           </p>
           
@@ -123,14 +123,14 @@ export default function ShopCategory() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="glass rounded-xl h-96 animate-pulse" />
+              <div key={i} className="glass-dark rounded-xl h-96 animate-pulse" />
             ))}
           </div>
         ) : sortedProducts.length === 0 ? (
           <div className="text-center py-20">
-            <ShoppingBag className="h-20 w-20 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-xl font-semibold mb-2">No products found</h3>
-            <p className="text-muted-foreground">Check back soon for new items!</p>
+            <ShoppingBag className="h-20 w-20 mx-auto mb-4 text-gray-600" />
+            <h3 className="text-xl font-semibold mb-2 text-white">No products found</h3>
+            <p className="text-gray-300">Check back soon for new items!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

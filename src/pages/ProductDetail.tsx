@@ -114,7 +114,7 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
       </div>
     );
@@ -123,18 +123,18 @@ export default function ProductDetail() {
   if (!product) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-black to-gray-900">
       {/* Header */}
-      <div className="sticky top-0 z-40 glass border-b border-border/40 backdrop-blur-xl">
+      <div className="sticky top-0 z-40 glass-dark border-b border-gray-800/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-gray-400 hover:text-white transition-colors"
             >
               ← Back
             </button>
-            <h1 className="text-lg font-bold">Product Details</h1>
+            <h1 className="text-lg font-bold text-white">Product Details</h1>
             <CartIcon />
           </div>
         </div>
@@ -149,12 +149,12 @@ export default function ProductDetail() {
           {/* Right: Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+              <h1 className="text-3xl font-bold mb-2 text-white">{product.name}</h1>
               <p className="text-4xl font-bold text-primary">${product.price_usd.toFixed(2)}</p>
             </div>
 
             {product.description && (
-              <p className="text-muted-foreground">{product.description}</p>
+              <p className="text-gray-300">{product.description}</p>
             )}
 
             {/* Color Selection */}
@@ -177,7 +177,7 @@ export default function ProductDetail() {
 
             {/* Quantity */}
             <div>
-              <label className="block text-sm font-medium mb-2">Quantity</label>
+              <label className="block text-sm font-medium mb-2 text-white">Quantity</label>
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
@@ -186,7 +186,7 @@ export default function ProductDetail() {
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="text-xl font-semibold w-12 text-center">{quantity}</span>
+                <span className="text-xl font-semibold w-12 text-center text-white">{quantity}</span>
                 <Button
                   variant="outline"
                   size="icon"
@@ -225,12 +225,12 @@ export default function ProductDetail() {
               </TabsList>
               
               <TabsContent value="description" className="space-y-4 mt-6">
-                <div className="glass p-6 rounded-lg space-y-3">
+                <div className="glass-dark p-6 rounded-lg space-y-3">
                   <div className="flex items-start gap-3">
                     <Package className="h-5 w-5 text-primary mt-0.5" />
                     <div>
-                      <h4 className="font-semibold mb-1">Materials</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <h4 className="font-semibold mb-1 text-white">Materials</h4>
+                      <p className="text-sm text-gray-300">
                         {product.material_info || "100% Premium Cotton"}
                       </p>
                     </div>
@@ -238,8 +238,8 @@ export default function ProductDetail() {
                   <div className="flex items-start gap-3">
                     <RotateCcw className="h-5 w-5 text-primary mt-0.5" />
                     <div>
-                      <h4 className="font-semibold mb-1">Care Instructions</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <h4 className="font-semibold mb-1 text-white">Care Instructions</h4>
+                      <p className="text-sm text-gray-300">
                         Machine wash cold. Tumble dry low. Do not bleach.
                       </p>
                     </div>
@@ -248,17 +248,17 @@ export default function ProductDetail() {
               </TabsContent>
               
               <TabsContent value="shipping" className="space-y-4 mt-6">
-                <div className="glass p-6 rounded-lg space-y-3">
+                <div className="glass-dark p-6 rounded-lg space-y-3">
                   <div className="flex items-start gap-3">
                     <Truck className="h-5 w-5 text-primary mt-0.5" />
                     <div>
-                      <h4 className="font-semibold mb-1">Shipping Info</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <h4 className="font-semibold mb-1 text-white">Shipping Info</h4>
+                      <p className="text-sm text-gray-300">
                         {product.shipping_info || "Ships within 2-3 business days. Free shipping on orders over $50."}
                       </p>
                     </div>
                   </div>
-                  <div className="text-sm space-y-2 text-muted-foreground">
+                  <div className="text-sm space-y-2 text-gray-300">
                     <p>• Standard Shipping: 5-7 business days - $5.99</p>
                     <p>• Express Shipping: 2-3 business days - $12.99</p>
                     <p>• FREE Shipping on orders over $50</p>
@@ -267,31 +267,31 @@ export default function ProductDetail() {
               </TabsContent>
               
               <TabsContent value="size-guide" className="space-y-4 mt-6">
-                <div className="glass p-6 rounded-lg">
+                <div className="glass-dark p-6 rounded-lg">
                   <div className="flex items-center gap-2 mb-4">
                     <Ruler className="h-5 w-5 text-primary" />
-                    <h4 className="font-semibold">Size Guide</h4>
+                    <h4 className="font-semibold text-white">Size Guide</h4>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2">Size</th>
-                          <th className="text-left py-2">Chest (inches)</th>
-                          <th className="text-left py-2">Length (inches)</th>
+                        <tr className="border-b border-gray-700">
+                          <th className="text-left py-2 text-white">Size</th>
+                          <th className="text-left py-2 text-white">Chest (inches)</th>
+                          <th className="text-left py-2 text-white">Length (inches)</th>
                         </tr>
                       </thead>
-                      <tbody className="text-muted-foreground">
-                        <tr className="border-b"><td className="py-2">S</td><td>34-36</td><td>28</td></tr>
-                        <tr className="border-b"><td className="py-2">M</td><td>38-40</td><td>29</td></tr>
-                        <tr className="border-b"><td className="py-2">L</td><td>42-44</td><td>30</td></tr>
-                        <tr className="border-b"><td className="py-2">XL</td><td>46-48</td><td>31</td></tr>
-                        <tr className="border-b"><td className="py-2">2XL</td><td>50-52</td><td>32</td></tr>
+                      <tbody className="text-gray-300">
+                        <tr className="border-b border-gray-700"><td className="py-2">S</td><td>34-36</td><td>28</td></tr>
+                        <tr className="border-b border-gray-700"><td className="py-2">M</td><td>38-40</td><td>29</td></tr>
+                        <tr className="border-b border-gray-700"><td className="py-2">L</td><td>42-44</td><td>30</td></tr>
+                        <tr className="border-b border-gray-700"><td className="py-2">XL</td><td>46-48</td><td>31</td></tr>
+                        <tr className="border-b border-gray-700"><td className="py-2">2XL</td><td>50-52</td><td>32</td></tr>
                         <tr><td className="py-2">3XL</td><td>54-56</td><td>33</td></tr>
                       </tbody>
                     </table>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-4">
+                  <p className="text-xs text-gray-400 mt-4">
                     * Measurements are approximate. Fits true to size.
                   </p>
                 </div>
