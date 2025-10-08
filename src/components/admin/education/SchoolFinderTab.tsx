@@ -78,9 +78,16 @@ export function SchoolFinderTab() {
       )}
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant={error.includes('simplified') ? 'default' : 'destructive'}>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {error}
+            {error.includes('busy') && (
+              <span className="block mt-2 text-xs">
+                The AI search is temporarily unavailable. Results are based on keyword matching.
+              </span>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 

@@ -30,7 +30,15 @@ export interface SearchResult {
   youth_services: any[];
   total_results: number;
   duration_ms: number;
+  using_fallback?: boolean;
 }
+
+// Simple in-memory cache with 5-minute TTL
+const searchCache = new Map<string, { data: SearchResult; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Track in-flight requests to prevent duplicates
+const inFlightRequests = new Map<string, Promise<SearchResult>>();
 
 export function useAISearch() {
   const [results, setResults] = useState<SearchResult | null>(null);
@@ -43,23 +51,74 @@ export function useAISearch() {
       return;
     }
 
+    const cacheKey = query.toLowerCase().trim();
+    
+    // Check cache first
+    const cached = searchCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log('Using cached results for:', query);
+      setResults(cached.data);
+      return;
+    }
+
+    // Check for duplicate in-flight request
+    const inFlight = inFlightRequests.get(cacheKey);
+    if (inFlight) {
+      console.log('Duplicate request detected, waiting for in-flight request');
+      try {
+        const data = await inFlight;
+        setResults(data);
+        return;
+      } catch (err) {
+        // Fall through to new request
+      }
+    }
+
     setIsLoading(true);
     setError(null);
 
+    const searchPromise = (async () => {
+      try {
+        const { data, error: functionError } = await supabase.functions.invoke('ai-search', {
+          body: { query },
+        });
+
+        if (functionError) throw functionError;
+
+        // Cache successful results
+        searchCache.set(cacheKey, { data, timestamp: Date.now() });
+        
+        // Show notice if using fallback
+        if (data.using_fallback) {
+          setError('Using simplified search (AI service busy)');
+        }
+
+        setResults(data);
+        return data;
+      } catch (err) {
+        console.error('Search error:', err);
+        const errorMsg = err instanceof Error ? err.message : 'Search failed';
+        
+        if (errorMsg.includes('429') || errorMsg.includes('rate limit')) {
+          setError('Search service is busy. Please try again in a moment.');
+        } else {
+          setError(errorMsg);
+        }
+        
+        setResults(null);
+        throw err;
+      } finally {
+        setIsLoading(false);
+        inFlightRequests.delete(cacheKey);
+      }
+    })();
+
+    inFlightRequests.set(cacheKey, searchPromise);
+    
     try {
-      const { data, error: functionError } = await supabase.functions.invoke('ai-search', {
-        body: { query },
-      });
-
-      if (functionError) throw functionError;
-
-      setResults(data);
-    } catch (err) {
-      console.error('Search error:', err);
-      setError(err instanceof Error ? err.message : 'Search failed');
-      setResults(null);
-    } finally {
-      setIsLoading(false);
+      await searchPromise;
+    } catch {
+      // Error already handled above
     }
   }, []);
 

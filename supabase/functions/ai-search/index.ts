@@ -6,6 +6,72 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Simple keyword-based fallback parser
+function parseFallbackFilters(query: string) {
+  const lowerQuery = query.toLowerCase();
+  const filters: any = { search_type: 'all', usedFallback: true };
+
+  // Extract state codes
+  const stateMatch = query.match(/\b([A-Z]{2})\b/);
+  if (stateMatch) filters.state = stateMatch[1];
+
+  // Extract cities
+  const cityWords = ['in', 'near', 'around'];
+  for (const word of cityWords) {
+    const regex = new RegExp(`${word}\\s+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*)`, 'i');
+    const match = query.match(regex);
+    if (match) {
+      filters.city = match[1];
+      break;
+    }
+  }
+
+  // Detect institution types
+  if (lowerQuery.includes('high school') || lowerQuery.includes('secondary')) {
+    filters.institution_type = 'high_school';
+    filters.search_type = 'schools';
+  } else if (lowerQuery.includes('college') || lowerQuery.includes('university')) {
+    filters.institution_type = 'college';
+    filters.search_type = 'schools';
+  }
+
+  // Detect school types
+  if (lowerQuery.includes('hbcu')) filters.school_type = 'HBCU';
+  else if (lowerQuery.includes('public')) filters.school_type = 'Public';
+  else if (lowerQuery.includes('private')) filters.school_type = 'Private';
+  
+  // Detect sports
+  const sports = ['basketball', 'football', 'soccer', 'baseball', 'volleyball'];
+  const foundSports = sports.filter(sport => lowerQuery.includes(sport));
+  if (foundSports.length > 0) {
+    filters.sports_programs = foundSports.map(s => s.charAt(0).toUpperCase() + s.slice(1));
+  }
+
+  return filters;
+}
+
+// Retry with exponential backoff
+async function fetchWithRetry(url: string, options: any, maxRetries = 2) {
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      const response = await fetch(url, options);
+      
+      if (response.status === 429 && i < maxRetries) {
+        const waitTime = Math.pow(2, i) * 1000; // 1s, 2s, 4s
+        console.log(`Rate limited, waiting ${waitTime}ms before retry ${i + 1}/${maxRetries}`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      
+      return response;
+    } catch (error) {
+      if (i === maxRetries) throw error;
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -15,24 +81,27 @@ serve(async (req) => {
     const { query } = await req.json();
     const startTime = Date.now();
 
-    // Get AI to parse the query
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
+    let filters: any;
+    let usingFallback = false;
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
+    // Try AI parsing first
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (LOVABLE_API_KEY) {
+      try {
+        const aiResponse = await fetchWithRetry(
+          'https://ai.gateway.lovable.dev/v1/chat/completions',
           {
-            role: 'system',
-            content: `You are an educational search assistant for colleges, high schools, scholarships, and youth sports programs. Parse natural language queries and extract structured filters.
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'google/gemini-2.5-flash',
+              messages: [
+                {
+                  role: 'system',
+                  content: `You are an educational search assistant for colleges, high schools, scholarships, and youth sports programs. Parse natural language queries and extract structured filters.
 
 Extract these fields (return null if not mentioned):
 - search_type: "schools" | "scholarships" | "youth_services" | "all" (default: "all")
@@ -60,22 +129,41 @@ Detection hints:
 - "college", "university" → set institution_type: "college"
 
 Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "California" → "CA", "engineering" → "Engineering", "basketball" → "Basketball").`
+                },
+                {
+                  role: 'user',
+                  content: query
+                }
+              ],
+              response_format: { type: "json_object" }
+            }),
           },
-          {
-            role: 'user',
-            content: query
-          }
-        ],
-        response_format: { type: "json_object" }
-      }),
-    });
+          2 // max retries
+        );
 
-    if (!aiResponse.ok) {
-      throw new Error(`AI parsing failed: ${aiResponse.status}`);
+        if (aiResponse.ok) {
+          const aiData = await aiResponse.json();
+          filters = JSON.parse(aiData.choices[0].message.content);
+          console.log('✓ AI parsing successful');
+        } else {
+          console.warn(`AI parsing failed with status ${aiResponse.status}, using fallback`);
+          filters = parseFallbackFilters(query);
+          usingFallback = true;
+        }
+      } catch (aiError) {
+        console.error('AI parsing error:', aiError);
+        filters = parseFallbackFilters(query);
+        usingFallback = true;
+      }
+    } else {
+      console.warn('LOVABLE_API_KEY not configured, using fallback parser');
+      filters = parseFallbackFilters(query);
+      usingFallback = true;
     }
 
-    const aiData = await aiResponse.json();
-    const filters = JSON.parse(aiData.choices[0].message.content);
+    if (usingFallback) {
+      console.log('Using fallback keyword search:', filters);
+    }
 
     // Initialize Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -233,6 +321,7 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         youth_services: youthServices,
         total_results: totalResults,
         duration_ms: duration,
+        using_fallback: usingFallback,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
