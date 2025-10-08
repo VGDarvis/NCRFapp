@@ -3376,6 +3376,36 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_history: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          record_id: string
+          record_type: string
+          verified_by: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          record_id: string
+          record_type: string
+          verified_by?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          record_id?: string
+          record_type?: string
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       wellness_progress: {
         Row: {
           activity_type: string
