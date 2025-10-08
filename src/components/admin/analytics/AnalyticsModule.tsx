@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Building2, Users, Calendar, FileText } from "lucide-react";
+import { BarChart3, Building2, Users, Calendar, FileText, Sparkles } from "lucide-react";
 import { DashboardTab } from "./DashboardTab";
 import { CRMAnalyticsTab } from "./CRMAnalyticsTab";
 import { HRAnalyticsTab } from "./HRAnalyticsTab";
 import { ProgramAnalyticsTab } from "./ProgramAnalyticsTab";
+import { AISearchPanel } from "./AISearchPanel";
 
 export function AnalyticsModule() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -19,7 +20,7 @@ export function AnalyticsModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+        <TabsList className="grid w-full grid-cols-6 lg:w-auto">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
@@ -35,6 +36,10 @@ export function AnalyticsModule() {
           <TabsTrigger value="hr" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">HR</span>
+          </TabsTrigger>
+          <TabsTrigger value="search" className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            <span className="hidden sm:inline">AI Search</span>
           </TabsTrigger>
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
@@ -56,6 +61,10 @@ export function AnalyticsModule() {
 
         <TabsContent value="hr" className="mt-6">
           <HRAnalyticsTab />
+        </TabsContent>
+
+        <TabsContent value="search" className="mt-6">
+          <AISearchPanel />
         </TabsContent>
 
         <TabsContent value="reports" className="mt-6">
