@@ -57,7 +57,7 @@ export function SchoolFinderTab() {
       <div className="glass-light p-6 rounded-lg border border-border/40">
         <div className="flex items-center gap-3 mb-2">
           <Search className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold text-foreground">AI-Powered School Search</h2>
+          <h2 className="text-xl font-semibold text-foreground">School Search</h2>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
           Find schools, colleges, and youth services to add to your CRM and outreach campaigns
