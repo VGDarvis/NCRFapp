@@ -9,9 +9,9 @@ export function useSchools() {
     queryKey: ["schools"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("schools_database")
+        .from("school_database")
         .select("*")
-        .order("name", { ascending: true });
+        .order("school_name", { ascending: true });
 
       if (error) throw error;
       return data;
@@ -21,7 +21,7 @@ export function useSchools() {
   const updateSchool = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
       const { error } = await supabase
-        .from("schools_database")
+        .from("school_database")
         .update(updates)
         .eq("id", id);
 
@@ -39,7 +39,7 @@ export function useSchools() {
   const createSchool = useMutation({
     mutationFn: async (newSchool: any) => {
       const { error } = await supabase
-        .from("schools_database")
+        .from("school_database")
         .insert(newSchool);
 
       if (error) throw error;
@@ -56,7 +56,7 @@ export function useSchools() {
   const deleteSchool = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from("schools_database")
+        .from("school_database")
         .delete()
         .eq("id", id);
 

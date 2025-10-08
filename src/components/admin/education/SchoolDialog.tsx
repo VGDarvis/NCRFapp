@@ -29,17 +29,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSchools } from "@/hooks/useSchools";
 
 const schoolSchema = z.object({
-  name: z.string().min(1, "School name is required"),
+  school_name: z.string().min(1, "School name is required"),
   school_type: z.enum(["college", "high_school"]),
-  address: z.string().optional(),
   city: z.string().min(1, "City is required"),
   state: z.string().min(2, "State is required"),
   zip_code: z.string().optional(),
-  enrollment: z.coerce.number().optional(),
   website: z.string().url().optional().or(z.literal("")),
-  description: z.string().optional(),
+  notes: z.string().optional(),
   data_source: z.enum(["official", "partner", "api", "manual"]),
-  is_verified: z.boolean().default(false),
+  verification_status: z.enum(["pending", "verified", "rejected"]).default("pending"),
 });
 
 type SchoolFormData = z.infer<typeof schoolSchema>;
@@ -57,38 +55,36 @@ export function SchoolDialog({ open, onOpenChange, school }: SchoolDialogProps) 
   const form = useForm<SchoolFormData>({
     resolver: zodResolver(schoolSchema),
     defaultValues: {
-      name: "",
+      school_name: "",
       school_type: "college",
       city: "",
       state: "",
       data_source: "manual",
-      is_verified: false,
+      verification_status: "pending",
     },
   });
 
   useEffect(() => {
     if (school) {
       form.reset({
-        name: school.name || "",
+        school_name: school.school_name || "",
         school_type: school.school_type || "college",
-        address: school.address || "",
         city: school.city || "",
         state: school.state || "",
         zip_code: school.zip_code || "",
-        enrollment: school.enrollment || undefined,
         website: school.website || "",
-        description: school.description || "",
+        notes: school.notes || "",
         data_source: school.data_source || "manual",
-        is_verified: school.is_verified || false,
+        verification_status: school.verification_status || "pending",
       });
     } else {
       form.reset({
-        name: "",
+        school_name: "",
         school_type: "college",
         city: "",
         state: "",
         data_source: "manual",
-        is_verified: false,
+        verification_status: "pending",
       });
     }
   }, [school, form]);
@@ -114,7 +110,7 @@ export function SchoolDialog({ open, onOpenChange, school }: SchoolDialogProps) 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="school_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>School Name</FormLabel>
@@ -180,47 +176,17 @@ export function SchoolDialog({ open, onOpenChange, school }: SchoolDialogProps) 
 
             <FormField
               control={form.control}
-              name="address"
+              name="zip_code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address (Optional)</FormLabel>
+                  <FormLabel>ZIP Code (Optional)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Street address" />
+                    <Input {...field} placeholder="12345" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="zip_code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ZIP Code (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="12345" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="enrollment"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Enrollment (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="number" placeholder="5000" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <FormField
               control={form.control}
@@ -238,12 +204,12 @@ export function SchoolDialog({ open, onOpenChange, school }: SchoolDialogProps) 
 
             <FormField
               control={form.control}
-              name="description"
+              name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>Notes (Optional)</FormLabel>
                   <FormControl>
-                    <Textarea {...field} placeholder="School description" rows={3} />
+                    <Textarea {...field} placeholder="Additional notes" rows={3} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

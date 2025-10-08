@@ -26,16 +26,16 @@ export function SchoolsTab() {
   };
 
   const handleVerify = (id: string, verified: boolean) => {
-    updateSchool.mutate({ id, updates: { is_verified: !verified } });
+    updateSchool.mutate({ id, updates: { verification_status: verified ? 'pending' : 'verified' } });
   };
 
   const columns: ColumnDef<any>[] = [
     {
-      accessorKey: "name",
+      accessorKey: "school_name",
       header: "School Name",
       cell: ({ row }) => (
         <div>
-          <div className="font-medium">{row.original.name}</div>
+          <div className="font-medium">{row.original.school_name}</div>
           <div className="text-xs text-muted-foreground">
             {row.original.school_type === "college" ? "College/University" : "High School"}
           </div>
@@ -52,27 +52,30 @@ export function SchoolsTab() {
       ),
     },
     {
-      accessorKey: "enrollment",
+      accessorKey: "total_enrollment",
       header: "Enrollment",
       cell: ({ row }) => {
-        const enrollment = row.original.enrollment;
+        const enrollment = row.original.total_enrollment || row.original.student_count;
         if (!enrollment) return <span className="text-muted-foreground">N/A</span>;
         return <span>{enrollment.toLocaleString()}</span>;
       },
     },
     {
-      accessorKey: "is_verified",
+      accessorKey: "verification_status",
       header: "Verified",
-      cell: ({ row }) => (
-        <Badge variant={row.original.is_verified ? "default" : "secondary"}>
-          {row.original.is_verified ? (
-            <CheckCircle className="w-3 h-3 mr-1" />
-          ) : (
-            <XCircle className="w-3 h-3 mr-1" />
-          )}
-          {row.original.is_verified ? "Verified" : "Unverified"}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const isVerified = row.original.verification_status === 'verified';
+        return (
+          <Badge variant={isVerified ? "default" : "secondary"}>
+            {isVerified ? (
+              <CheckCircle className="w-3 h-3 mr-1" />
+            ) : (
+              <XCircle className="w-3 h-3 mr-1" />
+            )}
+            {isVerified ? "Verified" : "Unverified"}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: "data_source",
@@ -88,9 +91,9 @@ export function SchoolsTab() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleVerify(row.original.id, row.original.is_verified)}
+            onClick={() => handleVerify(row.original.id, row.original.verification_status === 'verified')}
           >
-            {row.original.is_verified ? "Unverify" : "Verify"}
+            {row.original.verification_status === 'verified' ? "Unverify" : "Verify"}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => handleEdit(row.original)}>
             <Edit className="w-4 h-4" />
@@ -150,7 +153,7 @@ export function SchoolsTab() {
       <DataTable
         columns={columns}
         data={schools}
-        searchKey="name"
+        searchKey="school_name"
         searchPlaceholder="Search schools..."
       />
 
