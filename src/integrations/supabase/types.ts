@@ -2522,15 +2522,19 @@ export type Database = {
         Row: {
           acceptance_rate: number | null
           athletic_division: string | null
+          athletic_programs: string[] | null
           city: string
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
           created_at: string | null
+          data_source: string | null
           demographics: Json | null
           district: string | null
           grade_levels: string[] | null
           id: string
+          is_active: boolean | null
+          is_hbcu: boolean | null
           last_contact_date: string | null
           notes: string | null
           partnership_status: string | null
@@ -2539,26 +2543,34 @@ export type Database = {
           region: string | null
           school_name: string
           school_type: string | null
+          special_programs: string[] | null
           state: string
           student_count: number | null
           tags: string[] | null
           total_enrollment: number | null
           updated_at: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
           website: string | null
           zip_code: string | null
         }
         Insert: {
           acceptance_rate?: number | null
           athletic_division?: string | null
+          athletic_programs?: string[] | null
           city: string
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          data_source?: string | null
           demographics?: Json | null
           district?: string | null
           grade_levels?: string[] | null
           id?: string
+          is_active?: boolean | null
+          is_hbcu?: boolean | null
           last_contact_date?: string | null
           notes?: string | null
           partnership_status?: string | null
@@ -2567,26 +2579,34 @@ export type Database = {
           region?: string | null
           school_name: string
           school_type?: string | null
+          special_programs?: string[] | null
           state: string
           student_count?: number | null
           tags?: string[] | null
           total_enrollment?: number | null
           updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           website?: string | null
           zip_code?: string | null
         }
         Update: {
           acceptance_rate?: number | null
           athletic_division?: string | null
+          athletic_programs?: string[] | null
           city?: string
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          data_source?: string | null
           demographics?: Json | null
           district?: string | null
           grade_levels?: string[] | null
           id?: string
+          is_active?: boolean | null
+          is_hbcu?: boolean | null
           last_contact_date?: string | null
           notes?: string | null
           partnership_status?: string | null
@@ -2595,15 +2615,27 @@ export type Database = {
           region?: string | null
           school_name?: string
           school_type?: string | null
+          special_programs?: string[] | null
           state?: string
           student_count?: number | null
           tags?: string[] | null
           total_enrollment?: number | null
           updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
           website?: string | null
           zip_code?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "school_database_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seasonal_passes: {
         Row: {
