@@ -16,6 +16,7 @@ import Shop from "./pages/Shop";
 import ShopCategory from "./pages/ShopCategory";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
+import SchoolFinder from "./pages/SchoolFinder";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,9 @@ function App() {
             <Route path="/shop/category/:categoryName" element={<ShopCategory />} />
             <Route path="/shop/product/:productId" element={<ProductDetail />} />
             <Route path="/shop/checkout" element={<Checkout />} />
+            
+            {/* School Finder */}
+            <Route path="/school-finder" element={<SchoolFinder />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
