@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { SchoolsTab } from "./SchoolsTab";
 import { YouthServicesTab } from "./YouthServicesTab";
 import { VerificationTab } from "./VerificationTab";
+import { AnalyticsTab } from "./AnalyticsTab";
 import { BulkImportDialog } from "./BulkImportDialog";
-import { Upload, ShieldCheck } from "lucide-react";
+import { Upload, ShieldCheck, BarChart3 } from "lucide-react";
 
 export function EducationModule() {
   const [activeTab, setActiveTab] = useState("schools");
@@ -27,9 +28,13 @@ export function EducationModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="schools">Schools & Colleges</TabsTrigger>
           <TabsTrigger value="youth-services">Youth Services</TabsTrigger>
+          <TabsTrigger value="analytics">
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Analytics
+          </TabsTrigger>
           <TabsTrigger value="verification">
             <ShieldCheck className="mr-2 h-4 w-4" />
             Verification Queue
@@ -42,6 +47,10 @@ export function EducationModule() {
 
         <TabsContent value="youth-services">
           <YouthServicesTab />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <AnalyticsTab />
         </TabsContent>
 
         <TabsContent value="verification">
