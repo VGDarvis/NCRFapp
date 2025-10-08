@@ -6,6 +6,8 @@ import { useSessionManager } from '@/hooks/useSessionManager';
 import { SessionWarningDialog } from '@/components/SessionWarningDialog';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminMobileNav } from '@/components/admin/layout/AdminMobileNav';
+import { AppSidebar } from '@/components/admin/layout/AppSidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { MetricsGrid } from '@/components/admin/dashboard/MetricsGrid';
 import { QuickActionsPanel } from '@/components/admin/dashboard/QuickActionsPanel';
 import { RecentActivityFeed } from '@/components/admin/dashboard/RecentActivityFeed';
@@ -96,39 +98,50 @@ export default function AdminDashboard() {
           dismissWarning();
         }} 
       />
-      <div className="min-h-screen admin-gradient pb-20 md:pb-8">
-        <AdminHeader userEmail={userEmail} />
-        
-        <main className="container mx-auto px-4 py-6 space-y-6">
-          {activeTab === 'dashboard' && (
-            <>
-              <MetricsGrid />
-              <div className="grid gap-6 lg:grid-cols-2">
-                <QuickActionsPanel onAction={handleQuickAction} />
-                <UpcomingTasksWidget />
-              </div>
-              <RecentActivityFeed />
-            </>
-          )}
+      <SidebarProvider defaultOpen={true}>
+        <div className="min-h-screen w-full flex admin-gradient">
+          {/* Desktop Sidebar - Hidden on mobile */}
+          <div className="hidden md:flex">
+            <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          </div>
           
-          {activeTab === 'crm' && <CRMModule />}
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col w-full pb-20 md:pb-0">
+            <AdminHeader userEmail={userEmail} />
+            
+            <main className="flex-1 container mx-auto px-4 py-6 space-y-6 max-w-7xl">
+              {activeTab === 'dashboard' && (
+                <>
+                  <MetricsGrid />
+                  <div className="grid gap-6 xl:grid-cols-2">
+                    <QuickActionsPanel onAction={handleQuickAction} />
+                    <UpcomingTasksWidget />
+                  </div>
+                  <RecentActivityFeed />
+                </>
+              )}
+              
+              {activeTab === 'crm' && <CRMModule />}
+              
+              {activeTab === 'messages' && <MessagesModule />}
+              
+              {activeTab === 'hr' && <HRModule />}
+              
+              {activeTab === 'analytics' && <AnalyticsModule />}
+              
+              {activeTab === 'settings' && (
+                <div className="glass-premium rounded-lg p-8 text-center">
+                  <h2 className="text-2xl font-bold text-primary mb-2">Settings</h2>
+                  <p className="text-muted-foreground">Configuration options coming soon</p>
+                </div>
+              )}
+            </main>
+          </div>
           
-          {activeTab === 'messages' && <MessagesModule />}
-          
-          {activeTab === 'hr' && <HRModule />}
-          
-          {activeTab === 'analytics' && <AnalyticsModule />}
-          
-          {activeTab === 'settings' && (
-            <div className="glass-premium rounded-lg p-8 text-center">
-              <h2 className="text-2xl font-bold text-primary mb-2">Settings</h2>
-              <p className="text-muted-foreground">Configuration options coming soon</p>
-            </div>
-          )}
-        </main>
-        
-        <AdminMobileNav activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
+          {/* Mobile Bottom Navigation */}
+          <AdminMobileNav activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+      </SidebarProvider>
     </ThemeProvider>
   );
 }

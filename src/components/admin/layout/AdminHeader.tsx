@@ -1,6 +1,7 @@
 import { Shield, LogOut, User, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "../shared/ThemeToggle";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -29,16 +30,21 @@ export function AdminHeader({ userEmail }: AdminHeaderProps) {
   };
 
   return (
-    <header className="glass-premium border-b border-primary/20 backdrop-blur-lg sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
+    <header className="glass-premium border-b border-primary/20 backdrop-blur-lg sticky top-0 z-40 w-full">
+      <div className="px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* Desktop Sidebar Toggle */}
+            <div className="hidden md:flex">
+              <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+            </div>
+            
             <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
               <Shield className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-foreground">NCRF Admin</h1>
-              <p className="text-xs text-muted-foreground">HR & Outreach Management</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">HR & Outreach Management</p>
             </div>
           </div>
           
