@@ -200,6 +200,90 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_search_queries: {
+        Row: {
+          created_at: string | null
+          id: string
+          parsed_filters: Json | null
+          query_text: string
+          results_count: number | null
+          search_duration_ms: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          parsed_filters?: Json | null
+          query_text: string
+          results_count?: number | null
+          search_duration_ms?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          parsed_filters?: Json | null
+          query_text?: string
+          results_count?: number | null
+          search_duration_ms?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      analytics_summary: {
+        Row: {
+          active_campaigns: number | null
+          active_crm_contacts: number | null
+          active_employees: number | null
+          created_at: string | null
+          id: string
+          messages_sent_today: number | null
+          messages_sent_week: number | null
+          metadata: Json | null
+          outreach_success_rate: number | null
+          pending_hr_tasks: number | null
+          summary_date: string
+          top_performing_staff: Json | null
+          total_crm_contacts: number | null
+          total_employees: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          active_campaigns?: number | null
+          active_crm_contacts?: number | null
+          active_employees?: number | null
+          created_at?: string | null
+          id?: string
+          messages_sent_today?: number | null
+          messages_sent_week?: number | null
+          metadata?: Json | null
+          outreach_success_rate?: number | null
+          pending_hr_tasks?: number | null
+          summary_date: string
+          top_performing_staff?: Json | null
+          total_crm_contacts?: number | null
+          total_employees?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          active_campaigns?: number | null
+          active_crm_contacts?: number | null
+          active_employees?: number | null
+          created_at?: string | null
+          id?: string
+          messages_sent_today?: number | null
+          messages_sent_week?: number | null
+          metadata?: Json | null
+          outreach_success_rate?: number | null
+          pending_hr_tasks?: number | null
+          summary_date?: string
+          top_performing_staff?: Json | null
+          total_crm_contacts?: number | null
+          total_employees?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       athlete_profiles: {
         Row: {
           act_score: number | null
@@ -360,6 +444,77 @@ export type Database = {
             columns: ["scholarship_id"]
             isOneToOne: false
             referencedRelation: "scholarship_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bulk_campaigns: {
+        Row: {
+          campaign_name: string
+          campaign_type: string
+          clicked_count: number | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          delivered_count: number | null
+          failed_count: number | null
+          id: string
+          opened_count: number | null
+          recipient_count: number | null
+          scheduled_at: string | null
+          sent_count: number | null
+          started_at: string | null
+          status: string | null
+          target_audience: string | null
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_name: string
+          campaign_type: string
+          clicked_count?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          delivered_count?: number | null
+          failed_count?: number | null
+          id?: string
+          opened_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_count?: number | null
+          started_at?: string | null
+          status?: string | null
+          target_audience?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_name?: string
+          campaign_type?: string
+          clicked_count?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          delivered_count?: number | null
+          failed_count?: number | null
+          id?: string
+          opened_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_count?: number | null
+          started_at?: string | null
+          status?: string | null
+          target_audience?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulk_campaigns_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "message_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -666,6 +821,254 @@ export type Database = {
         }
         Relationships: []
       }
+      crm_contacts: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          first_name: string
+          id: string
+          last_contact_date: string | null
+          last_name: string
+          notes: string | null
+          organization_id: string | null
+          phone: string | null
+          position: string | null
+          preferred_contact_method: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          first_name: string
+          id?: string
+          last_contact_date?: string | null
+          last_name: string
+          notes?: string | null
+          organization_id?: string | null
+          phone?: string | null
+          position?: string | null
+          preferred_contact_method?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_contact_date?: string | null
+          last_name?: string
+          notes?: string | null
+          organization_id?: string | null
+          phone?: string | null
+          position?: string | null
+          preferred_contact_method?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_contacts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "crm_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_interactions: {
+        Row: {
+          contact_id: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          interaction_date: string
+          interaction_type: string
+          notes: string | null
+          organization_id: string | null
+          outcome: string | null
+          subject: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          interaction_date: string
+          interaction_type: string
+          notes?: string | null
+          organization_id?: string | null
+          outcome?: string | null
+          subject?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          interaction_date?: string
+          interaction_type?: string
+          notes?: string | null
+          organization_id?: string | null
+          outcome?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_interactions_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_interactions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "crm_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_organizations: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          created_by: string | null
+          email: string | null
+          id: string
+          industry: string | null
+          name: string
+          notes: string | null
+          organization_type: string | null
+          partnership_status: string | null
+          partnership_tier: string | null
+          phone: string | null
+          region: string | null
+          state: string | null
+          updated_at: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          industry?: string | null
+          name: string
+          notes?: string | null
+          organization_type?: string | null
+          partnership_status?: string | null
+          partnership_tier?: string | null
+          phone?: string | null
+          region?: string | null
+          state?: string | null
+          updated_at?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          industry?: string | null
+          name?: string
+          notes?: string | null
+          organization_type?: string | null
+          partnership_status?: string | null
+          partnership_tier?: string | null
+          phone?: string | null
+          region?: string | null
+          state?: string | null
+          updated_at?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      crm_tags: {
+        Row: {
+          contact_id: string | null
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          tag_category: string | null
+          tag_name: string
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          tag_category?: string | null
+          tag_name: string
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          tag_category?: string | null
+          tag_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_tags_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_tags_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "crm_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      departments: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          manager_id: string | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_id?: string | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          manager_id?: string | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       disputes: {
         Row: {
           accused_team_id: string
@@ -789,6 +1192,133 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      employee_documents: {
+        Row: {
+          created_at: string | null
+          document_name: string
+          document_type: string
+          employee_id: string
+          file_size: number | null
+          file_url: string
+          id: string
+          mime_type: string | null
+          notes: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_name: string
+          document_type: string
+          employee_id: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_name?: string
+          document_type?: string
+          employee_id?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          mime_type?: string | null
+          notes?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_documents_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string | null
+          department_id: string | null
+          email: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          employment_type: string | null
+          end_date: string | null
+          first_name: string
+          id: string
+          last_name: string
+          notes: string | null
+          phone: string | null
+          role: string
+          start_date: string
+          state: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          email: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          employment_type?: string | null
+          end_date?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          notes?: string | null
+          phone?: string | null
+          role: string
+          start_date: string
+          state?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          email?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          employment_type?: string | null
+          end_date?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          phone?: string | null
+          role?: string
+          start_date?: string
+          state?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       event_attendance: {
         Row: {
@@ -968,6 +1498,53 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      hr_onboarding: {
+        Row: {
+          checklist_item: string
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string | null
+          due_date: string | null
+          employee_id: string
+          id: string
+          is_completed: boolean | null
+          notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          checklist_item: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          employee_id: string
+          id?: string
+          is_completed?: boolean | null
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          checklist_item?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          employee_id?: string
+          id?: string
+          is_completed?: boolean | null
+          notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_onboarding_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_applications: {
         Row: {
@@ -1150,6 +1727,132 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      message_templates: {
+        Row: {
+          body: string
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          subject: string | null
+          template_name: string
+          template_type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          body: string
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          subject?: string | null
+          template_name: string
+          template_type: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          body?: string
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          subject?: string | null
+          template_name?: string
+          template_type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          campaign_id: string | null
+          clicked_at: string | null
+          created_at: string | null
+          delivered_at: string | null
+          error_message: string | null
+          id: string
+          message_type: string
+          metadata: Json | null
+          opened_at: string | null
+          recipient_contact_id: string | null
+          recipient_email: string | null
+          recipient_phone: string | null
+          scheduled_at: string | null
+          sender_id: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string | null
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          body: string
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          message_type: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_contact_id?: string | null
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          scheduled_at?: string | null
+          sender_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          body?: string
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          recipient_contact_id?: string | null
+          recipient_email?: string | null
+          recipient_phone?: string | null
+          scheduled_at?: string | null
+          sender_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string | null
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_recipient_contact_id_fkey"
+            columns: ["recipient_contact_id"]
+            isOneToOne: false
+            referencedRelation: "crm_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "message_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       movement_tutors: {
         Row: {
@@ -1354,6 +2057,39 @@ export type Database = {
           processed_by?: string | null
           status?: string | null
           stripe_payment_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      performance_metrics: {
+        Row: {
+          created_at: string | null
+          department: string | null
+          id: string
+          metadata: Json | null
+          metric_date: string
+          metric_type: string
+          metric_value: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          metadata?: Json | null
+          metric_date: string
+          metric_type: string
+          metric_value?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          metadata?: Json | null
+          metric_date?: string
+          metric_type?: string
+          metric_value?: number | null
           user_id?: string
         }
         Relationships: []
@@ -1782,6 +2518,78 @@ export type Database = {
         }
         Relationships: []
       }
+      school_database: {
+        Row: {
+          city: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          demographics: Json | null
+          district: string | null
+          grade_levels: string[] | null
+          id: string
+          last_contact_date: string | null
+          notes: string | null
+          partnership_status: string | null
+          programs_interested: Json | null
+          region: string | null
+          school_name: string
+          state: string
+          student_count: number | null
+          tags: string[] | null
+          updated_at: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          city: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          demographics?: Json | null
+          district?: string | null
+          grade_levels?: string[] | null
+          id?: string
+          last_contact_date?: string | null
+          notes?: string | null
+          partnership_status?: string | null
+          programs_interested?: Json | null
+          region?: string | null
+          school_name: string
+          state: string
+          student_count?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          city?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          demographics?: Json | null
+          district?: string | null
+          grade_levels?: string[] | null
+          id?: string
+          last_contact_date?: string | null
+          notes?: string | null
+          partnership_status?: string | null
+          programs_interested?: Json | null
+          region?: string | null
+          school_name?: string
+          state?: string
+          student_count?: number | null
+          tags?: string[] | null
+          updated_at?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       seasonal_passes: {
         Row: {
           created_at: string
@@ -2195,6 +3003,56 @@ export type Database = {
             columns: ["tournament_id"]
             isOneToOne: false
             referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_tracking: {
+        Row: {
+          approval_date: string | null
+          approved_by: string | null
+          created_at: string | null
+          employee_id: string
+          entry_date: string
+          entry_type: string
+          hours: number | null
+          id: string
+          notes: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          approval_date?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          employee_id: string
+          entry_date: string
+          entry_type: string
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          approval_date?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          employee_id?: string
+          entry_date?: string
+          entry_type?: string
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_tracking_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
         ]
