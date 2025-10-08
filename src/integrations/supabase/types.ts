@@ -1555,6 +1555,54 @@ export type Database = {
           },
         ]
       }
+      import_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          error_log: Json | null
+          failed_records: number | null
+          id: string
+          job_type: string
+          metadata: Json | null
+          processed_records: number | null
+          started_at: string | null
+          status: string
+          total_records: number | null
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error_log?: Json | null
+          failed_records?: number | null
+          id?: string
+          job_type: string
+          metadata?: Json | null
+          processed_records?: number | null
+          started_at?: string | null
+          status?: string
+          total_records?: number | null
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          error_log?: Json | null
+          failed_records?: number | null
+          id?: string
+          job_type?: string
+          metadata?: Json | null
+          processed_records?: number | null
+          started_at?: string | null
+          status?: string
+          total_records?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       job_applications: {
         Row: {
           application_date: string
