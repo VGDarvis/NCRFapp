@@ -12,21 +12,17 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  // Debounce search input
+  // Debounce search input - increased to 800ms to prevent spam
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
-    }, 300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Trigger search when debounced query changes
-  useEffect(() => {
-    if (debouncedQuery.trim()) {
-      onSearch(debouncedQuery);
-    }
-  }, [debouncedQuery, onSearch]);
+  // Trigger search when debounced query changes (removed auto-search on typing)
+  // Search now only happens on Enter key or button click
 
   const handleClear = () => {
     setQuery("");
