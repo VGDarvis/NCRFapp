@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, MessageSquare, Briefcase, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, Briefcase, GraduationCap, BarChart3, Settings } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -42,6 +42,12 @@ const navigationItems = [
     label: "HR", 
     icon: Briefcase,
     description: "Employees & onboarding"
+  },
+  { 
+    id: "education", 
+    label: "Education", 
+    icon: GraduationCap,
+    description: "School Finder & databases"
   },
   { 
     id: "analytics", 

@@ -18,6 +18,7 @@ import { CRMModule } from '@/components/admin/crm/CRMModule';
 import { HRModule } from '@/components/admin/hr/HRModule';
 import { MessagesModule } from '@/components/admin/messages/MessagesModule';
 import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
+import { EducationModule } from '@/components/admin/education/EducationModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -126,6 +127,8 @@ export default function AdminDashboard() {
               {activeTab === 'messages' && <MessagesModule />}
               
               {activeTab === 'hr' && <HRModule />}
+              
+              {activeTab === 'education' && <EducationModule />}
               
               {activeTab === 'analytics' && <AnalyticsModule />}
               
