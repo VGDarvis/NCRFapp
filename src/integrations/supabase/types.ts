@@ -2520,6 +2520,8 @@ export type Database = {
       }
       school_database: {
         Row: {
+          acceptance_rate: number | null
+          athletic_division: string | null
           city: string
           contact_email: string | null
           contact_name: string | null
@@ -2533,16 +2535,21 @@ export type Database = {
           notes: string | null
           partnership_status: string | null
           programs_interested: Json | null
+          programs_offered: string[] | null
           region: string | null
           school_name: string
+          school_type: string | null
           state: string
           student_count: number | null
           tags: string[] | null
+          total_enrollment: number | null
           updated_at: string | null
           website: string | null
           zip_code: string | null
         }
         Insert: {
+          acceptance_rate?: number | null
+          athletic_division?: string | null
           city: string
           contact_email?: string | null
           contact_name?: string | null
@@ -2556,16 +2563,21 @@ export type Database = {
           notes?: string | null
           partnership_status?: string | null
           programs_interested?: Json | null
+          programs_offered?: string[] | null
           region?: string | null
           school_name: string
+          school_type?: string | null
           state: string
           student_count?: number | null
           tags?: string[] | null
+          total_enrollment?: number | null
           updated_at?: string | null
           website?: string | null
           zip_code?: string | null
         }
         Update: {
+          acceptance_rate?: number | null
+          athletic_division?: string | null
           city?: string
           contact_email?: string | null
           contact_name?: string | null
@@ -2579,11 +2591,14 @@ export type Database = {
           notes?: string | null
           partnership_status?: string | null
           programs_interested?: Json | null
+          programs_offered?: string[] | null
           region?: string | null
           school_name?: string
+          school_type?: string | null
           state?: string
           student_count?: number | null
           tags?: string[] | null
+          total_enrollment?: number | null
           updated_at?: string | null
           website?: string | null
           zip_code?: string | null
