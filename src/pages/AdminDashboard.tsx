@@ -15,6 +15,7 @@ import { ThemeProvider } from "next-themes";
 import { CRMModule } from '@/components/admin/crm/CRMModule';
 import { HRModule } from '@/components/admin/hr/HRModule';
 import { MessagesModule } from '@/components/admin/messages/MessagesModule';
+import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -116,12 +117,7 @@ export default function AdminDashboard() {
           
           {activeTab === 'hr' && <HRModule />}
           
-          {activeTab === 'analytics' && (
-            <div className="glass-premium rounded-lg p-8 text-center">
-              <h2 className="text-2xl font-bold text-primary mb-2">Analytics Module</h2>
-              <p className="text-muted-foreground">Coming in Phase 6</p>
-            </div>
-          )}
+          {activeTab === 'analytics' && <AnalyticsModule />}
           
           {activeTab === 'settings' && (
             <div className="glass-premium rounded-lg p-8 text-center">
