@@ -5,11 +5,12 @@ import { SchoolsTab } from "./SchoolsTab";
 import { YouthServicesTab } from "./YouthServicesTab";
 import { VerificationTab } from "./VerificationTab";
 import { AnalyticsTab } from "./AnalyticsTab";
+import { SchoolFinderTab } from "./SchoolFinderTab";
 import { BulkImportDialog } from "./BulkImportDialog";
-import { Upload, ShieldCheck, BarChart3 } from "lucide-react";
+import { Upload, ShieldCheck, BarChart3, Search } from "lucide-react";
 
 export function EducationModule() {
-  const [activeTab, setActiveTab] = useState("schools");
+  const [activeTab, setActiveTab] = useState("school-finder");
   const [showImportDialog, setShowImportDialog] = useState(false);
 
   return (
@@ -28,7 +29,11 @@ export function EducationModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="school-finder">
+            <Search className="mr-2 h-4 w-4" />
+            School Finder
+          </TabsTrigger>
           <TabsTrigger value="schools">Schools & Colleges</TabsTrigger>
           <TabsTrigger value="youth-services">Youth Services</TabsTrigger>
           <TabsTrigger value="analytics">
@@ -40,6 +45,10 @@ export function EducationModule() {
             Verification Queue
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="school-finder">
+          <SchoolFinderTab />
+        </TabsContent>
 
         <TabsContent value="schools">
           <SchoolsTab />
