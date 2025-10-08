@@ -202,6 +202,7 @@ export type Database = {
       }
       ai_search_queries: {
         Row: {
+          actions_taken: Json | null
           created_at: string | null
           id: string
           parsed_filters: Json | null
@@ -211,6 +212,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          actions_taken?: Json | null
           created_at?: string | null
           id?: string
           parsed_filters?: Json | null
@@ -220,6 +222,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          actions_taken?: Json | null
           created_at?: string | null
           id?: string
           parsed_filters?: Json | null
@@ -943,6 +946,7 @@ export type Database = {
           email: string | null
           id: string
           industry: string | null
+          metadata: Json | null
           name: string
           notes: string | null
           organization_type: string | null
@@ -950,6 +954,7 @@ export type Database = {
           partnership_tier: string | null
           phone: string | null
           region: string | null
+          source: string | null
           state: string | null
           updated_at: string | null
           website: string | null
@@ -963,6 +968,7 @@ export type Database = {
           email?: string | null
           id?: string
           industry?: string | null
+          metadata?: Json | null
           name: string
           notes?: string | null
           organization_type?: string | null
@@ -970,6 +976,7 @@ export type Database = {
           partnership_tier?: string | null
           phone?: string | null
           region?: string | null
+          source?: string | null
           state?: string | null
           updated_at?: string | null
           website?: string | null
@@ -983,6 +990,7 @@ export type Database = {
           email?: string | null
           id?: string
           industry?: string | null
+          metadata?: Json | null
           name?: string
           notes?: string | null
           organization_type?: string | null
@@ -990,6 +998,7 @@ export type Database = {
           partnership_tier?: string | null
           phone?: string | null
           region?: string | null
+          source?: string | null
           state?: string | null
           updated_at?: string | null
           website?: string | null
@@ -2019,6 +2028,45 @@ export type Database = {
           tracking_number?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      outreach_search_lists: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          list_name: string
+          notes: string | null
+          parsed_filters: Json | null
+          school_ids: string[] | null
+          search_query: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_name: string
+          notes?: string | null
+          parsed_filters?: Json | null
+          school_ids?: string[] | null
+          search_query: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          list_name?: string
+          notes?: string | null
+          parsed_filters?: Json | null
+          school_ids?: string[] | null
+          search_query?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

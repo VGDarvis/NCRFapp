@@ -14,7 +14,7 @@ export function useCRMIntegration() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("crm_organizations")
-        .select("id, name, metadata");
+        .select("id, name, source");
 
       if (error) throw error;
       return data;
@@ -23,8 +23,9 @@ export function useCRMIntegration() {
 
   const checkIfInCRM = (schoolId: string) => {
     if (addedSchools.has(schoolId)) return true;
+    // Check if any org has source indicating it came from school finder
     return existingOrgs?.some(org => 
-      org.metadata?.school_id === schoolId
+      org.source === "school_finder_search" || org.source === "school_finder_bulk_import"
     ) || false;
   };
 
