@@ -12,6 +12,7 @@ import { RecentActivityFeed } from '@/components/admin/dashboard/RecentActivityF
 import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksWidget';
 import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
+import { CRMModule } from '@/components/admin/crm/CRMModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -107,12 +108,7 @@ export default function AdminDashboard() {
             </>
           )}
           
-          {activeTab === 'crm' && (
-            <div className="glass-premium rounded-lg p-8 text-center">
-              <h2 className="text-2xl font-bold text-primary mb-2">CRM Module</h2>
-              <p className="text-muted-foreground">Coming in Phase 3</p>
-            </div>
-          )}
+          {activeTab === 'crm' && <CRMModule />}
           
           {activeTab === 'messages' && (
             <div className="glass-premium rounded-lg p-8 text-center">
