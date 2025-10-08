@@ -1,0 +1,197 @@
+school_name,district,region,state,city,zip_code,grade_levels,student_count,contact_phone,website,school_type,total_enrollment,verification_status,data_source
+Skyline High School,Dallas ISD,North Texas,TX,Dallas,75217,"9,10,11,12",2100,214-932-4000,https://www.dallasisd.org/skyline,high_school,2100,pending,nces_import
+W.H. Adamson High School,Dallas ISD,North Texas,TX,Dallas,75203,"9,10,11,12",1850,214-932-5000,https://www.dallasisd.org/adamson,high_school,1850,pending,nces_import
+North Dallas High School,Dallas ISD,North Texas,TX,Dallas,75230,"9,10,11,12",1650,214-932-6000,https://www.dallasisd.org/northdallas,high_school,1650,pending,nces_import
+South Oak Cliff High School,Dallas ISD,North Texas,TX,Dallas,75224,"9,10,11,12",1900,214-932-7000,https://www.dallasisd.org/southoakcliff,high_school,1900,pending,nces_import
+Woodrow Wilson High School,Dallas ISD,North Texas,TX,Dallas,75214,"9,10,11,12",1750,214-932-8000,https://www.dallasisd.org/wilson,high_school,1750,pending,nces_import
+W.T. White High School,Dallas ISD,North Texas,TX,Dallas,75243,"9,10,11,12",1600,214-932-9000,https://www.dallasisd.org/wtwhite,high_school,1600,pending,nces_import
+Sunset High School,Dallas ISD,North Texas,TX,Dallas,75208,"9,10,11,12",1950,214-932-3000,https://www.dallasisd.org/sunset,high_school,1950,pending,nces_import
+Lincoln High School,Dallas ISD,North Texas,TX,Dallas,75215,"9,10,11,12",1450,214-932-2000,https://www.dallasisd.org/lincoln,high_school,1450,pending,nces_import
+Pinkston High School,Dallas ISD,North Texas,TX,Dallas,75212,"9,10,11,12",1350,214-932-1000,https://www.dallasisd.org/pinkston,high_school,1350,pending,nces_import
+Kimball High School,Dallas ISD,North Texas,TX,Dallas,75241,"9,10,11,12",2050,214-932-4100,https://www.dallasisd.org/kimball,high_school,2050,pending,nces_import
+Berkner High School,Richardson ISD,North Texas,TX,Richardson,75081,"9,10,11,12",2200,469-593-6000,https://www.risd.org/berkner,high_school,2200,pending,nces_import
+Pearce High School,Richardson ISD,North Texas,TX,Richardson,75082,"9,10,11,12",2150,469-593-7000,https://www.risd.org/pearce,high_school,2150,pending,nces_import
+Richardson High School,Richardson ISD,North Texas,TX,Richardson,75080,"9,10,11,12",1950,469-593-8000,https://www.risd.org/rhs,high_school,1950,pending,nces_import
+Lake Highlands High School,Richardson ISD,North Texas,TX,Dallas,75238,"9,10,11,12",2300,469-593-5000,https://www.risd.org/lakehighlands,high_school,2300,pending,nces_import
+Plano Senior High School,Plano ISD,North Texas,TX,Plano,75075,"9,10,11,12",2400,469-752-8100,https://www.pisd.edu/planosenior,high_school,2400,pending,nces_import
+Plano East Senior High School,Plano ISD,North Texas,TX,Plano,75074,"9,10,11,12",2350,469-752-9100,https://www.pisd.edu/planoeast,high_school,2350,pending,nces_import
+Plano West Senior High School,Plano ISD,North Texas,TX,Plano,75093,"9,10,11,12",2500,469-752-7100,https://www.pisd.edu/planowest,high_school,2500,pending,nces_import
+Jasper High School,Plano ISD,North Texas,TX,Plano,75024,"9,10,11,12",2250,469-752-6100,https://www.pisd.edu/jasper,high_school,2250,pending,nces_import
+McKinney High School,McKinney ISD,North Texas,TX,McKinney,75069,"9,10,11,12",2100,469-302-5000,https://www.mckinneyisd.net/mhs,high_school,2100,pending,nces_import
+McKinney Boyd High School,McKinney ISD,North Texas,TX,McKinney,75070,"9,10,11,12",2200,469-302-6000,https://www.mckinneyisd.net/boyd,high_school,2200,pending,nces_import
+McKinney North High School,McKinney ISD,North Texas,TX,McKinney,75071,"9,10,11,12",2150,469-302-7000,https://www.mckinneyisd.net/north,high_school,2150,pending,nces_import
+Frisco High School,Frisco ISD,North Texas,TX,Frisco,75034,"9,10,11,12",2000,469-633-5000,https://www.friscoisd.org/fhs,high_school,2000,pending,nces_import
+Centennial High School,Frisco ISD,North Texas,TX,Frisco,75035,"9,10,11,12",2100,469-633-6000,https://www.friscoisd.org/centennial,high_school,2100,pending,nces_import
+Heritage High School,Frisco ISD,North Texas,TX,Frisco,75036,"9,10,11,12",2050,469-633-7000,https://www.friscoisd.org/heritage,high_school,2050,pending,nces_import
+Independence High School,Frisco ISD,North Texas,TX,Frisco,75035,"9,10,11,12",2150,469-633-8000,https://www.friscoisd.org/independence,high_school,2150,pending,nces_import
+Liberty High School,Frisco ISD,North Texas,TX,Frisco,75036,"9,10,11,12",2200,469-633-9000,https://www.friscoisd.org/liberty,high_school,2200,pending,nces_import
+Lone Star High School,Frisco ISD,North Texas,TX,Frisco,75033,"9,10,11,12",2250,469-633-4000,https://www.friscoisd.org/lonestar,high_school,2250,pending,nces_import
+Reedy High School,Frisco ISD,North Texas,TX,Frisco,75034,"9,10,11,12",2100,469-633-3000,https://www.friscoisd.org/reedy,high_school,2100,pending,nces_import
+Wakeland High School,Frisco ISD,North Texas,TX,Frisco,75033,"9,10,11,12",2000,469-633-2000,https://www.friscoisd.org/wakeland,high_school,2000,pending,nces_import
+Bellaire High School,Houston ISD,Southeast Texas,TX,Houston,77025,"9,10,11,12",3100,713-295-5476,https://www.houstonisd.org/bellaire,high_school,3100,pending,nces_import
+Lamar High School,Houston ISD,Southeast Texas,TX,Houston,77019,"9,10,11,12",2900,713-522-5960,https://www.houstonisd.org/lamar,high_school,2900,pending,nces_import
+Westside High School,Houston ISD,Southeast Texas,TX,Houston,77063,"9,10,11,12",2600,713-251-1500,https://www.houstonisd.org/westside,high_school,2600,pending,nces_import
+Carnegie Vanguard High School,Houston ISD,Southeast Texas,TX,Houston,77006,"9,10,11,12",1150,713-942-1960,https://www.houstonisd.org/carnegie,high_school,1150,pending,nces_import
+DeBakey High School,Houston ISD,Southeast Texas,TX,Houston,77030,"9,10,11,12",1200,713-749-2000,https://www.houstonisd.org/debakey,high_school,1200,pending,nces_import
+Waltrip High School,Houston ISD,Southeast Texas,TX,Houston,77092,"9,10,11,12",2400,713-613-2600,https://www.houstonisd.org/waltrip,high_school,2400,pending,nces_import
+Austin High School,Houston ISD,Southeast Texas,TX,Houston,77004,"9,10,11,12",2100,713-802-4050,https://www.houstonisd.org/austin,high_school,2100,pending,nces_import
+Heights High School,Houston ISD,Southeast Texas,TX,Houston,77008,"9,10,11,12",2300,713-802-4100,https://www.houstonisd.org/heights,high_school,2300,pending,nces_import
+Madison High School,Houston ISD,Southeast Texas,TX,Houston,77016,"9,10,11,12",2500,713-613-2800,https://www.houstonisd.org/madison,high_school,2500,pending,nces_import
+Milby High School,Houston ISD,Southeast Texas,TX,Houston,77017,"9,10,11,12",2400,713-845-3540,https://www.houstonisd.org/milby,high_school,2400,pending,nces_import
+Sterling High School,Houston ISD,Southeast Texas,TX,Houston,77045,"9,10,11,12",2700,713-726-3639,https://www.houstonisd.org/sterling,high_school,2700,pending,nces_import
+Yates High School,Houston ISD,Southeast Texas,TX,Houston,77004,"9,10,11,12",1800,713-748-0061,https://www.houstonisd.org/yates,high_school,1800,pending,nces_import
+Reagan High School,Houston ISD,Southeast Texas,TX,Houston,77009,"9,10,11,12",2200,713-802-4300,https://www.houstonisd.org/reagan,high_school,2200,pending,nces_import
+Washington High School,Houston ISD,Southeast Texas,TX,Houston,77007,"9,10,11,12",1900,713-802-4400,https://www.houstonisd.org/washington,high_school,1900,pending,nces_import
+Westbury High School,Houston ISD,Southeast Texas,TX,Houston,77035,"9,10,11,12",2600,713-726-2350,https://www.houstonisd.org/westbury,high_school,2600,pending,nces_import
+Cy-Fair High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Cypress,77433,"9,10,11,12",3200,281-897-4600,https://www.cfisd.net/cyfair,high_school,3200,pending,nces_import
+Cypress Creek High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Houston,77095,"9,10,11,12",3100,281-517-2600,https://www.cfisd.net/creek,high_school,3100,pending,nces_import
+Cypress Falls High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Houston,77095,"9,10,11,12",3000,281-213-1800,https://www.cfisd.net/falls,high_school,3000,pending,nces_import
+Cypress Lakes High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Katy,77493,"9,10,11,12",2900,832-484-2000,https://www.cfisd.net/lakes,high_school,2900,pending,nces_import
+Cypress Ranch High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Cypress,77433,"9,10,11,12",3050,281-213-1650,https://www.cfisd.net/ranch,high_school,3050,pending,nces_import
+Cypress Ridge High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Houston,77433,"9,10,11,12",2950,832-484-2200,https://www.cfisd.net/ridge,high_school,2950,pending,nces_import
+Cypress Springs High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Cypress,77433,"9,10,11,12",3100,281-213-1550,https://www.cfisd.net/springs,high_school,3100,pending,nces_import
+Cypress Woods High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Cypress,77433,"9,10,11,12",3000,832-484-2400,https://www.cfisd.net/woods,high_school,3000,pending,nces_import
+Langham Creek High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Houston,77084,"9,10,11,12",3200,281-213-1700,https://www.cfisd.net/langham,high_school,3200,pending,nces_import
+Jersey Village High School,Cypress-Fairbanks ISD,Northwest Houston,TX,Houston,77040,"9,10,11,12",2800,281-897-4600,https://www.cfisd.net/jerseyvillage,high_school,2800,pending,nces_import
+Cinco Ranch High School,Katy ISD,West Houston,TX,Katy,77494,"9,10,11,12",3400,281-237-2000,https://www.katyisd.org/cincoranch,high_school,3400,pending,nces_import
+Mayde Creek High School,Katy ISD,West Houston,TX,Houston,77450,"9,10,11,12",3200,281-237-3000,https://www.katyisd.org/maydecreek,high_school,3200,pending,nces_import
+Morton Ranch High School,Katy ISD,West Houston,TX,Katy,77449,"9,10,11,12",3100,281-237-4000,https://www.katyisd.org/mortonranch,high_school,3100,pending,nces_import
+Paetow High School,Katy ISD,West Houston,TX,Katy,77494,"9,10,11,12",2900,281-237-8000,https://www.katyisd.org/paetow,high_school,2900,pending,nces_import
+Seven Lakes High School,Katy ISD,West Houston,TX,Katy,77494,"9,10,11,12",3300,281-237-5000,https://www.katyisd.org/sevenlakes,high_school,3300,pending,nces_import
+Tompkins High School,Katy ISD,West Houston,TX,Katy,77494,"9,10,11,12",3500,281-237-7000,https://www.katyisd.org/tompkins,high_school,3500,pending,nces_import
+Taylor High School,Katy ISD,West Houston,TX,Katy,77494,"9,10,11,12",3000,281-237-6000,https://www.katyisd.org/taylor,high_school,3000,pending,nces_import
+Katy High School,Katy ISD,West Houston,TX,Katy,77449,"9,10,11,12",2800,281-396-2457,https://www.katyisd.org/khs,high_school,2800,pending,nces_import
+Anderson High School,Austin ISD,Central Texas,TX,Austin,78757,"9,10,11,12",2200,512-414-2538,https://www.austinisd.org/anderson,high_school,2200,pending,nces_import
+Akins High School,Austin ISD,Central Texas,TX,Austin,78748,"9,10,11,12",2100,512-841-7000,https://www.austinisd.org/akins,high_school,2100,pending,nces_import
+Austin High School,Austin ISD,Central Texas,TX,Austin,78703,"9,10,11,12",1900,512-414-2505,https://www.austinisd.org/austinhigh,high_school,1900,pending,nces_import
+Bowie High School,Austin ISD,Central Texas,TX,Austin,78749,"9,10,11,12",2300,512-841-8200,https://www.austinisd.org/bowie,high_school,2300,pending,nces_import
+Crockett High School,Austin ISD,Central Texas,TX,Austin,78741,"9,10,11,12",1600,512-414-2536,https://www.austinisd.org/crockett,high_school,1600,pending,nces_import
+Eastside Memorial High School,Austin ISD,Central Texas,TX,Austin,78702,"9,10,11,12",850,512-414-3229,https://www.austinisd.org/eastside,high_school,850,pending,nces_import
+Lanier High School,Austin ISD,Central Texas,TX,Austin,78721,"9,10,11,12",1400,512-414-2511,https://www.austinisd.org/lanier,high_school,1400,pending,nces_import
+LBJ High School,Austin ISD,Central Texas,TX,Austin,78723,"9,10,11,12",1100,512-414-2519,https://www.austinisd.org/lbj,high_school,1100,pending,nces_import
+McCallum High School,Austin ISD,Central Texas,TX,Austin,78756,"9,10,11,12",1800,512-414-2524,https://www.austinisd.org/mccallum,high_school,1800,pending,nces_import
+Northeast Early College High School,Austin ISD,Central Texas,TX,Austin,78753,"9,10,11,12",700,512-414-5247,https://www.austinisd.org/northeast,high_school,700,pending,nces_import
+Reagan High School,Austin ISD,Central Texas,TX,Austin,78753,"9,10,11,12",1500,512-414-2528,https://www.austinisd.org/reagan,high_school,1500,pending,nces_import
+Travis High School,Austin ISD,Central Texas,TX,Austin,78745,"9,10,11,12",1700,512-414-2532,https://www.austinisd.org/travis,high_school,1700,pending,nces_import
+Westlake High School,Eanes ISD,Central Texas,TX,Austin,78746,"9,10,11,12",2600,512-732-9280,https://www.eanesisd.net/westlake,high_school,2600,pending,nces_import
+Lake Travis High School,Lake Travis ISD,Central Texas,TX,Austin,78734,"9,10,11,12",2400,512-533-6000,https://www.ltisdschools.org/laketravis,high_school,2400,pending,nces_import
+Leander High School,Leander ISD,Central Texas,TX,Leander,78641,"9,10,11,12",2500,512-570-3900,https://www.leanderisd.org/lhs,high_school,2500,pending,nces_import
+Rouse High School,Leander ISD,Central Texas,TX,Leander,78641,"9,10,11,12",2400,512-570-2700,https://www.leanderisd.org/rouse,high_school,2400,pending,nces_import
+Vista Ridge High School,Leander ISD,Central Texas,TX,Cedar Park,78613,"9,10,11,12",2600,512-570-2400,https://www.leanderisd.org/vistaridge,high_school,2600,pending,nces_import
+Vandegrift High School,Leander ISD,Central Texas,TX,Austin,78730,"9,10,11,12",2700,512-570-2200,https://www.leanderisd.org/vandegrift,high_school,2700,pending,nces_import
+Cedar Park High School,Leander ISD,Central Texas,TX,Cedar Park,78613,"9,10,11,12",2300,512-570-1200,https://www.leanderisd.org/cedarpark,high_school,2300,pending,nces_import
+Glenn High School,Leander ISD,Central Texas,TX,Leander,78641,"9,10,11,12",2500,512-570-3100,https://www.leanderisd.org/glenn,high_school,2500,pending,nces_import
+Round Rock High School,Round Rock ISD,Central Texas,TX,Round Rock,78681,"9,10,11,12",2400,512-428-7000,https://www.roundrockisd.org/roundrock,high_school,2400,pending,nces_import
+Stony Point High School,Round Rock ISD,Central Texas,TX,Round Rock,78665,"9,10,11,12",2500,512-428-8000,https://www.roundrockisd.org/stonypoint,high_school,2500,pending,nces_import
+Westwood High School,Round Rock ISD,Central Texas,TX,Austin,78750,"9,10,11,12",2400,512-428-3800,https://www.roundrockisd.org/westwood,high_school,2400,pending,nces_import
+McNeil High School,Round Rock ISD,Central Texas,TX,Austin,78729,"9,10,11,12",2300,512-428-2000,https://www.roundrockisd.org/mcneil,high_school,2300,pending,nces_import
+Cedar Ridge High School,Round Rock ISD,Central Texas,TX,Round Rock,78664,"9,10,11,12",2200,512-428-9000,https://www.roundrockisd.org/cedarridge,high_school,2200,pending,nces_import
+Alamo Heights High School,Alamo Heights ISD,South Texas,TX,San Antonio,78209,"9,10,11,12",1850,210-824-2483,https://www.ahisd.net/ahhs,high_school,1850,pending,nces_import
+Brackenridge High School,San Antonio ISD,South Texas,TX,San Antonio,78201,"9,10,11,12",1600,210-554-2400,https://www.saisd.net/brackenridge,high_school,1600,pending,nces_import
+Burbank High School,San Antonio ISD,South Texas,TX,San Antonio,78207,"9,10,11,12",1400,210-554-2500,https://www.saisd.net/burbank,high_school,1400,pending,nces_import
+Edison High School,San Antonio ISD,South Texas,TX,San Antonio,78237,"9,10,11,12",1300,210-554-2600,https://www.saisd.net/edison,high_school,1300,pending,nces_import
+Fox Tech High School,San Antonio ISD,South Texas,TX,San Antonio,78205,"9,10,11,12",900,210-554-2700,https://www.saisd.net/foxtech,high_school,900,pending,nces_import
+Highlands High School,San Antonio ISD,South Texas,TX,San Antonio,78210,"9,10,11,12",1100,210-554-2800,https://www.saisd.net/highlands,high_school,1100,pending,nces_import
+Lanier High School,San Antonio ISD,South Texas,TX,San Antonio,78211,"9,10,11,12",1200,210-554-2900,https://www.saisd.net/lanier,high_school,1200,pending,nces_import
+Sam Houston High School,San Antonio ISD,South Texas,TX,San Antonio,78207,"9,10,11,12",1350,210-554-3000,https://www.saisd.net/samhouston,high_school,1350,pending,nces_import
+Brackenridge High School,Northside ISD,South Texas,TX,San Antonio,78251,"9,10,11,12",2600,210-397-8600,https://www.nisd.net/brackenridge,high_school,2600,pending,nces_import
+Brandeis High School,Northside ISD,South Texas,TX,San Antonio,78251,"9,10,11,12",2700,210-397-7200,https://www.nisd.net/brandeis,high_school,2700,pending,nces_import
+Brennan High School,Northside ISD,South Texas,TX,San Antonio,78254,"9,10,11,12",2800,210-397-3800,https://www.nisd.net/brennan,high_school,2800,pending,nces_import
+Clark High School,Northside ISD,South Texas,TX,San Antonio,78245,"9,10,11,12",3000,210-397-7700,https://www.nisd.net/clark,high_school,3000,pending,nces_import
+Holmes High School,Northside ISD,South Texas,TX,San Antonio,78240,"9,10,11,12",2900,210-397-7300,https://www.nisd.net/holmes,high_school,2900,pending,nces_import
+Marshall High School,Northside ISD,South Texas,TX,San Antonio,78251,"9,10,11,12",2650,210-397-5700,https://www.nisd.net/marshall,high_school,2650,pending,nces_import
+O'Connor High School,Northside ISD,South Texas,TX,San Antonio,78247,"9,10,11,12",2750,210-397-7400,https://www.nisd.net/oconnor,high_school,2750,pending,nces_import
+Stevens High School,Northside ISD,South Texas,TX,San Antonio,78254,"9,10,11,12",2500,210-397-3900,https://www.nisd.net/stevens,high_school,2500,pending,nces_import
+Taft High School,Northside ISD,South Texas,TX,San Antonio,78251,"9,10,11,12",2600,210-397-7500,https://www.nisd.net/taft,high_school,2600,pending,nces_import
+Warren High School,Northside ISD,South Texas,TX,San Antonio,78250,"9,10,11,12",2700,210-397-4700,https://www.nisd.net/warren,high_school,2700,pending,nces_import
+Churchill High School,North East ISD,South Texas,TX,San Antonio,78230,"9,10,11,12",2400,210-442-0300,https://www.neisd.net/churchill,high_school,2400,pending,nces_import
+Johnson High School,North East ISD,South Texas,TX,San Antonio,78245,"9,10,11,12",2500,210-356-0600,https://www.neisd.net/johnson,high_school,2500,pending,nces_import
+Lee High School,North East ISD,South Texas,TX,San Antonio,78217,"9,10,11,12",2300,210-804-7200,https://www.neisd.net/lee,high_school,2300,pending,nces_import
+MacArthur High School,North East ISD,South Texas,TX,San Antonio,78217,"9,10,11,12",2200,210-804-8200,https://www.neisd.net/macarthur,high_school,2200,pending,nces_import
+Madison High School,North East ISD,South Texas,TX,San Antonio,78218,"9,10,11,12",2100,210-442-3100,https://www.neisd.net/madison,high_school,2100,pending,nces_import
+Reagan High School,North East ISD,South Texas,TX,San Antonio,78258,"9,10,11,12",2600,210-356-1500,https://www.neisd.net/reagan,high_school,2600,pending,nces_import
+Roosevelt High School,North East ISD,South Texas,TX,San Antonio,78239,"9,10,11,12",2000,210-804-8500,https://www.neisd.net/roosevelt,high_school,2000,pending,nces_import
+Central High School,El Paso ISD,West Texas,TX,El Paso,79903,"9,10,11,12",1800,915-230-2100,https://www.episd.org/central,high_school,1800,pending,nces_import
+Jefferson High School,El Paso ISD,West Texas,TX,El Paso,79930,"9,10,11,12",1750,915-230-2200,https://www.episd.org/jefferson,high_school,1750,pending,nces_import
+Austin High School,El Paso ISD,West Texas,TX,El Paso,79930,"9,10,11,12",1900,915-230-2300,https://www.episd.org/austin,high_school,1900,pending,nces_import
+Bowie High School,El Paso ISD,West Texas,TX,El Paso,79925,"9,10,11,12",2000,915-230-2400,https://www.episd.org/bowie,high_school,2000,pending,nces_import
+Burges High School,El Paso ISD,West Texas,TX,El Paso,79915,"9,10,11,12",2100,915-230-2500,https://www.episd.org/burges,high_school,2100,pending,nces_import
+Coronado High School,El Paso ISD,West Texas,TX,El Paso,79932,"9,10,11,12",2200,915-230-2600,https://www.episd.org/coronado,high_school,2200,pending,nces_import
+Eastwood High School,Ysleta ISD,West Texas,TX,El Paso,79936,"9,10,11,12",2300,915-434-0400,https://www.yisd.net/eastwood,high_school,2300,pending,nces_import
+Irvin High School,Ysleta ISD,West Texas,TX,El Paso,79907,"9,10,11,12",2250,915-434-0500,https://www.yisd.net/irvin,high_school,2250,pending,nces_import
+Bel Air High School,Ysleta ISD,West Texas,TX,El Paso,79936,"9,10,11,12",2400,915-434-0600,https://www.yisd.net/belair,high_school,2400,pending,nces_import
+Parkland High School,Ysleta ISD,West Texas,TX,El Paso,79907,"9,10,11,12",2350,915-434-0700,https://www.yisd.net/parkland,high_school,2350,pending,nces_import
+Riverside High School,Ysleta ISD,West Texas,TX,El Paso,79905,"9,10,11,12",2200,915-434-0800,https://www.yisd.net/riverside,high_school,2200,pending,nces_import
+Ysleta High School,Ysleta ISD,West Texas,TX,El Paso,79907,"9,10,11,12",2100,915-434-0900,https://www.yisd.net/ysleta,high_school,2100,pending,nces_import
+Midland High School,Midland ISD,West Texas,TX,Midland,79701,"9,10,11,12",2000,432-240-1000,https://www.midlandisd.net/mhs,high_school,2000,pending,nces_import
+Legacy High School,Midland ISD,West Texas,TX,Midland,79707,"9,10,11,12",1950,432-240-1100,https://www.midlandisd.net/legacy,high_school,1950,pending,nces_import
+Lubbock High School,Lubbock ISD,West Texas,TX,Lubbock,79401,"9,10,11,12",1900,806-219-2200,https://www.lubbockisd.org/lhs,high_school,1900,pending,nces_import
+Monterey High School,Lubbock ISD,West Texas,TX,Lubbock,79410,"9,10,11,12",1850,806-219-2300,https://www.lubbockisd.org/monterey,high_school,1850,pending,nces_import
+Coronado High School,Lubbock ISD,West Texas,TX,Lubbock,79423,"9,10,11,12",2050,806-219-2400,https://www.lubbockisd.org/coronado,high_school,2050,pending,nces_import
+Frenship High School,Frenship ISD,West Texas,TX,Wolfforth,79382,"9,10,11,12",2200,806-866-4400,https://www.frenship.us/fhs,high_school,2200,pending,nces_import
+Amarillo High School,Amarillo ISD,Panhandle,TX,Amarillo,79109,"9,10,11,12",1750,806-326-1000,https://www.amaisd.org/ahs,high_school,1750,pending,nces_import
+Palo Duro High School,Amarillo ISD,Panhandle,TX,Amarillo,79109,"9,10,11,12",1800,806-326-1100,https://www.amaisd.org/pdhs,high_school,1800,pending,nces_import
+Caprock High School,Amarillo ISD,Panhandle,TX,Amarillo,79109,"9,10,11,12",1650,806-326-1200,https://www.amaisd.org/caprock,high_school,1650,pending,nces_import
+Tascosa High School,Amarillo ISD,Panhandle,TX,Amarillo,79124,"9,10,11,12",1700,806-326-1300,https://www.amaisd.org/tascosa,high_school,1700,pending,nces_import
+Arlington High School,Arlington ISD,North Texas,TX,Arlington,76010,"9,10,11,12",2100,682-867-7300,https://www.aisd.net/ahs,high_school,2100,pending,nces_import
+Bowie High School,Arlington ISD,North Texas,TX,Arlington,76013,"9,10,11,12",2000,682-867-7400,https://www.aisd.net/bowie,high_school,2000,pending,nces_import
+Lamar High School,Arlington ISD,North Texas,TX,Arlington,76014,"9,10,11,12",1950,682-867-7500,https://www.aisd.net/lamar,high_school,1950,pending,nces_import
+Martin High School,Arlington ISD,North Texas,TX,Arlington,76001,"9,10,11,12",2200,682-867-7600,https://www.aisd.net/martin,high_school,2200,pending,nces_import
+Sam Houston High School,Arlington ISD,North Texas,TX,Arlington,76011,"9,10,11,12",1900,682-867-7700,https://www.aisd.net/samhouston,high_school,1900,pending,nces_import
+Seguin High School,Arlington ISD,North Texas,TX,Arlington,76017,"9,10,11,12",1850,682-867-7800,https://www.aisd.net/seguin,high_school,1850,pending,nces_import
+Fort Worth Polytechnic High School,Fort Worth ISD,North Texas,TX,Fort Worth,76110,"9,10,11,12",1600,817-814-5000,https://www.fwisd.org/polytechnic,high_school,1600,pending,nces_import
+Eastern Hills High School,Fort Worth ISD,North Texas,TX,Fort Worth,76118,"9,10,11,12",1750,817-814-5100,https://www.fwisd.org/easternhills,high_school,1750,pending,nces_import
+North Side High School,Fort Worth ISD,North Texas,TX,Fort Worth,76164,"9,10,11,12",1900,817-814-5200,https://www.fwisd.org/northside,high_school,1900,pending,nces_import
+Trimble Tech High School,Fort Worth ISD,North Texas,TX,Fort Worth,76115,"9,10,11,12",1650,817-814-5300,https://www.fwisd.org/trimbletech,high_school,1650,pending,nces_import
+South Hills High School,Fort Worth ISD,North Texas,TX,Fort Worth,76132,"9,10,11,12",1700,817-814-5400,https://www.fwisd.org/southhills,high_school,1700,pending,nces_import
+Paschal High School,Fort Worth ISD,North Texas,TX,Fort Worth,76107,"9,10,11,12",1950,817-814-5500,https://www.fwisd.org/paschal,high_school,1950,pending,nces_import
+Western Hills High School,Fort Worth ISD,North Texas,TX,Fort Worth,76116,"9,10,11,12",1800,817-814-5600,https://www.fwisd.org/westernhills,high_school,1800,pending,nces_import
+North Crowley High School,Crowley ISD,North Texas,TX,Fort Worth,76179,"9,10,11,12",2400,817-297-5800,https://www.crowley.k12.tx.us/northcrowley,high_school,2400,pending,nces_import
+Crowley High School,Crowley ISD,North Texas,TX,Crowley,76036,"9,10,11,12",2200,817-297-5700,https://www.crowley.k12.tx.us/crowley,high_school,2200,pending,nces_import
+Burleson High School,Burleson ISD,North Texas,TX,Burleson,76028,"9,10,11,12",2100,817-426-3300,https://www.burlesonisd.net/bhs,high_school,2100,pending,nces_import
+Centennial High School,Burleson ISD,North Texas,TX,Burleson,76028,"9,10,11,12",2000,817-426-3400,https://www.burlesonisd.net/centennial,high_school,2000,pending,nces_import
+Waco High School,Waco ISD,Central Texas,TX,Waco,76701,"9,10,11,12",1600,254-755-9471,https://www.wacoisd.org/whs,high_school,1600,pending,nces_import
+University High School,Waco ISD,Central Texas,TX,Waco,76705,"9,10,11,12",1500,254-755-9486,https://www.wacoisd.org/university,high_school,1500,pending,nces_import
+Midway High School,Midway ISD,Central Texas,TX,Waco,76712,"9,10,11,12",2300,254-761-5610,https://www.midwayisd.org/mhs,high_school,2300,pending,nces_import
+Killeen High School,Killeen ISD,Central Texas,TX,Killeen,76541,"9,10,11,12",2400,254-336-0200,https://www.killeenisd.org/khs,high_school,2400,pending,nces_import
+Harker Heights High School,Killeen ISD,Central Texas,TX,Harker Heights,76548,"9,10,11,12",2300,254-336-3600,https://www.killeenisd.org/hhhs,high_school,2300,pending,nces_import
+Shoemaker High School,Killeen ISD,Central Texas,TX,Killeen,76543,"9,10,11,12",2200,254-336-1400,https://www.killeenisd.org/shs,high_school,2200,pending,nces_import
+Ellison High School,Killeen ISD,Central Texas,TX,Killeen,76542,"9,10,11,12",2350,254-336-4100,https://www.killeenisd.org/ehs,high_school,2350,pending,nces_import
+Temple High School,Temple ISD,Central Texas,TX,Temple,76501,"9,10,11,12",1900,254-215-2000,https://www.templeisd.org/ths,high_school,1900,pending,nces_import
+Belton High School,Belton ISD,Central Texas,TX,Belton,76513,"9,10,11,12",2000,254-215-2100,https://www.bisd.net/bhs,high_school,2000,pending,nces_import
+Tyler High School,Tyler ISD,East Texas,TX,Tyler,75701,"9,10,11,12",2000,903-262-2100,https://www.tylerisd.org/ths,high_school,2000,pending,nces_import
+Tyler Legacy High School,Tyler ISD,East Texas,TX,Tyler,75703,"9,10,11,12",1950,903-262-2200,https://www.tylerisd.org/legacy,high_school,1950,pending,nces_import
+John Tyler High School,Tyler ISD,East Texas,TX,Tyler,75702,"9,10,11,12",1850,903-262-2300,https://www.tylerisd.org/johntyler,high_school,1850,pending,nces_import
+Longview High School,Longview ISD,East Texas,TX,Longview,75601,"9,10,11,12",2200,903-381-2200,https://www.lisd.org/lhs,high_school,2200,pending,nces_import
+Pine Tree High School,Pine Tree ISD,East Texas,TX,Longview,75604,"9,10,11,12",1600,903-295-5000,https://www.ptisd.org/pths,high_school,1600,pending,nces_import
+Marshall High School,Marshall ISD,East Texas,TX,Marshall,75670,"9,10,11,12",1400,903-927-8700,https://www.marshallisd.com/mhs,high_school,1400,pending,nces_import
+Lufkin High School,Lufkin ISD,East Texas,TX,Lufkin,75901,"9,10,11,12",1950,936-630-4200,https://www.lufkinisd.org/lhs,high_school,1950,pending,nces_import
+Nacogdoches High School,Nacogdoches ISD,East Texas,TX,Nacogdoches,75961,"9,10,11,12",1600,936-569-5000,https://www.nacisd.org/nhs,high_school,1600,pending,nces_import
+College Station High School,College Station ISD,Central Texas,TX,College Station,77845,"9,10,11,12",2300,979-764-5500,https://www.csisd.org/cshs,high_school,2300,pending,nces_import
+Bryan High School,Bryan ISD,Central Texas,TX,Bryan,77803,"9,10,11,12",1900,979-209-1300,https://www.bryanisd.org/bhs,high_school,1900,pending,nces_import
+Rudder High School,Bryan ISD,Central Texas,TX,Bryan,77802,"9,10,11,12",1850,979-209-1400,https://www.bryanisd.org/rudder,high_school,1850,pending,nces_import
+A&M Consolidated High School,College Station ISD,Central Texas,TX,College Station,77845,"9,10,11,12",2200,979-764-5600,https://www.csisd.org/consol,high_school,2200,pending,nces_import
+Corpus Christi Carroll High School,Corpus Christi ISD,Coastal Texas,TX,Corpus Christi,78411,"9,10,11,12",1700,361-878-1400,https://www.ccisd.us/carroll,high_school,1700,pending,nces_import
+Corpus Christi King High School,Corpus Christi ISD,Coastal Texas,TX,Corpus Christi,78418,"9,10,11,12",1750,361-878-1500,https://www.ccisd.us/king,high_school,1750,pending,nces_import
+Corpus Christi Miller High School,Corpus Christi ISD,Coastal Texas,TX,Corpus Christi,78410,"9,10,11,12",1800,361-878-1600,https://www.ccisd.us/miller,high_school,1800,pending,nces_import
+Corpus Christi Moody High School,Corpus Christi ISD,Coastal Texas,TX,Corpus Christi,78405,"9,10,11,12",1650,361-878-1700,https://www.ccisd.us/moody,high_school,1650,pending,nces_import
+Corpus Christi Ray High School,Corpus Christi ISD,Coastal Texas,TX,Corpus Christi,78412,"9,10,11,12",1900,361-878-1800,https://www.ccisd.us/ray,high_school,1900,pending,nces_import
+Veterans Memorial High School,Corpus Christi ISD,Coastal Texas,TX,Corpus Christi,78418,"9,10,11,12",2000,361-878-1900,https://www.ccisd.us/veterans,high_school,2000,pending,nces_import
+Victoria East High School,Victoria ISD,Coastal Texas,TX,Victoria,77901,"9,10,11,12",1500,361-788-9700,https://www.visd.com/east,high_school,1500,pending,nces_import
+Victoria West High School,Victoria ISD,Coastal Texas,TX,Victoria,77901,"9,10,11,12",1450,361-788-9800,https://www.visd.com/west,high_school,1450,pending,nces_import
+Laredo United High School,United ISD,South Texas,TX,Laredo,78045,"9,10,11,12",2100,956-473-6300,https://www.uisd.net/united,high_school,2100,pending,nces_import
+Alexander High School,United ISD,South Texas,TX,Laredo,78045,"9,10,11,12",2000,956-473-6400,https://www.uisd.net/alexander,high_school,2000,pending,nces_import
+Nixon High School,United ISD,South Texas,TX,Laredo,78046,"9,10,11,12",1950,956-473-6500,https://www.uisd.net/nixon,high_school,1950,pending,nces_import
+United South High School,United ISD,South Texas,TX,Laredo,78046,"9,10,11,12",2050,956-473-6600,https://www.uisd.net/unitedsouth,high_school,2050,pending,nces_import
+McAllen High School,McAllen ISD,South Texas,TX,McAllen,78501,"9,10,11,12",2400,956-632-5000,https://www.mcallenisd.org/mhs,high_school,2400,pending,nces_import
+Memorial High School,McAllen ISD,South Texas,TX,McAllen,78503,"9,10,11,12",2300,956-632-6000,https://www.mcallenisd.org/memorial,high_school,2300,pending,nces_import
+Rowe High School,McAllen ISD,South Texas,TX,McAllen,78504,"9,10,11,12",2200,956-632-7000,https://www.mcallenisd.org/rowe,high_school,2200,pending,nces_import
+Edinburg High School,Edinburg CISD,South Texas,TX,Edinburg,78539,"9,10,11,12",2500,956-289-2300,https://www.ecisd.us/ehs,high_school,2500,pending,nces_import
+Edinburg North High School,Edinburg CISD,South Texas,TX,Edinburg,78541,"9,10,11,12",2400,956-289-2400,https://www.ecisd.us/enhs,high_school,2400,pending,nces_import
+Vela High School,Edinburg CISD,South Texas,TX,Edinburg,78542,"9,10,11,12",2300,956-289-2500,https://www.ecisd.us/vela,high_school,2300,pending,nces_import
+Brownsville Hanna High School,Brownsville ISD,South Texas,TX,Brownsville,78520,"9,10,11,12",2000,956-698-0600,https://www.bisd.us/hanna,high_school,2000,pending,nces_import
+Brownsville Lopez High School,Brownsville ISD,South Texas,TX,Brownsville,78520,"9,10,11,12",1900,956-698-0700,https://www.bisd.us/lopez,high_school,1900,pending,nces_import
+Brownsville Pace High School,Brownsville ISD,South Texas,TX,Brownsville,78521,"9,10,11,12",1850,956-698-0800,https://www.bisd.us/pace,high_school,1850,pending,nces_import
+Brownsville Porter High School,Brownsville ISD,South Texas,TX,Brownsville,78526,"9,10,11,12",2100,956-698-0900,https://www.bisd.us/porter,high_school,2100,pending,nces_import
+Brownsville Rivera High School,Brownsville ISD,South Texas,TX,Brownsville,78521,"9,10,11,12",1950,956-698-1000,https://www.bisd.us/rivera,high_school,1950,pending,nces_import
+Brownsville Veterans Memorial High School,Brownsville ISD,South Texas,TX,Brownsville,78526,"9,10,11,12",2050,956-698-1100,https://www.bisd.us/veterans,high_school,2050,pending,nces_import

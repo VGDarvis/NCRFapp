@@ -6,8 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, Download, FileSpreadsheet, AlertCircle } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, AlertCircle, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useImportJobs } from "@/hooks/useImportJobs";
+import { ImportProgressWidget } from "./ImportProgressWidget";
 
 interface BulkImportDialogProps {
   open: boolean;
@@ -21,6 +23,10 @@ export function BulkImportDialog({ open, onOpenChange }: BulkImportDialogProps) 
   const [errors, setErrors] = useState<string[]>([]);
   const [successCount, setSuccessCount] = useState(0);
   const [activeTab, setActiveTab] = useState("schools");
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
+  
+  const { activeJobs, createJob, updateProgress } = useImportJobs();
+  const BATCH_SIZE = 50;
 
   const downloadTemplate = (type: "schools" | "youth_services") => {
     if (type === "schools") {
@@ -78,6 +84,177 @@ export function BulkImportDialog({ open, onOpenChange }: BulkImportDialogProps) 
     return null;
   };
 
+  const checkDuplicates = async (rows: any[], table: string): Promise<Set<string>> => {
+    const duplicates = new Set<string>();
+    
+    for (const row of rows) {
+      const nameField = table === "school_database" ? "school_name" : "organization_name";
+      const nameValue = table === "school_database" ? row.school_name : row.organization_name;
+      
+      const { data } = await supabase
+        .from(table as any)
+        .select("id")
+        .eq(nameField, nameValue)
+        .eq("city", row.city)
+        .eq("state", row.state)
+        .maybeSingle();
+      
+      if (data) {
+        const key = `${nameValue}-${row.city}-${row.state}`;
+        duplicates.add(key);
+      }
+    }
+    
+    return duplicates;
+  };
+
+  const quickStartTexas = async () => {
+    setFile(null);
+    setImporting(true);
+    setErrors([]);
+    setSuccessCount(0);
+    setProgress(0);
+
+    try {
+      const response = await fetch("/datasets/texas_high_schools.csv");
+      const text = await response.text();
+      await processImport(text);
+    } catch (error: any) {
+      toast.error(`Quick Start failed: ${error.message}`);
+      setImporting(false);
+    }
+  };
+
+  const processImport = async (text: string) => {
+    const rows = parseCSV(text);
+    
+    if (rows.length === 0) {
+      toast.error("No data found in file");
+      setImporting(false);
+      return;
+    }
+
+    const validationErrors: string[] = [];
+    const validRows: any[] = [];
+
+    // Validate all rows
+    rows.forEach((row, index) => {
+      const error = activeTab === "schools" 
+        ? validateSchoolRow(row, index + 2)
+        : validateYouthServiceRow(row, index + 2);
+      
+      if (error) {
+        validationErrors.push(error);
+      } else {
+        validRows.push(row);
+      }
+    });
+
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      setImporting(false);
+      return;
+    }
+
+    // Create import job
+    const job = await createJob.mutateAsync({
+      job_type: activeTab,
+      total_records: validRows.length,
+      metadata: { filename: file?.name || "texas_quick_start" },
+    });
+    
+    setCurrentJobId(job.id);
+    
+    await updateProgress.mutateAsync({
+      jobId: job.id,
+      processed: 0,
+      failed: 0,
+      status: "in_progress",
+    });
+
+    const table = activeTab === "schools" ? "school_database" : "youth_services_database";
+    
+    // Check for duplicates
+    const duplicates = await checkDuplicates(validRows, table);
+    
+    // Filter out duplicates
+    const nonDuplicateRows = validRows.filter(row => {
+      const key = `${row.school_name || row.organization_name}-${row.city}-${row.state}`;
+      return !duplicates.has(key);
+    });
+
+    if (duplicates.size > 0) {
+      toast.info(`Skipping ${duplicates.size} duplicate records`);
+    }
+
+    // Batch import
+    let imported = 0;
+    let failed = 0;
+    const errorLog: any[] = [];
+    
+    for (let i = 0; i < nonDuplicateRows.length; i += BATCH_SIZE) {
+      const batch = nonDuplicateRows.slice(i, i + BATCH_SIZE);
+      
+      // Add metadata to each row
+      const batchWithMetadata = batch.map(row => ({
+        ...row,
+        data_source: "bulk_import",
+        verification_status: "pending",
+      }));
+      
+      try {
+        const { error } = await supabase.from(table).insert(batchWithMetadata);
+        
+        if (!error) {
+          imported += batch.length;
+        } else {
+          failed += batch.length;
+          errorLog.push({ batch: i / BATCH_SIZE, error: error.message });
+          validationErrors.push(`Batch ${i / BATCH_SIZE + 1}: ${error.message}`);
+        }
+      } catch (err: any) {
+        failed += batch.length;
+        errorLog.push({ batch: i / BATCH_SIZE, error: err.message });
+        validationErrors.push(`Batch ${i / BATCH_SIZE + 1}: ${err.message}`);
+      }
+      
+      // Update progress
+      const processed = imported + failed;
+      setProgress(Math.round((processed / nonDuplicateRows.length) * 100));
+      
+      await updateProgress.mutateAsync({
+        jobId: job.id,
+        processed,
+        failed,
+        errorLog,
+      });
+    }
+
+    // Complete job
+    await updateProgress.mutateAsync({
+      jobId: job.id,
+      processed: imported + failed,
+      failed,
+      status: failed === nonDuplicateRows.length ? "failed" : "completed",
+      errorLog,
+    });
+
+    setSuccessCount(imported);
+    setErrors(validationErrors);
+    
+    if (imported > 0) {
+      toast.success(`Successfully imported ${imported} records (${duplicates.size} duplicates skipped)`);
+      setTimeout(() => {
+        onOpenChange(false);
+        window.location.reload();
+      }, 2000);
+    } else {
+      toast.error("Import failed - no records were imported");
+    }
+    
+    setImporting(false);
+  };
+
   const handleImport = async () => {
     if (!file) {
       toast.error("Please select a file");
@@ -91,76 +268,9 @@ export function BulkImportDialog({ open, onOpenChange }: BulkImportDialogProps) 
 
     try {
       const text = await file.text();
-      const rows = parseCSV(text);
-      
-      if (rows.length === 0) {
-        toast.error("No data found in file");
-        setImporting(false);
-        return;
-      }
-
-      const validationErrors: string[] = [];
-      const validRows: any[] = [];
-
-      // Validate all rows
-      rows.forEach((row, index) => {
-        const error = activeTab === "schools" 
-          ? validateSchoolRow(row, index + 2)
-          : validateYouthServiceRow(row, index + 2);
-        
-        if (error) {
-          validationErrors.push(error);
-        } else {
-          validRows.push(row);
-        }
-      });
-
-      if (validationErrors.length > 0) {
-        setErrors(validationErrors);
-        setImporting(false);
-        return;
-      }
-
-      // Import valid rows
-      let imported = 0;
-      const table = activeTab === "schools" ? "school_database" : "youth_services_database";
-      
-      for (let i = 0; i < validRows.length; i++) {
-        const row = validRows[i];
-        
-        // Add metadata
-        row.data_source = "bulk_import";
-        row.verification_status = "pending";
-        
-        try {
-          const { error } = await supabase.from(table).insert(row);
-          
-          if (!error) {
-            imported++;
-          } else {
-            validationErrors.push(`Row ${i + 2}: ${error.message}`);
-          }
-        } catch (err: any) {
-          validationErrors.push(`Row ${i + 2}: ${err.message}`);
-        }
-        
-        setProgress(Math.round(((i + 1) / validRows.length) * 100));
-      }
-
-      setSuccessCount(imported);
-      setErrors(validationErrors);
-      
-      if (imported > 0) {
-        toast.success(`Successfully imported ${imported} records`);
-        setTimeout(() => {
-          onOpenChange(false);
-          window.location.reload(); // Refresh to show new data
-        }, 2000);
-      }
-      
+      await processImport(text);
     } catch (error: any) {
       toast.error(`Import failed: ${error.message}`);
-    } finally {
       setImporting(false);
     }
   };
@@ -186,14 +296,25 @@ export function BulkImportDialog({ open, onOpenChange }: BulkImportDialogProps) 
               </AlertDescription>
             </Alert>
 
-            <Button
-              variant="outline"
-              onClick={() => downloadTemplate("schools")}
-              className="w-full"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Download Template
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                onClick={() => downloadTemplate("schools")}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download Template
+              </Button>
+              
+              <Button
+                variant="default"
+                onClick={quickStartTexas}
+                disabled={importing}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                <Zap className="mr-2 h-4 w-4" />
+                Quick Start (200 TX Schools)
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="youth_services" className="space-y-4">
@@ -216,6 +337,14 @@ export function BulkImportDialog({ open, onOpenChange }: BulkImportDialogProps) 
         </Tabs>
 
         <div className="space-y-4">
+          {activeJobs.length > 0 && (
+            <div className="space-y-2">
+              {activeJobs.map((job) => (
+                <ImportProgressWidget key={job.id} job={job} />
+              ))}
+            </div>
+          )}
+          
           <div>
             <Input
               type="file"
