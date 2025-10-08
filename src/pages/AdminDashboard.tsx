@@ -14,6 +14,7 @@ import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
 import { CRMModule } from '@/components/admin/crm/CRMModule';
 import { HRModule } from '@/components/admin/hr/HRModule';
+import { MessagesModule } from '@/components/admin/messages/MessagesModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -111,12 +112,7 @@ export default function AdminDashboard() {
           
           {activeTab === 'crm' && <CRMModule />}
           
-          {activeTab === 'messages' && (
-            <div className="glass-premium rounded-lg p-8 text-center">
-              <h2 className="text-2xl font-bold text-primary mb-2">Messages Module</h2>
-              <p className="text-muted-foreground">Coming in Phase 5</p>
-            </div>
-          )}
+          {activeTab === 'messages' && <MessagesModule />}
           
           {activeTab === 'hr' && <HRModule />}
           
