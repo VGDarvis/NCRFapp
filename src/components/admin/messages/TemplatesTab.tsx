@@ -13,8 +13,8 @@ import { Switch } from "@/components/ui/switch";
 
 export function TemplatesTab() {
   const [filters, setFilters] = useState({
-    templateType: "",
-    category: "",
+    templateType: "all",
+    category: "all",
     isActive: undefined as boolean | undefined,
     search: "",
   });
@@ -142,7 +142,7 @@ export function TemplatesTab() {
               <SelectValue placeholder="Template Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="email">Email</SelectItem>
               <SelectItem value="sms">SMS</SelectItem>
               <SelectItem value="whatsapp">WhatsApp</SelectItem>
@@ -153,7 +153,7 @@ export function TemplatesTab() {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="partnership">Partnership</SelectItem>
               <SelectItem value="recruitment">Recruitment</SelectItem>
               <SelectItem value="event">Event</SelectItem>
@@ -163,16 +163,16 @@ export function TemplatesTab() {
             </SelectContent>
           </Select>
           <Select
-            value={filters.isActive === undefined ? "" : filters.isActive ? "active" : "inactive"}
+            value={filters.isActive === undefined ? "all" : filters.isActive ? "active" : "inactive"}
             onValueChange={(value) =>
-              setFilters({ ...filters, isActive: value === "" ? undefined : value === "active" })
+              setFilters({ ...filters, isActive: value === "all" ? undefined : value === "active" })
             }
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="inactive">Inactive</SelectItem>
             </SelectContent>

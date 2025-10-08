@@ -12,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export function MessagesTab() {
   const [filters, setFilters] = useState({
-    status: "",
-    messageType: "",
+    status: "all",
+    messageType: "all",
     search: "",
   });
 
@@ -143,7 +143,7 @@ export function MessagesTab() {
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Statuses</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
             <SelectItem value="scheduled">Scheduled</SelectItem>
             <SelectItem value="sent">Sent</SelectItem>
@@ -158,7 +158,7 @@ export function MessagesTab() {
             <SelectValue placeholder="Message Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="email">Email</SelectItem>
             <SelectItem value="sms">SMS</SelectItem>
             <SelectItem value="whatsapp">WhatsApp</SelectItem>

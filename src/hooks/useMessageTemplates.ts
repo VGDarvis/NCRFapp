@@ -36,10 +36,10 @@ export function useMessageTemplates(filters?: TemplateFilters) {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (filters?.templateType) {
+      if (filters?.templateType && filters.templateType !== "all") {
         query = query.eq("template_type", filters.templateType);
       }
-      if (filters?.category) {
+      if (filters?.category && filters.category !== "all") {
         query = query.eq("category", filters.category);
       }
       if (filters?.isActive !== undefined) {

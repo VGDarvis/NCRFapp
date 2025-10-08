@@ -44,10 +44,10 @@ export function useCampaigns(filters?: CampaignFilters) {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (filters?.status) {
+      if (filters?.status && filters.status !== "all") {
         query = query.eq("status", filters.status);
       }
-      if (filters?.campaignType) {
+      if (filters?.campaignType && filters.campaignType !== "all") {
         query = query.eq("campaign_type", filters.campaignType);
       }
       if (filters?.dateFrom) {

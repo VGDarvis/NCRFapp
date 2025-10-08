@@ -13,8 +13,8 @@ import { Progress } from "@/components/ui/progress";
 
 export function CampaignsTab() {
   const [filters, setFilters] = useState({
-    status: "",
-    campaignType: "",
+    status: "all",
+    campaignType: "all",
     search: "",
   });
 
@@ -193,7 +193,7 @@ export function CampaignsTab() {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
               <SelectItem value="in-progress">In Progress</SelectItem>
@@ -206,7 +206,7 @@ export function CampaignsTab() {
               <SelectValue placeholder="Campaign Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="email">Email</SelectItem>
               <SelectItem value="sms">SMS</SelectItem>
               <SelectItem value="mixed">Mixed</SelectItem>

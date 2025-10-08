@@ -49,10 +49,10 @@ export function useMessages(filters?: MessageFilters) {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (filters?.status) {
+      if (filters?.status && filters.status !== "all") {
         query = query.eq("status", filters.status);
       }
-      if (filters?.messageType) {
+      if (filters?.messageType && filters.messageType !== "all") {
         query = query.eq("message_type", filters.messageType);
       }
       if (filters?.campaignId) {
