@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface SearchFilters {
-  search_type?: 'schools' | 'scholarships' | 'both';
+  search_type?: 'schools' | 'scholarships' | 'youth_services' | 'all';
+  institution_type?: 'college' | 'high_school' | 'all';
   school_type?: string;
   state?: string;
   region?: string;
@@ -16,12 +17,17 @@ export interface SearchFilters {
   gpa_requirement?: number;
   demographics?: string[];
   athletic_division?: string;
+  sports_programs?: string[];
+  age_ranges?: string[];
+  service_type?: string;
 }
 
 export interface SearchResult {
   filters: SearchFilters;
   schools: any[];
+  high_schools: any[];
   scholarships: any[];
+  youth_services: any[];
   total_results: number;
   duration_ms: number;
 }

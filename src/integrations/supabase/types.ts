@@ -3451,6 +3451,107 @@ export type Database = {
         }
         Relationships: []
       }
+      youth_services_database: {
+        Row: {
+          address: string | null
+          age_ranges: string[] | null
+          city: string
+          coaching_staff: Json | null
+          contact_email: string | null
+          contact_phone: string | null
+          cost_info: string | null
+          created_at: string | null
+          data_source: string | null
+          eligibility_requirements: string[] | null
+          facilities: string[] | null
+          id: string
+          is_active: boolean | null
+          last_updated: string | null
+          organization_name: string | null
+          programs_offered: string[] | null
+          region: string | null
+          schedule: Json | null
+          service_name: string
+          service_type: string
+          sports_offered: string[] | null
+          state: string
+          updated_at: string | null
+          verification_status: string | null
+          verified_at: string | null
+          verified_by: string | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          age_ranges?: string[] | null
+          city: string
+          coaching_staff?: Json | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cost_info?: string | null
+          created_at?: string | null
+          data_source?: string | null
+          eligibility_requirements?: string[] | null
+          facilities?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          last_updated?: string | null
+          organization_name?: string | null
+          programs_offered?: string[] | null
+          region?: string | null
+          schedule?: Json | null
+          service_name: string
+          service_type: string
+          sports_offered?: string[] | null
+          state: string
+          updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          age_ranges?: string[] | null
+          city?: string
+          coaching_staff?: Json | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cost_info?: string | null
+          created_at?: string | null
+          data_source?: string | null
+          eligibility_requirements?: string[] | null
+          facilities?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          last_updated?: string | null
+          organization_name?: string | null
+          programs_offered?: string[] | null
+          region?: string | null
+          schedule?: Json | null
+          service_name?: string
+          service_type?: string
+          sports_offered?: string[] | null
+          state?: string
+          updated_at?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youth_services_database_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
