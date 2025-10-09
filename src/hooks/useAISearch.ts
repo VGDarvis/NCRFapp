@@ -33,6 +33,15 @@ export interface SearchResult {
   using_fallback?: boolean;
   search_message?: string;
   search_expanded?: boolean;
+  search_explanation?: {
+    total: number;
+    breakdown: {
+      high_schools: number;
+      colleges: number;
+      scholarships: number;
+      youth_services: number;
+    };
+  };
 }
 
 // Simple in-memory cache with 5-minute TTL

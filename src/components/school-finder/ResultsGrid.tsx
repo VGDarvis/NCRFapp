@@ -1,8 +1,8 @@
 import { ResultCard } from "./ResultCard";
 import { EmptyState } from "./EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Search, MapPin } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Search, MapPin, BarChart3 } from "lucide-react";
 import { SearchResult } from "@/hooks/useAISearch";
 
 interface ResultsGridProps {
@@ -68,8 +68,49 @@ export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
   // Display results by type
   return (
     <div className="space-y-8">
+      {/* Statistical Summary - For "How many" queries */}
+      {results.search_explanation && (
+        <Alert className="bg-primary/10 border-primary/20">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <AlertTitle className="text-lg font-bold">
+            {results.search_message}
+          </AlertTitle>
+          <AlertDescription className="mt-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+              <div className="text-center p-3 bg-background/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {results.search_explanation.breakdown.high_schools}
+                </div>
+                <div className="text-xs text-muted-foreground">High Schools</div>
+              </div>
+              <div className="text-center p-3 bg-background/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {results.search_explanation.breakdown.colleges}
+                </div>
+                <div className="text-xs text-muted-foreground">Colleges</div>
+              </div>
+              <div className="text-center p-3 bg-background/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {results.search_explanation.breakdown.scholarships}
+                </div>
+                <div className="text-xs text-muted-foreground">Scholarships</div>
+              </div>
+              <div className="text-center p-3 bg-background/50 rounded-lg">
+                <div className="text-2xl font-bold text-primary">
+                  {results.search_explanation.breakdown.youth_services}
+                </div>
+                <div className="text-xs text-muted-foreground">Youth Services</div>
+              </div>
+            </div>
+            <p className="text-sm mt-3 text-center">
+              View the complete list of schools below ↓
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       {/* Search Expansion Notice */}
-      {results.search_expanded && results.search_message && (
+      {results.search_expanded && results.search_message && !results.search_explanation && (
         <Alert className="bg-primary/10 border-primary/20">
           <MapPin className="h-4 w-4 text-primary" />
           <AlertDescription className="text-foreground">

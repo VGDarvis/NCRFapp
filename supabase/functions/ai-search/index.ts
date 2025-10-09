@@ -11,18 +11,46 @@ function parseFallbackFilters(query: string) {
   const lowerQuery = query.toLowerCase();
   const filters: any = { search_type: 'all', usedFallback: true };
 
+  // Detect statistical queries
+  if (lowerQuery.match(/\b(how many|count|total|number of)\b/)) {
+    filters.query_type = 'count';
+  }
+
+  // Extract county (NEW - Phase 1)
+  const countyMatch = query.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+County/i);
+  if (countyMatch) {
+    filters.county = countyMatch[1] + ' County';
+    filters.search_radius_miles = 30;
+    console.log(`📍 Detected county: ${filters.county}`);
+  }
+
   // Extract state codes
   const stateMatch = query.match(/\b([A-Z]{2})\b/);
   if (stateMatch) filters.state = stateMatch[1];
-
-  // Extract cities
-  const cityWords = ['in', 'near', 'around'];
-  for (const word of cityWords) {
-    const regex = new RegExp(`${word}\\s+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*)`, 'i');
-    const match = query.match(regex);
-    if (match) {
-      filters.city = match[1];
+  
+  // Full state names (NEW - Phase 1)
+  const stateNames = {
+    'california': 'CA', 'texas': 'TX', 'florida': 'FL', 'new york': 'NY',
+    'pennsylvania': 'PA', 'illinois': 'IL', 'ohio': 'OH', 'georgia': 'GA',
+    'north carolina': 'NC', 'michigan': 'MI', 'new jersey': 'NJ', 'virginia': 'VA'
+  };
+  for (const [name, code] of Object.entries(stateNames)) {
+    if (lowerQuery.includes(name)) {
+      filters.state = code;
       break;
+    }
+  }
+
+  // Extract cities (only if no county detected)
+  if (!filters.county) {
+    const cityWords = ['in', 'near', 'around'];
+    for (const word of cityWords) {
+      const regex = new RegExp(`${word}\\s+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*)`, 'i');
+      const match = query.match(regex);
+      if (match) {
+        filters.city = match[1];
+        break;
+      }
     }
   }
 
@@ -105,11 +133,14 @@ serve(async (req) => {
 
 Extract these fields (return null if not mentioned):
 - search_type: "schools" | "scholarships" | "youth_services" | "all" (default: "all")
+- query_type: "list" | "count" | "statistical" | null (detect "how many", "count", "total")
 - institution_type: "college" | "high_school" | "all" | null (for schools search)
 - school_type: "HBCU" | "Public" | "Private" | "Community College" | "High School" | null
 - state: string | null (e.g., "CA", "TX")
 - region: "West" | "South" | "Midwest" | "Northeast" | null
 - city: string | null
+- county: string | null (extract county names like "Los Angeles County", "Dallas County")
+- search_radius_miles: number | null (default to 30 if county mentioned, null otherwise)
 - programs: string[] (e.g., ["Engineering", "Business"])
 - min_enrollment: number | null
 - max_enrollment: number | null
@@ -127,6 +158,16 @@ Detection hints:
 - "high school", "secondary school", "prep school" → set institution_type: "high_school"
 - "AAU", "youth league", "sports program", "youth sports" → set search_type: "youth_services"
 - "college", "university" → set institution_type: "college"
+- "how many", "count", "total", "number of" → set query_type: "count"
+- "County" in query → extract county name and set search_radius_miles: 30
+- "Los Angeles County" → set county: "Los Angeles County", city: null, search_radius_miles: 30
+- "LA County" → set county: "Los Angeles County", city: null, search_radius_miles: 30
+- "Greater [City]" → set city: "[City]", search_radius_miles: 30
+
+Common aliases:
+- "LA County" → "Los Angeles County"
+- "NYC" → "New York City", state: "NY"
+- "DFW" → city: "Dallas", state: "TX", search_radius_miles: 30
 
 Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "California" → "CA", "engineering" → "Engineering", "basketball" → "Basketball").`
                 },
@@ -235,6 +276,48 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
 
         const { data, error } = await highSchoolQuery.limit(50);
         if (!error) highSchools = data || [];
+      }
+    }
+
+    // PHASE 1: Geographic expansion for county/region searches
+    if ((filters.county || filters.search_radius_miles) && filters.state && (schools.length + highSchools.length) < 10) {
+      console.log(`🗺️ Expanding search for county/region: ${filters.county || 'radius search'}`);
+      
+      let expandedQuery = supabase
+        .from('school_database')
+        .select('*')
+        .eq('state', filters.state);
+      
+      if (filters.institution_type === 'high_school') {
+        expandedQuery = expandedQuery.eq('school_type', 'High School');
+      } else if (filters.institution_type === 'college') {
+        expandedQuery = expandedQuery.neq('school_type', 'High School');
+      }
+      
+      if (filters.school_type) {
+        expandedQuery = expandedQuery.eq('school_type', filters.school_type);
+      }
+      if (filters.sports_programs && filters.sports_programs.length > 0) {
+        expandedQuery = expandedQuery.overlaps('athletic_programs', filters.sports_programs);
+      }
+      
+      const { data: expandedData, error: expandedError } = await expandedQuery.limit(200);
+      
+      if (!expandedError && expandedData && expandedData.length > 0) {
+        const taggedResults = expandedData.map(school => ({
+          ...school,
+          search_expanded: true,
+          distance_category: 'county_wide',
+          expansion_reason: filters.county ? `Part of ${filters.county}` : 'Nearby area'
+        }));
+        
+        const expandedColleges = taggedResults.filter(s => s.school_type !== 'High School');
+        const expandedHighSchools = taggedResults.filter(s => s.school_type === 'High School');
+        
+        schools = [...schools, ...expandedColleges];
+        highSchools = [...highSchools, ...expandedHighSchools];
+        
+        console.log(`✅ County expansion added ${taggedResults.length} schools (${expandedColleges.length} colleges, ${expandedHighSchools.length} high schools)`);
       }
     }
 
@@ -470,6 +553,31 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
       user_id: userId,
     });
 
+    // Generate search explanation for statistical queries
+    let searchExplanation = null;
+    if (filters.query_type === 'count') {
+      searchExplanation = {
+        total: totalResults,
+        breakdown: {
+          high_schools: highSchools.length,
+          colleges: schools.length,
+          scholarships: scholarships.length,
+          youth_services: youthServices.length
+        }
+      };
+      
+      if (!searchMessage) {
+        searchMessage = `Found ${totalResults} results`;
+        if (filters.county) {
+          searchMessage += ` in ${filters.county}`;
+        } else if (filters.city) {
+          searchMessage += ` in ${filters.city}`;
+        } else if (filters.state) {
+          searchMessage += ` in ${filters.state}`;
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({
         filters,
@@ -482,6 +590,7 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         using_fallback: usingFallback,
         search_message: searchMessage,
         search_expanded: searchExpanded,
+        search_explanation: searchExplanation,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
