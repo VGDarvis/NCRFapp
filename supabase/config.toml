@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.web-scrape-schools]
 verify_jwt = false
+
+[functions.ai-enrich-school]
+verify_jwt = false

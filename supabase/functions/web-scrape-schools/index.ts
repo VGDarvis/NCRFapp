@@ -18,6 +18,12 @@ interface SchoolResult {
   enrollment?: number;
   source: string;
   import_available: boolean;
+  programs?: string[];
+  sports?: string[];
+  demographics?: any;
+  notes?: string;
+  ai_enriched?: boolean;
+  confidence_score?: number;
 }
 
 // Simple HTML parser to extract school data
@@ -201,20 +207,55 @@ Deno.serve(async (req) => {
     // Scrape the web
     const schools = await scrapeSchools(city, state, school_type || 'high_school');
 
-    // Store in cache
+    // Enrich with AI (parallel for speed)
+    console.log('🤖 Enriching', schools.length, 'schools with AI...');
+    const enrichedSchools = await Promise.all(
+      schools.map(async (school) => {
+        try {
+          const { data: enrichedData, error } = await supabase.functions.invoke('ai-enrich-school', {
+            body: { schoolData: school }
+          });
+
+          if (error || !enrichedData?.enrichedData) {
+            console.log('⚠️ AI enrichment failed for:', school.name);
+            return school;
+          }
+
+          const enriched = enrichedData.enrichedData;
+          console.log('✨ AI enriched:', school.name, 'confidence:', enriched.confidence_score);
+
+          return {
+            ...school,
+            enrollment: enriched.enrollment || school.enrollment,
+            programs: enriched.programs_offered || [],
+            sports: enriched.athletic_programs || [],
+            phone: enriched.contact_info?.phone || school.phone,
+            demographics: enriched.demographics,
+            notes: enriched.notes,
+            ai_enriched: true,
+            confidence_score: enriched.confidence_score
+          };
+        } catch (error) {
+          console.error('❌ Enrichment error for', school.name, ':', error);
+          return school;
+        }
+      })
+    );
+
+    // Store enriched results in cache
     await supabase
       .from('web_search_cache')
       .upsert({
         search_key: searchKey,
-        results: schools,
+        results: enrichedSchools,
         created_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       });
 
-    console.log(`💾 Cached ${schools.length} results for:`, searchKey);
+    console.log(`💾 Cached ${enrichedSchools.length} AI-enriched results for:`, searchKey);
 
     return new Response(
-      JSON.stringify({ schools, from_cache: false }),
+      JSON.stringify({ schools: enrichedSchools, from_cache: false }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

@@ -18,10 +18,13 @@ export function QuickImportDialog({ open, onOpenChange, schoolData }: QuickImpor
   const { createSchool } = useSchools();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    programs: "",
-    sports: "",
-    notes: "",
+    programs: schoolData.programs?.join(", ") || "",
+    sports: schoolData.sports?.join(", ") || "",
+    notes: schoolData.notes || "",
   });
+
+  const isAiEnriched = schoolData.ai_enriched;
+  const confidenceScore = schoolData.confidence_score || 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,9 +62,18 @@ export function QuickImportDialog({ open, onOpenChange, schoolData }: QuickImpor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add School to Database</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            Add School to Database
+            {isAiEnriched && (
+              <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                ✨ AI-Enhanced ({confidenceScore}% confidence)
+              </span>
+            )}
+          </DialogTitle>
           <DialogDescription>
-            Review the information from web search and add additional details
+            {isAiEnriched 
+              ? "AI has automatically extracted and verified this information. Review and edit as needed."
+              : "Review the information from web search and add additional details"}
           </DialogDescription>
         </DialogHeader>
 
