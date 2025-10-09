@@ -31,6 +31,8 @@ export interface SearchResult {
   total_results: number;
   duration_ms: number;
   using_fallback?: boolean;
+  search_message?: string;
+  search_expanded?: boolean;
 }
 
 // Simple in-memory cache with 5-minute TTL

@@ -281,6 +281,121 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
     // Merge web results with high schools
     highSchools = [...highSchools, ...webResults];
 
+    // NEVER SHOW BLANK: 5-Layer Fallback System
+    const totalSchoolsAfterWeb = schools.length + highSchools.length;
+    let searchMessage = null;
+    let searchExpanded = false;
+
+    if (totalSchoolsAfterWeb < 5) {
+      console.log(`🔄 Only ${totalSchoolsAfterWeb} schools found, expanding search...`);
+      
+      // LAYER 2: Expand to entire state (if city was specified)
+      if (filters.city && filters.state) {
+        console.log(`📍 Searching entire ${filters.state} state...`);
+        
+        let stateWideQuery = supabase
+          .from('school_database')
+          .select('*')
+          .eq('state', filters.state);
+        
+        if (filters.institution_type === 'high_school') {
+          stateWideQuery = stateWideQuery.eq('school_type', 'High School');
+        } else if (filters.institution_type === 'college') {
+          stateWideQuery = stateWideQuery.neq('school_type', 'High School');
+        }
+        
+        const { data: stateSchools } = await stateWideQuery.limit(100);
+        
+        if (stateSchools && stateSchools.length > 0) {
+          const nearbyResults = stateSchools.map(school => ({
+            ...school,
+            distance_category: 'state_wide',
+            search_expanded: true,
+            original_search_city: filters.city
+          }));
+          
+          const hsResults = nearbyResults.filter(s => s.school_type === 'High School');
+          const collegeResults = nearbyResults.filter(s => s.school_type !== 'High School');
+          
+          highSchools = [...highSchools, ...hsResults];
+          schools = [...schools, ...collegeResults];
+          searchExpanded = true;
+          console.log(`✅ Added ${nearbyResults.length} state-wide results`);
+        }
+      }
+      
+      // LAYER 3: Remove all filters except state
+      const currentTotal = schools.length + highSchools.length;
+      if (currentTotal < 5 && filters.state) {
+        console.log(`🌐 Broadening to all schools in ${filters.state}...`);
+        
+        const { data: allStateSchools } = await supabase
+          .from('school_database')
+          .select('*')
+          .eq('state', filters.state)
+          .limit(100);
+        
+        if (allStateSchools && allStateSchools.length > 0) {
+          const broadResults = allStateSchools.map(school => ({
+            ...school,
+            distance_category: 'state_wide_all',
+            search_expanded: true,
+            all_filters_removed: true
+          }));
+          
+          const hsResults = broadResults.filter(s => s.school_type === 'High School');
+          const collegeResults = broadResults.filter(s => s.school_type !== 'High School');
+          
+          schools = [...schools, ...collegeResults];
+          highSchools = [...highSchools, ...hsResults];
+          searchExpanded = true;
+        }
+      }
+      
+      // LAYER 4: Show popular schools nationwide as last resort
+      const finalTotal = schools.length + highSchools.length;
+      if (finalTotal === 0) {
+        console.log(`🚨 No results found anywhere, showing popular schools...`);
+        
+        const { data: popularSchools } = await supabase
+          .from('school_database')
+          .select('*')
+          .order('total_enrollment', { ascending: false, nullsLast: true })
+          .limit(20);
+        
+        if (popularSchools && popularSchools.length > 0) {
+          const fallbackResults = popularSchools.map(school => ({
+            ...school,
+            distance_category: 'national',
+            search_expanded: true,
+            fallback_result: true
+          }));
+          
+          const hsResults = fallbackResults.filter(s => s.school_type === 'High School');
+          const collegeResults = fallbackResults.filter(s => s.school_type !== 'High School');
+          
+          schools = collegeResults;
+          highSchools = hsResults;
+          searchExpanded = true;
+        }
+      }
+    }
+
+    // Generate helpful search expansion message
+    if (searchExpanded) {
+      const originalCity = filters.city || 'your area';
+      const state = filters.state || 'nearby areas';
+      const expandedCount = [...schools, ...highSchools].filter(s => s.search_expanded).length;
+      
+      if (filters.city && filters.state) {
+        searchMessage = `We expanded your search beyond ${originalCity} and found ${expandedCount} additional schools in ${state}.`;
+      } else if (filters.state) {
+        searchMessage = `Found ${expandedCount} schools across ${state}.`;
+      } else {
+        searchMessage = `Showing popular schools from our database to help you get started.`;
+      }
+    }
+
     // Search scholarships
     let scholarships = [];
     if (filters.search_type === 'scholarships' || filters.search_type === 'all' || !filters.search_type) {
@@ -365,6 +480,8 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         total_results: totalResults,
         duration_ms: duration,
         using_fallback: usingFallback,
+        search_message: searchMessage,
+        search_expanded: searchExpanded,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

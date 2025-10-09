@@ -66,6 +66,34 @@ export default function SchoolFinder() {
             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
           </div>
 
+          {/* Quick Start - Show before first search */}
+          {!results && !isLoading && (
+            <div className="mb-8">
+              <p className="text-sm text-muted-foreground mb-4 text-center">
+                Popular searches:
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {[
+                  'Texas high schools',
+                  'California HBCUs',
+                  'Houston colleges',
+                  'Dallas schools',
+                  'Florida universities'
+                ].map(suggestion => (
+                  <Button
+                    key={suggestion}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSearch(suggestion)}
+                    className="hover:bg-primary/10"
+                  >
+                    {suggestion}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Search Stats */}
           {results && (
             <div className="mb-6">

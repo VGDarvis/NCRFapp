@@ -2,7 +2,7 @@ import { ResultCard } from "./ResultCard";
 import { EmptyState } from "./EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Search, MapPin } from "lucide-react";
 import { SearchResult } from "@/hooks/useAISearch";
 
 interface ResultsGridProps {
@@ -42,14 +42,41 @@ export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
     return <EmptyState message="Start searching to find schools, scholarships, and youth services" />;
   }
 
-  // No results found
+  // No results found - show helpful guidance instead of blank screen
   if (results.total_results === 0) {
-    return <EmptyState message="No results found. Try adjusting your search or filters." />;
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <div className="w-20 h-20 rounded-full glass-premium flex items-center justify-center mb-6">
+          <Search className="w-10 h-10 text-primary animate-pulse" />
+        </div>
+        <h3 className="text-xl font-semibold text-foreground mb-2">
+          Searching nearby areas...
+        </h3>
+        <p className="text-muted-foreground max-w-md mb-6">
+          We couldn't find results in your exact search area, but we're looking at nearby cities and the entire state to find schools for you.
+        </p>
+        <Alert className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Try searching with just a state (e.g., "Texas high schools") or city name (e.g., "Dallas") for best results.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   // Display results by type
   return (
     <div className="space-y-8">
+      {/* Search Expansion Notice */}
+      {results.search_expanded && results.search_message && (
+        <Alert className="bg-primary/10 border-primary/20">
+          <MapPin className="h-4 w-4 text-primary" />
+          <AlertDescription className="text-foreground">
+            {results.search_message}
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Schools */}
       {results.schools && results.schools.length > 0 && (
         <section>
@@ -67,7 +94,7 @@ export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
         </section>
       )}
 
-      {/* High Schools */}
+      {/* High Schools - Grouped by Distance */}
       {results.high_schools && results.high_schools.length > 0 && (
         <section>
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
@@ -76,11 +103,55 @@ export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
               ({results.high_schools.length})
             </span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {results.high_schools.map((school, index) => (
-              <ResultCard key={school.id || index} type="school" data={school} />
-            ))}
-          </div>
+          
+          {(() => {
+            const inCity = results.high_schools.filter(s => !s.search_expanded);
+            const stateWide = results.high_schools.filter(s => s.distance_category === 'state_wide' || s.distance_category === 'state_wide_all');
+            const national = results.high_schools.filter(s => s.distance_category === 'national');
+            
+            return (
+              <>
+                {inCity.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-primary">
+                      📍 In Your Area ({inCity.length})
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {inCity.map((school, index) => (
+                        <ResultCard key={school.id || index} type="school" data={school} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {stateWide.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 text-muted-foreground">
+                      🗺️ Nearby in {results.filters?.state || 'State'} ({stateWide.length})
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {stateWide.map((school, index) => (
+                        <ResultCard key={school.id || index} type="school" data={school} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {national.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3 text-muted-foreground">
+                      🌎 Popular Schools Nationwide ({national.length})
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {national.map((school, index) => (
+                        <ResultCard key={school.id || index} type="school" data={school} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </section>
       )}
 

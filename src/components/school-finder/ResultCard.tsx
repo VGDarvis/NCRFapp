@@ -30,6 +30,13 @@ export function ResultCard({ type, data }: ResultCardProps) {
                   Verified
                 </Badge>
               )}
+              {data.search_expanded && data.distance_category && (
+                <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-200">
+                  {data.distance_category === 'state_wide' && '🗺️ Nearby'}
+                  {data.distance_category === 'state_wide_all' && '🗺️ In State'}
+                  {data.distance_category === 'national' && '🌎 Popular'}
+                </Badge>
+              )}
             </div>
             {isWebScraped && (
               <p className="text-xs text-muted-foreground mb-2">
