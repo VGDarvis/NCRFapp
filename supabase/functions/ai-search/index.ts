@@ -238,6 +238,49 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
       }
     }
 
+    // Check if we need to search the web for more schools
+    const totalSchools = schools.length + highSchools.length;
+    let webResults = [];
+    if (totalSchools < 5 && filters.city && filters.state) {
+      console.log(`📡 Database only has ${totalSchools} schools, searching web...`);
+      
+      try {
+        const webResponse = await fetch(
+          `${Deno.env.get('SUPABASE_URL')}/functions/v1/web-scrape-schools`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+            },
+            body: JSON.stringify({
+              city: filters.city,
+              state: filters.state,
+              school_type: filters.institution_type || 'high_school'
+            })
+          }
+        );
+
+        if (webResponse.ok) {
+          const webData = await webResponse.json();
+          if (webData.schools && webData.schools.length > 0) {
+            webResults = webData.schools.map(school => ({
+              ...school,
+              source: 'web_scraped',
+              import_available: true,
+              verification_status: 'unverified'
+            }));
+            console.log(`✅ Found ${webResults.length} schools from web scraping`);
+          }
+        }
+      } catch (webError) {
+        console.error('⚠️ Web scraping failed:', webError);
+      }
+    }
+
+    // Merge web results with high schools
+    highSchools = [...highSchools, ...webResults];
+
     // Search scholarships
     let scholarships = [];
     if (filters.search_type === 'scholarships' || filters.search_type === 'all' || !filters.search_type) {

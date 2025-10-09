@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Users, GraduationCap, DollarSign, Calendar, Shield } from "lucide-react";
+import { MapPin, Users, GraduationCap, DollarSign, Calendar, Shield, Globe } from "lucide-react";
 
 interface ResultCardProps {
   type: "school" | "scholarship" | "youth_service";
@@ -10,19 +10,32 @@ interface ResultCardProps {
 
 export function ResultCard({ type, data }: ResultCardProps) {
   if (type === "school") {
+    const isWebScraped = data.source === 'web_scraped';
+    
     return (
       <Card className="p-6 glass-premium hover:shadow-elegant transition-all duration-300 border-border/40 hover:border-primary/40">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-xl font-bold text-foreground">{data.school_name}</h3>
-              {data.verification_status === "verified" && (
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <h3 className="text-xl font-bold text-foreground">{data.school_name || data.name}</h3>
+              {isWebScraped && (
+                <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1">
+                  <Globe className="w-3 h-3" />
+                  From Web
+                </Badge>
+              )}
+              {!isWebScraped && data.verification_status === "verified" && (
                 <Badge variant="default" className="gap-1">
                   <Shield className="w-3 h-3" />
                   Verified
                 </Badge>
               )}
             </div>
+            {isWebScraped && (
+              <p className="text-xs text-muted-foreground mb-2">
+                Not in database - from public records
+              </p>
+            )}
             {data.school_type && (
               <Badge variant="outline" className="mb-2">
                 {data.school_type}

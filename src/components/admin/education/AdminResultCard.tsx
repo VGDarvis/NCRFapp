@@ -2,9 +2,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MapPin, Users, GraduationCap, DollarSign, Calendar, Shield, Building2, CheckCircle2, Clock } from "lucide-react";
+import { MapPin, Users, GraduationCap, DollarSign, Calendar, Shield, Building2, CheckCircle2, Clock, Globe, Database } from "lucide-react";
 import { useCRMIntegration } from "@/hooks/useCRMIntegration";
 import { format } from "date-fns";
+import { useState } from "react";
+import { QuickImportDialog } from "./QuickImportDialog";
 
 interface AdminResultCardProps {
   type: "school" | "scholarship" | "youth_service";
@@ -16,10 +18,16 @@ interface AdminResultCardProps {
 export function AdminResultCard({ type, data, isSelected, onSelect }: AdminResultCardProps) {
   const { addSchoolToCRM, checkIfInCRM, isAddingToCRM } = useCRMIntegration();
   const isInCRM = checkIfInCRM(data.id);
+  const isWebScraped = data.source === 'web_scraped';
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   const handleAddToCRM = async () => {
     if (type === "school") {
-      await addSchoolToCRM(data);
+      if (isWebScraped) {
+        setShowImportDialog(true);
+      } else {
+        await addSchoolToCRM(data);
+      }
     }
   };
 
@@ -45,38 +53,45 @@ export function AdminResultCard({ type, data, isSelected, onSelect }: AdminResul
 
   if (type === "school") {
     return (
-      <Card className="p-6 glass-premium hover:shadow-elegant transition-all duration-300 border-border/40 hover:border-primary/40 relative">
-        <div className="absolute top-4 right-4">
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={onSelect}
-          />
-        </div>
+      <>
+        <Card className="p-6 glass-premium hover:shadow-elegant transition-all duration-300 border-border/40 hover:border-primary/40 relative">
+          <div className="absolute top-4 right-4">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={onSelect}
+            />
+          </div>
 
-        <div className="flex items-start justify-between mb-4 pr-8">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <h3 className="text-xl font-bold text-foreground">{data.school_name}</h3>
-              {data.verification_status === "verified" && (
-                <Badge variant="default" className="gap-1">
-                  <Shield className="w-3 h-3" />
-                  Verified
-                </Badge>
-              )}
-              {isInCRM && (
-                <Badge variant="secondary" className="gap-1">
-                  <CheckCircle2 className="w-3 h-3" />
-                  In CRM
+          <div className="flex items-start justify-between mb-4 pr-8">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <h3 className="text-xl font-bold text-foreground">{data.school_name || data.name}</h3>
+                {isWebScraped && (
+                  <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1">
+                    <Globe className="w-3 h-3" />
+                    From Web
+                  </Badge>
+                )}
+                {!isWebScraped && data.verification_status === "verified" && (
+                  <Badge variant="default" className="gap-1">
+                    <Shield className="w-3 h-3" />
+                    Verified
+                  </Badge>
+                )}
+                {!isWebScraped && isInCRM && (
+                  <Badge variant="secondary" className="gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    In CRM
+                  </Badge>
+                )}
+              </div>
+              {data.school_type && (
+                <Badge variant="outline" className="mb-2">
+                  {data.school_type}
                 </Badge>
               )}
             </div>
-            {data.school_type && (
-              <Badge variant="outline" className="mb-2">
-                {data.school_type}
-              </Badge>
-            )}
           </div>
-        </div>
 
         <div className="space-y-2 mb-4">
           {(data.city || data.state) && (
@@ -116,26 +131,44 @@ export function AdminResultCard({ type, data, isSelected, onSelect }: AdminResul
           </div>
         </div>
 
-        <div className="flex gap-2">
-          {data.website && (
-            <Button variant="outline" className="flex-1" size="sm" asChild>
-              <a href={data.website} target="_blank" rel="noopener noreferrer">
-                Website
-              </a>
+          <div className="flex gap-2">
+            {data.website && (
+              <Button variant="outline" className="flex-1" size="sm" asChild>
+                <a href={data.website} target="_blank" rel="noopener noreferrer">
+                  Website
+                </a>
+              </Button>
+            )}
+            <Button
+              variant={isInCRM ? "secondary" : "default"}
+              className="flex-1"
+              size="sm"
+              onClick={handleAddToCRM}
+              disabled={(!isWebScraped && isInCRM) || isAddingToCRM}
+            >
+              {isWebScraped ? (
+                <>
+                  <Database className="w-4 h-4 mr-2" />
+                  Add to Database
+                </>
+              ) : (
+                <>
+                  <Building2 className="w-4 h-4 mr-2" />
+                  {isInCRM ? "In CRM" : isAddingToCRM ? "Adding..." : "Add to CRM"}
+                </>
+              )}
             </Button>
-          )}
-          <Button
-            variant={isInCRM ? "secondary" : "default"}
-            className="flex-1"
-            size="sm"
-            onClick={handleAddToCRM}
-            disabled={isInCRM || isAddingToCRM}
-          >
-            <Building2 className="w-4 h-4 mr-2" />
-            {isInCRM ? "In CRM" : isAddingToCRM ? "Adding..." : "Add to CRM"}
-          </Button>
-        </div>
-      </Card>
+          </div>
+        </Card>
+
+        {isWebScraped && (
+          <QuickImportDialog
+            open={showImportDialog}
+            onOpenChange={setShowImportDialog}
+            schoolData={data}
+          />
+        )}
+      </>
     );
   }
 

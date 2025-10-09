@@ -3502,6 +3502,30 @@ export type Database = {
         }
         Relationships: []
       }
+      web_search_cache: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          results: Json
+          search_key: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          results: Json
+          search_key: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          results?: Json
+          search_key?: string
+        }
+        Relationships: []
+      }
       wellness_progress: {
         Row: {
           activity_type: string
@@ -3715,6 +3739,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
