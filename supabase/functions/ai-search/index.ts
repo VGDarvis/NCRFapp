@@ -155,9 +155,10 @@ Extract these fields (return null if not mentioned):
 - service_type: "Sports" | "Mentorship" | "STEM" | "After-School" | "Arts" | "Community Center" | "Tutoring" | null
 
 Detection hints:
-- "high school", "secondary school", "prep school" → set institution_type: "high_school"
+- "high school", "high schools", "secondary school", "prep school", "HS" → ALWAYS set institution_type: "high_school"
+- "college", "university", "universities" (without "high school" in query) → ALWAYS set institution_type: "college"
+- If query has BOTH "high school" AND "college" → set institution_type: "all"
 - "AAU", "youth league", "sports program", "youth sports" → set search_type: "youth_services"
-- "college", "university" → set institution_type: "college"
 - "how many", "count", "total", "number of" → set query_type: "count"
 - "County" in query → extract county name and set search_radius_miles: 30
 - "Los Angeles County" → set county: "Los Angeles County", city: null, search_radius_miles: 30
@@ -202,6 +203,27 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
       usingFallback = true;
     }
 
+    // SAFETY CHECK: Override AI if query explicitly mentions high school or college
+    const lowerQuery = query.toLowerCase();
+    if (lowerQuery.includes('high school') || 
+        lowerQuery.includes('secondary school') ||
+        lowerQuery.includes('prep school')) {
+      console.log('🛡️ SAFETY: Forcing institution_type to high_school');
+      filters.institution_type = 'high_school';
+      filters.search_type = 'schools';
+    } else if ((lowerQuery.includes('college') || 
+         lowerQuery.includes('university')) &&
+        !lowerQuery.includes('high school')) {
+      console.log('🛡️ SAFETY: Forcing institution_type to college');
+      filters.institution_type = 'college';
+      filters.search_type = 'schools';
+    }
+
+    // Debug logging for final filters
+    console.log('🔍 Final filters:', JSON.stringify(filters, null, 2));
+    console.log(`📊 institution_type: ${filters.institution_type}`);
+    console.log(`📊 search_type: ${filters.search_type}`);
+
     if (usingFallback) {
       console.log('Using fallback keyword search:', filters);
     }
@@ -240,6 +262,13 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
     
     if (filters.search_type === 'schools' || filters.search_type === 'all' || !filters.search_type) {
       const institutionType = filters.institution_type || 'all';
+      
+      // Log search intent
+      if (!filters.institution_type && filters.search_type === 'schools') {
+        console.log('⚠️ No institution_type specified, searching all schools');
+      } else {
+        console.log(`🎯 Searching for: ${institutionType}`);
+      }
       
       // Search colleges/universities
       if (institutionType === 'college' || institutionType === 'all') {
@@ -633,7 +662,16 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         } else if (filters.state) {
           locationContext = ` in ${filters.state}`;
         }
-        searchMessage = `Found ${totalResults} educational results${locationContext}`;
+        
+        // Add institution type context
+        let institutionContext = '';
+        if (filters.institution_type === 'high_school') {
+          institutionContext = ' (HIGH SCHOOLS ONLY)';
+        } else if (filters.institution_type === 'college') {
+          institutionContext = ' (COLLEGES/UNIVERSITIES ONLY)';
+        }
+        
+        searchMessage = `Found ${totalResults} educational results${locationContext}${institutionContext}`;
       }
     }
 
