@@ -121,6 +121,7 @@ export default function SchoolFinder() {
                 results={results}
                 isLoading={isLoading}
                 error={error}
+                onSearch={handleSearch}
               />
             </div>
           </div>

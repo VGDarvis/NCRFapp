@@ -41,6 +41,16 @@ export interface SearchResult {
       scholarships: number;
       youth_services: number;
     };
+    query_details?: {
+      searched_county: string | null;
+      searched_cities: number | null;
+      searched_state: string | null;
+      search_method: string;
+    };
+  };
+  did_you_mean?: {
+    suggestion: string;
+    reason: string;
   };
 }
 

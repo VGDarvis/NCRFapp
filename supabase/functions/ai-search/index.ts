@@ -211,6 +211,29 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Phase 2: County Intelligence - Expand county to cities
+    if (filters.county && filters.state) {
+      console.log(`🏛️ County detected: ${filters.county}, looking up cities...`);
+      
+      // Look up cities in this county from our mapping table
+      const { data: countyData, error: countyError } = await supabase
+        .from('counties')
+        .select('cities, county_name')
+        .eq('county_name', filters.county)
+        .eq('state_code', filters.state)
+        .maybeSingle();
+      
+      if (!countyError && countyData && countyData.cities.length > 0) {
+        console.log(`✅ Found ${countyData.cities.length} cities in ${filters.county}`);
+        filters.county_cities = countyData.cities;
+        filters.search_expanded_reason = `Searching all cities in ${filters.county}`;
+      } else {
+        console.log(`⚠️ County ${filters.county} not in database, using fallback`);
+        // Fallback: search entire state if county not found
+        filters.search_radius_miles = 50;
+      }
+    }
+
     // Search schools (colleges and high schools)
     let schools = [];
     let highSchools = [];
@@ -231,9 +254,22 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         if (filters.region) {
           schoolQuery = schoolQuery.eq('region', filters.region);
         }
-        if (filters.city) {
+        
+        // Priority 1: Search by county column (fastest)
+        if (filters.county) {
+          schoolQuery = schoolQuery.eq('county', filters.county);
+          console.log(`🎯 Searching by county field: ${filters.county}`);
+        }
+        // Priority 2: Search by cities in county (if we have the list)
+        else if (filters.county_cities && filters.county_cities.length > 0) {
+          schoolQuery = schoolQuery.in('city', filters.county_cities);
+          console.log(`🎯 Searching ${filters.county_cities.length} cities in county`);
+        }
+        // Priority 3: Single city search
+        else if (filters.city) {
           schoolQuery = schoolQuery.ilike('city', `%${filters.city}%`);
         }
+        
         if (filters.programs && filters.programs.length > 0) {
           schoolQuery = schoolQuery.overlaps('programs_offered', filters.programs);
         }
@@ -267,9 +303,22 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         if (filters.region) {
           highSchoolQuery = highSchoolQuery.eq('region', filters.region);
         }
-        if (filters.city) {
+        
+        // Priority 1: Search by county column
+        if (filters.county) {
+          highSchoolQuery = highSchoolQuery.eq('county', filters.county);
+          console.log(`🎯 High schools by county field: ${filters.county}`);
+        }
+        // Priority 2: Search by cities in county
+        else if (filters.county_cities && filters.county_cities.length > 0) {
+          highSchoolQuery = highSchoolQuery.in('city', filters.county_cities);
+          console.log(`🎯 High schools in ${filters.county_cities.length} county cities`);
+        }
+        // Priority 3: Single city search
+        else if (filters.city) {
           highSchoolQuery = highSchoolQuery.ilike('city', `%${filters.city}%`);
         }
+        
         if (filters.sports_programs && filters.sports_programs.length > 0) {
           highSchoolQuery = highSchoolQuery.overlaps('athletic_programs', filters.sports_programs);
         }
@@ -563,18 +612,48 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
           colleges: schools.length,
           scholarships: scholarships.length,
           youth_services: youthServices.length
+        },
+        query_details: {
+          searched_county: filters.county || null,
+          searched_cities: filters.county_cities?.length || (filters.city ? 1 : null),
+          searched_state: filters.state || null,
+          search_method: filters.county ? 'county_wide' : (filters.city ? 'city' : 'state_wide')
         }
       };
       
       if (!searchMessage) {
-        searchMessage = `Found ${totalResults} results`;
+        let locationContext = '';
         if (filters.county) {
-          searchMessage += ` in ${filters.county}`;
+          locationContext = ` in ${filters.county}`;
+          if (filters.county_cities && filters.county_cities.length > 0) {
+            locationContext += ` (${filters.county_cities.length} cities)`;
+          }
         } else if (filters.city) {
-          searchMessage += ` in ${filters.city}`;
+          locationContext = ` in ${filters.city}${filters.state ? ', ' + filters.state : ''}`;
         } else if (filters.state) {
-          searchMessage += ` in ${filters.state}`;
+          locationContext = ` in ${filters.state}`;
         }
+        searchMessage = `Found ${totalResults} educational results${locationContext}`;
+      }
+    }
+
+    // Add intelligent "Did You Mean?" suggestions
+    let didYouMean = null;
+    if (filters.city && !filters.county && totalResults < 5) {
+      // Suggest county search if city search yields few results
+      const { data: possibleCounty } = await supabase
+        .from('counties')
+        .select('county_name, state_code')
+        .contains('cities', [filters.city])
+        .limit(1)
+        .maybeSingle();
+      
+      if (possibleCounty) {
+        didYouMean = {
+          suggestion: `${possibleCounty.county_name} schools`,
+          reason: `${filters.city} is in ${possibleCounty.county_name}. Searching the entire county might give you more results.`
+        };
+        console.log(`💡 Suggesting: ${didYouMean.suggestion}`);
       }
     }
 
@@ -591,6 +670,7 @@ Return ONLY valid JSON with these fields. Be smart about synonyms (e.g., "Califo
         search_message: searchMessage,
         search_expanded: searchExpanded,
         search_explanation: searchExplanation,
+        did_you_mean: didYouMean,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

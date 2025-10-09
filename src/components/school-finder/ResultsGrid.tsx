@@ -2,16 +2,18 @@ import { ResultCard } from "./ResultCard";
 import { EmptyState } from "./EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Search, MapPin, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, Search, MapPin, BarChart3, Lightbulb } from "lucide-react";
 import { SearchResult } from "@/hooks/useAISearch";
 
 interface ResultsGridProps {
   results: SearchResult | null;
   isLoading: boolean;
   error: string | null;
+  onSearch?: (query: string) => void;
 }
 
-export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
+export function ResultsGrid({ results, isLoading, error, onSearch }: ResultsGridProps) {
   // Loading state
   if (isLoading) {
     return (
@@ -68,6 +70,25 @@ export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
   // Display results by type
   return (
     <div className="space-y-8">
+      {/* Did You Mean Suggestion */}
+      {results.did_you_mean && onSearch && (
+        <Alert className="bg-blue-500/10 border-blue-500/20">
+          <Lightbulb className="h-4 w-4 text-blue-600" />
+          <AlertTitle className="text-blue-600">Did you mean?</AlertTitle>
+          <AlertDescription className="text-foreground">
+            {results.did_you_mean.reason}
+            <br />
+            <Button
+              variant="link"
+              className="p-0 h-auto font-semibold text-blue-600 hover:text-blue-700"
+              onClick={() => onSearch(results.did_you_mean!.suggestion)}
+            >
+              Search for "{results.did_you_mean.suggestion}"
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Statistical Summary - For "How many" queries */}
       {results.search_explanation && (
         <Alert className="bg-primary/10 border-primary/20">
@@ -76,6 +97,28 @@ export function ResultsGrid({ results, isLoading, error }: ResultsGridProps) {
             {results.search_message}
           </AlertTitle>
           <AlertDescription className="mt-2">
+            {/* Query Details */}
+            {results.search_explanation.query_details && (
+              <div className="mb-4 space-y-1 text-sm">
+                {results.search_explanation.query_details.searched_county && (
+                  <p className="font-medium">
+                    📍 Searched: {results.search_explanation.query_details.searched_county}
+                  </p>
+                )}
+                {results.search_explanation.query_details.searched_cities !== null && (
+                  <p className="text-muted-foreground">
+                    🏙️ Cities included: {results.search_explanation.query_details.searched_cities}
+                  </p>
+                )}
+                {results.search_explanation.query_details.search_method && (
+                  <p className="text-muted-foreground">
+                    🔍 Search method: {results.search_explanation.query_details.search_method.replace('_', ' ')}
+                  </p>
+                )}
+              </div>
+            )}
+            
+            {/* Results Breakdown */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
               <div className="text-center p-3 bg-background/50 rounded-lg">
                 <div className="text-2xl font-bold text-primary">

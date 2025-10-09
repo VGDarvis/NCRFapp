@@ -824,6 +824,45 @@ export type Database = {
         }
         Relationships: []
       }
+      counties: {
+        Row: {
+          cities: string[]
+          county_name: string
+          created_at: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          population: number | null
+          state_code: string
+          state_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          cities?: string[]
+          county_name: string
+          created_at?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          population?: number | null
+          state_code: string
+          state_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          cities?: string[]
+          county_name?: string
+          created_at?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          population?: number | null
+          state_code?: string
+          state_name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       crm_contacts: {
         Row: {
           created_at: string | null
@@ -2623,6 +2662,7 @@ export type Database = {
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
+          county: string | null
           created_at: string | null
           data_source: string | null
           demographics: Json | null
@@ -2659,6 +2699,7 @@ export type Database = {
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
+          county?: string | null
           created_at?: string | null
           data_source?: string | null
           demographics?: Json | null
@@ -2695,6 +2736,7 @@ export type Database = {
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
+          county?: string | null
           created_at?: string | null
           data_source?: string | null
           demographics?: Json | null

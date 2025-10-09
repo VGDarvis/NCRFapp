@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X, Loader2 } from "lucide-react";
+import { CountySuggestions } from "./CountySuggestions";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -37,7 +38,7 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className="w-full space-y-2">
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
@@ -69,6 +70,14 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
           )}
         </div>
       </div>
+      
+      <CountySuggestions 
+        searchQuery={query}
+        onSelectCounty={(countyQuery) => {
+          setQuery(countyQuery);
+          onSearch(countyQuery);
+        }}
+      />
     </form>
   );
 }
