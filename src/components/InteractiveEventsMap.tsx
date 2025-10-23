@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Input } from '@/components/ui/input';
-import { MapPin } from 'lucide-react';
-
-// Mapbox token - users will need to add their own
-const MAPBOX_TOKEN = 'pk.eyJ1IjoibmNyZi1jb2xsZWdlIiwiYSI6ImNtNGN4eXkwMTBjMGgya3NjdHl0YXN3d3AifQ.placeholder';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -27,8 +24,8 @@ interface InteractiveEventsMapProps {
 export const InteractiveEventsMap = ({ events, onEventClick }: InteractiveEventsMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState(MAPBOX_TOKEN);
-  const [needsToken, setNeedsToken] = useState(false);
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+  const [isLoadingToken, setIsLoadingToken] = useState(true);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   // Geocode addresses to get coordinates
@@ -49,11 +46,28 @@ export const InteractiveEventsMap = ({ events, onEventClick }: InteractiveEvents
     return null;
   };
 
+  // Fetch Mapbox token
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || mapboxToken.includes('placeholder')) {
-      setNeedsToken(true);
-      return;
-    }
+    const fetchToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) throw error;
+        if (data?.token) {
+          setMapboxToken(data.token);
+        }
+      } catch (error) {
+        console.error('Failed to fetch Mapbox token:', error);
+      } finally {
+        setIsLoadingToken(false);
+      }
+    };
+
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    if (!mapContainer.current || !mapboxToken || isLoadingToken) return;
 
     if (map.current) return;
 
@@ -72,10 +86,10 @@ export const InteractiveEventsMap = ({ events, onEventClick }: InteractiveEvents
       map.current?.remove();
       map.current = null;
     };
-  }, [mapboxToken]);
+  }, [mapboxToken, isLoadingToken]);
 
   useEffect(() => {
-    if (!map.current || !events.length || needsToken) return;
+    if (!map.current || !events.length || isLoadingToken) return;
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
@@ -158,35 +172,12 @@ export const InteractiveEventsMap = ({ events, onEventClick }: InteractiveEvents
     return () => {
       window.removeEventListener('event-marker-click', handleMarkerClick);
     };
-  }, [events, onEventClick, needsToken]);
+  }, [events, onEventClick, isLoadingToken]);
 
-  if (needsToken) {
+  if (isLoadingToken) {
     return (
-      <div className="w-full h-[500px] bg-muted/50 rounded-lg flex items-center justify-center p-8">
-        <div className="max-w-md space-y-4 text-center">
-          <MapPin className="w-12 h-12 mx-auto text-muted-foreground" />
-          <h3 className="font-semibold text-lg">Mapbox Token Required</h3>
-          <p className="text-sm text-muted-foreground">
-            To display the interactive map, please enter your Mapbox access token.
-            Get one free at <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">mapbox.com</a>
-          </p>
-          <Input
-            type="text"
-            placeholder="Enter your Mapbox access token"
-            value={mapboxToken}
-            onChange={(e) => setMapboxToken(e.target.value)}
-            className="max-w-sm mx-auto"
-          />
-          <button
-            onClick={() => {
-              setNeedsToken(false);
-              window.location.reload();
-            }}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-          >
-            Apply Token
-          </button>
-        </div>
+      <div className="w-full h-[500px] bg-muted/50 rounded-lg flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }

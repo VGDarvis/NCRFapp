@@ -1,8 +1,28 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Users, BarChart } from "lucide-react";
+import { Calendar, MapPin, Users, BarChart, Loader2 } from "lucide-react";
+import { FloorPlanUploader } from "./FloorPlanUploader";
+import { BoothCSVImporter } from "./BoothCSVImporter";
+import { SeminarCSVImporter } from "./SeminarCSVImporter";
+import { useEvents } from "@/hooks/useEvents";
+import { useVenues } from "@/hooks/useVenues";
 
 export const EventsModule = () => {
+  const { events, isLoading: isLoadingEvents } = useEvents();
+  const { data: venues, isLoading: isLoadingVenues } = useVenues();
+
+  // Get the first event and venue for demo purposes
+  const firstEvent = events?.[0];
+  const firstVenue = venues?.[0];
+
+  if (isLoadingEvents || isLoadingVenues) {
+    return (
+      <div className="flex items-center justify-center h-[600px]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -41,23 +61,59 @@ export const EventsModule = () => {
         </TabsContent>
 
         <TabsContent value="venues" className="mt-6">
-          <Card className="p-8 text-center">
-            <MapPin className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Venue Management</h3>
-            <p className="text-muted-foreground">
-              Add and manage event venues with floor plans
-            </p>
-          </Card>
+          {firstVenue ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              <FloorPlanUploader 
+                venueId={firstVenue.id}
+                onUploadComplete={() => window.location.reload()}
+              />
+              <Card>
+                <CardHeader>
+                  <CardTitle>Current Venue</CardTitle>
+                  <CardDescription>{firstVenue.name}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Address:</strong> {firstVenue.address}</p>
+                    <p><strong>City:</strong> {firstVenue.city}, {firstVenue.state}</p>
+                    <p><strong>Capacity:</strong> {firstVenue.capacity || 'N/A'}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <Card className="p-8 text-center">
+              <MapPin className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                No venues found. Create a venue first.
+              </p>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="booths" className="mt-6">
-          <Card className="p-8 text-center">
-            <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Booth Management</h3>
-            <p className="text-muted-foreground">
-              Visual floor plan editor with drag-drop booth positioning
-            </p>
-          </Card>
+          {firstEvent && firstVenue ? (
+            <div className="grid gap-4">
+              <BoothCSVImporter 
+                eventId={firstEvent.id}
+                onImportComplete={() => window.location.reload()}
+              />
+              
+              <SeminarCSVImporter 
+                eventId={firstEvent.id}
+                venueId={firstVenue.id}
+                eventDate={firstEvent.start_at}
+                onImportComplete={() => window.location.reload()}
+              />
+            </div>
+          ) : (
+            <Card className="p-8 text-center">
+              <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                {!firstEvent ? 'No events found. Create an event first.' : 'No venues found. Create a venue first.'}
+              </p>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-6">

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Loader2, Search, Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { EventSwitcher } from "./map/EventSwitcher";
 import { MapFilterSidebar, MapFilters } from "./map/MapFilterSidebar";
 import { MapCardDrawer } from "./map/MapCardDrawer";
@@ -23,7 +24,6 @@ import { getUserLocation } from "@/lib/geolocation-utils";
 
 export const MapTab = () => {
   const [mapboxToken, setMapboxToken] = useState<string | null>(null);
-  const [tokenInput, setTokenInput] = useState("");
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [showBoothLayer, setShowBoothLayer] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,14 +54,22 @@ export const MapTab = () => {
   );
   const { map, isLoaded } = useMapbox("map-container", mapboxToken);
 
-  // Load Mapbox token (stub - in production would fetch from backend)
+  // Fetch Mapbox token automatically via edge function
   useEffect(() => {
-    // For now, user must input token manually
-    // In production, fetch from Supabase Edge Function
-    const savedToken = localStorage.getItem("mapbox_token");
-    if (savedToken) {
-      setMapboxToken(savedToken);
-    }
+    const fetchToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        
+        if (error) throw error;
+        if (data?.token) {
+          setMapboxToken(data.token);
+        }
+      } catch (error) {
+        console.error('Failed to fetch Mapbox token:', error);
+      }
+    };
+
+    fetchToken();
   }, []);
 
   // Get user location
@@ -225,17 +233,6 @@ export const MapTab = () => {
     });
   }, [map, isLoaded, showBoothLayer, booths]);
 
-  // Handle token submission
-  const handleTokenSubmit = () => {
-    if (!tokenInput.trim()) {
-      toast.error("Please enter a valid Mapbox token");
-      return;
-    }
-    localStorage.setItem("mapbox_token", tokenInput);
-    setMapboxToken(tokenInput);
-    toast.success("Mapbox token saved!");
-  };
-
   // Handle registration
   const handleRegister = () => {
     setDrawerOpen(false);
@@ -247,43 +244,6 @@ export const MapTab = () => {
     // TODO: Implement in Phase 3
     toast.success("Added to your schedule!");
   };
-
-  if (!mapboxToken) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Card className="p-8 max-w-lg mx-auto">
-          <h2 className="text-2xl font-bold mb-4">Mapbox Setup Required</h2>
-          <p className="text-muted-foreground mb-6">
-            To use the interactive map, you need a Mapbox public token. Get one
-            for free at{" "}
-            <a
-              href="https://mapbox.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              mapbox.com
-            </a>
-          </p>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="token">Mapbox Public Token</Label>
-              <Input
-                id="token"
-                value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value)}
-                placeholder="pk.eyJ1..."
-                className="mt-2"
-              />
-            </div>
-            <Button onClick={handleTokenSubmit} className="w-full">
-              Save Token
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
 
   if (isLoadingEventsWithVenues) {
     return (
