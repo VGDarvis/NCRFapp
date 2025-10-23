@@ -104,15 +104,22 @@ export const WelcomeTab = () => {
             </div>
           </div>
 
-          {event.event_flyer_url && (
-            <div className="rounded-lg overflow-hidden shadow-xl border border-emerald-500/20">
+          <div className="rounded-lg overflow-hidden shadow-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-green-500/10">
+            {event.event_flyer_url ? (
               <img 
                 src={event.event_flyer_url} 
                 alt={event.title}
                 className="w-full h-full object-cover"
               />
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                <div className="text-center space-y-2">
+                  <Calendar className="w-12 h-12 mx-auto opacity-50" />
+                  <p className="text-sm">Event Flyer Coming Soon</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Card>
 
