@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Home, Calendar, MapPin, Building2, BookmarkCheck, Heart, Grid3x3, Presentation } from 'lucide-react';
+import { useGuestAnalytics } from '@/hooks/useGuestAnalytics';
 import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
 import { MapTab } from './dashboard/college-expo/MapTab';
 import { FloorPlanTabWrapper } from './dashboard/college-expo/FloorPlanTabWrapper';
@@ -20,12 +21,31 @@ interface CollegeExpoDashboardProps {
 export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardProps) => {
   const [activeTab, setActiveTab] = useState('welcome');
   const [user, setUser] = useState<User | null>(null);
+  const [eventId, setEventId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
     });
+
+    // Fetch the current/next event for analytics
+    const fetchCurrentEvent = async () => {
+      const { data } = await supabase
+        .from('events')
+        .select('id')
+        .eq('status', 'upcoming')
+        .order('start_at', { ascending: true })
+        .limit(1)
+        .single();
+      
+      if (data) setEventId(data.id);
+    };
+
+    fetchCurrentEvent();
   }, []);
+
+  // Track guest analytics
+  useGuestAnalytics(eventId, `college-expo-${activeTab}`);
 
   const tabs = [
     {

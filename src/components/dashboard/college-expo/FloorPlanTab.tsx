@@ -27,7 +27,7 @@ export const FloorPlanTab = ({ eventId, venueId }: FloorPlanTabProps) => {
 
   const { data: floorPlans, isLoading: isLoadingFloors } = useFloorPlans(venueId);
   const { data: booths, isLoading: isLoadingBooths } = useBooths(eventId);
-  const { favorites, isFavorite, addFavorite, removeFavorite } = useBoothFavorites(eventId);
+  const { favorites, isFavorite, addFavorite, removeFavorite, isGuest } = useBoothFavorites(eventId);
   const { hasVisitedBooth, createCheckIn } = useBoothCheckIns(eventId);
 
   const selectedFloorPlan = floorPlans?.[0]; // Default to first floor
@@ -130,6 +130,7 @@ export const FloorPlanTab = ({ eventId, venueId }: FloorPlanTabProps) => {
               booths={booths || []}
               onBoothClick={setSelectedBoothId}
               onRemoveFavorite={(boothId) => removeFavorite.mutate({ boothId, eventId })}
+              isGuest={isGuest}
             />
           </div>
         </div>

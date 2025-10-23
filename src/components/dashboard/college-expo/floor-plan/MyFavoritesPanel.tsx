@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, X, Route, MapPin } from "lucide-react";
+import { Star, X, Route, MapPin, Smartphone } from "lucide-react";
 import { BoothFavorite } from "@/hooks/useBoothFavorites";
 import { Booth } from "@/hooks/useBooths";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MyFavoritesPanelProps {
   eventId: string;
@@ -12,6 +13,7 @@ interface MyFavoritesPanelProps {
   booths: Booth[];
   onBoothClick: (boothId: string) => void;
   onRemoveFavorite: (boothId: string) => void;
+  isGuest?: boolean;
 }
 
 export const MyFavoritesPanel = ({
@@ -19,6 +21,7 @@ export const MyFavoritesPanel = ({
   booths,
   onBoothClick,
   onRemoveFavorite,
+  isGuest = false,
 }: MyFavoritesPanelProps) => {
   const favoriteBooths = favorites
     .map(fav => booths.find(b => b.id === fav.booth_id))
@@ -30,6 +33,21 @@ export const MyFavoritesPanel = ({
         <div className="flex items-center gap-2">
           <Star className="w-5 h-5 fill-warning text-warning" />
           <h3 className="font-semibold">My Favorites</h3>
+          {isGuest && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge variant="outline" className="gap-1">
+                    <Smartphone className="w-3 h-3" />
+                    Device
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Saved on this device only</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
         <Badge variant="secondary">{favorites.length}</Badge>
       </div>

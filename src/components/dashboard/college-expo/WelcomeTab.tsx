@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Users, Award, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Users, Award, ExternalLink, MapPinned, Building2, Heart, Grid3x3 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 export const WelcomeTab = () => {
   const [event, setEvent] = useState<any>(null);
@@ -64,12 +65,17 @@ export const WelcomeTab = () => {
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
       {/* Hero Section */}
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 to-green-500/5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
           <div className="space-y-6">
             <div>
-              <h1 className="text-4xl font-bold mb-2">{event.title}</h1>
-              <p className="text-lg text-muted-foreground">{event.description}</p>
+              <Badge className="mb-3 bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+                Next Event
+              </Badge>
+              <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+                {event.title}
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed">{event.description}</p>
             </div>
 
             <div className="space-y-3">
@@ -87,17 +93,19 @@ export const WelcomeTab = () => {
               </div>
             </div>
 
-            {event.registration_url && (
-              <Button size="lg" className="w-full md:w-auto" asChild>
-                <a href={event.registration_url} target="_blank" rel="noopener noreferrer">
-                  Register Now <ExternalLink className="w-4 h-4 ml-2" />
-                </a>
-              </Button>
-            )}
+            <div className="flex gap-3">
+              {event.registration_url && (
+                <Button size="lg" className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700" asChild>
+                  <a href={event.registration_url} target="_blank" rel="noopener noreferrer">
+                    Register Now <ExternalLink className="w-4 h-4 ml-2" />
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
 
           {event.event_flyer_url && (
-            <div className="rounded-lg overflow-hidden">
+            <div className="rounded-lg overflow-hidden shadow-xl border border-emerald-500/20">
               <img 
                 src={event.event_flyer_url} 
                 alt={event.title}
@@ -107,6 +115,36 @@ export const WelcomeTab = () => {
           )}
         </div>
       </Card>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
+            <MapPinned className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold mb-1">Explore Map</h3>
+            <p className="text-sm text-muted-foreground">Find event locations and directions</p>
+          </Card>
+          
+          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
+            <Grid3x3 className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold mb-1">View Floor Plan</h3>
+            <p className="text-sm text-muted-foreground">Navigate booth layouts and exhibitors</p>
+          </Card>
+          
+          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
+            <Building2 className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold mb-1">Browse Colleges</h3>
+            <p className="text-sm text-muted-foreground">Discover schools and programs</p>
+          </Card>
+          
+          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
+            <Heart className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold mb-1">Support Us</h3>
+            <p className="text-sm text-muted-foreground">View donors and contribute</p>
+          </Card>
+        </div>
+      </div>
 
       {/* Highlights */}
       {event.highlights && event.highlights.length > 0 && (

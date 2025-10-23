@@ -1929,6 +1929,47 @@ export type Database = {
           },
         ]
       }
+      guest_analytics: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          page_view: string
+          referrer: string | null
+          session_id: string
+          timestamp: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          page_view: string
+          referrer?: string | null
+          session_id: string
+          timestamp?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          page_view?: string
+          referrer?: string | null
+          session_id?: string
+          timestamp?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_analytics_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hr_onboarding: {
         Row: {
           checklist_item: string
