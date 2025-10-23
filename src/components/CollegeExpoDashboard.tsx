@@ -6,8 +6,8 @@ import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
 import { MapTab } from './dashboard/college-expo/MapTab';
 import { FloorPlanTabWrapper } from './dashboard/college-expo/FloorPlanTabWrapper';
 import { SeminarsTabWrapper } from './dashboard/college-expo/SeminarsTabWrapper';
-import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
-import { VendorsTab } from './dashboard/college-expo/VendorsTab';
+import { ScheduleTabV2 } from './dashboard/college-expo/ScheduleTabV2';
+import { VendorsTabV2 } from './dashboard/college-expo/VendorsTabV2';
 import { MyScheduleTab } from './dashboard/college-expo/MyScheduleTab';
 import { DonorsTab } from './dashboard/college-expo/DonorsTab';
 import { DashboardHeader } from './DashboardHeader';
@@ -56,13 +56,13 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       id: 'schedule',
       label: 'Schedule',
       icon: Calendar,
-      component: ScheduleTab
+      component: ScheduleTabV2
     },
     {
       id: 'vendors',
       label: 'Vendors',
       icon: Building2,
-      component: VendorsTab
+      component: VendorsTabV2
     },
     {
       id: 'my-schedule',

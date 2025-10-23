@@ -19,6 +19,7 @@ import { HRModule } from '@/components/admin/hr/HRModule';
 import { MessagesModule } from '@/components/admin/messages/MessagesModule';
 import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
 import { EducationModule } from '@/components/admin/education/EducationModule';
+import { EventsModule } from '@/components/admin/events/EventsModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -131,6 +132,8 @@ export default function AdminDashboard() {
               {activeTab === 'education' && <EducationModule />}
               
               {activeTab === 'analytics' && <AnalyticsModule />}
+              
+              {activeTab === 'events' && <EventsModule />}
               
               {activeTab === 'settings' && (
                 <div className="glass-premium rounded-lg p-8 text-center">
