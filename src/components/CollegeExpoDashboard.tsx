@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { Home, Calendar, MapPin, Building2, BookmarkCheck, Heart } from 'lucide-react';
+import { Home, Calendar, MapPin, Building2, BookmarkCheck, Heart, Grid3x3, Presentation } from 'lucide-react';
 import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
 import { MapTab } from './dashboard/college-expo/MapTab';
+import { FloorPlanTabWrapper } from './dashboard/college-expo/FloorPlanTabWrapper';
+import { SeminarsTabWrapper } from './dashboard/college-expo/SeminarsTabWrapper';
 import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
 import { VendorsTab } from './dashboard/college-expo/VendorsTab';
 import { MyScheduleTab } from './dashboard/college-expo/MyScheduleTab';
@@ -37,6 +39,18 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       label: 'Map',
       icon: MapPin,
       component: MapTab
+    },
+    {
+      id: 'floor-plan',
+      label: 'Floor Plan',
+      icon: Grid3x3,
+      component: FloorPlanTabWrapper
+    },
+    {
+      id: 'seminars',
+      label: 'Seminars',
+      icon: Presentation,
+      component: SeminarsTabWrapper
     },
     {
       id: 'schedule',
@@ -84,7 +98,7 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       
       {/* Bottom Navigation for Mobile */}
       <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border md:hidden z-50">
-        <div className="grid grid-cols-6 h-16">
+        <div className="grid grid-cols-8 h-16">
           {tabs.map((tab) => (
             <button
               key={tab.id}

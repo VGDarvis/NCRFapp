@@ -451,8 +451,58 @@ export type Database = {
           },
         ]
       }
+      booth_check_ins: {
+        Row: {
+          booth_id: string
+          check_in_method: string | null
+          check_in_time: string
+          event_id: string
+          id: string
+          metadata: Json | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          booth_id: string
+          check_in_method?: string | null
+          check_in_time?: string
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          booth_id?: string
+          check_in_method?: string | null
+          check_in_time?: string
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booth_check_ins_booth_id_fkey"
+            columns: ["booth_id"]
+            isOneToOne: false
+            referencedRelation: "booths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booth_check_ins_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booths: {
         Row: {
+          booth_depth: number | null
+          booth_width: number | null
           contact_email: string | null
           contact_name: string | null
           contact_phone: string | null
@@ -461,6 +511,7 @@ export type Database = {
           display_order: number | null
           event_id: string
           floor_number: number | null
+          floor_plan_id: string | null
           id: string
           is_featured: boolean | null
           latitude: number | null
@@ -477,9 +528,13 @@ export type Database = {
           venue_id: string | null
           waives_application_fee: boolean | null
           website_url: string | null
+          x_position: number | null
+          y_position: number | null
           zone: string | null
         }
         Insert: {
+          booth_depth?: number | null
+          booth_width?: number | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -488,6 +543,7 @@ export type Database = {
           display_order?: number | null
           event_id: string
           floor_number?: number | null
+          floor_plan_id?: string | null
           id?: string
           is_featured?: boolean | null
           latitude?: number | null
@@ -504,9 +560,13 @@ export type Database = {
           venue_id?: string | null
           waives_application_fee?: boolean | null
           website_url?: string | null
+          x_position?: number | null
+          y_position?: number | null
           zone?: string | null
         }
         Update: {
+          booth_depth?: number | null
+          booth_width?: number | null
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
@@ -515,6 +575,7 @@ export type Database = {
           display_order?: number | null
           event_id?: string
           floor_number?: number | null
+          floor_plan_id?: string | null
           id?: string
           is_featured?: boolean | null
           latitude?: number | null
@@ -531,6 +592,8 @@ export type Database = {
           venue_id?: string | null
           waives_application_fee?: boolean | null
           website_url?: string | null
+          x_position?: number | null
+          y_position?: number | null
           zone?: string | null
         }
         Relationships: [
@@ -539,6 +602,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booths_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
             referencedColumns: ["id"]
           },
           {
@@ -1808,6 +1878,56 @@ export type Database = {
           zip_code?: string | null
         }
         Relationships: []
+      }
+      floor_plans: {
+        Row: {
+          created_at: string
+          floor_name: string | null
+          floor_number: number
+          height_meters: number | null
+          id: string
+          image_url: string | null
+          scale_factor: number | null
+          svg_data: string | null
+          updated_at: string
+          venue_id: string
+          width_meters: number | null
+        }
+        Insert: {
+          created_at?: string
+          floor_name?: string | null
+          floor_number?: number
+          height_meters?: number | null
+          id?: string
+          image_url?: string | null
+          scale_factor?: number | null
+          svg_data?: string | null
+          updated_at?: string
+          venue_id: string
+          width_meters?: number | null
+        }
+        Update: {
+          created_at?: string
+          floor_name?: string | null
+          floor_number?: number
+          height_meters?: number | null
+          id?: string
+          image_url?: string | null
+          scale_factor?: number | null
+          svg_data?: string | null
+          updated_at?: string
+          venue_id?: string
+          width_meters?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "floor_plans_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hr_onboarding: {
         Row: {
@@ -3206,6 +3326,132 @@ export type Database = {
         }
         Relationships: []
       }
+      seminar_rooms: {
+        Row: {
+          amenities: Json | null
+          capacity: number | null
+          created_at: string
+          floor_plan_id: string | null
+          id: string
+          room_name: string
+          room_number: string | null
+          venue_id: string
+          x_position: number | null
+          y_position: number | null
+        }
+        Insert: {
+          amenities?: Json | null
+          capacity?: number | null
+          created_at?: string
+          floor_plan_id?: string | null
+          id?: string
+          room_name: string
+          room_number?: string | null
+          venue_id: string
+          x_position?: number | null
+          y_position?: number | null
+        }
+        Update: {
+          amenities?: Json | null
+          capacity?: number | null
+          created_at?: string
+          floor_plan_id?: string | null
+          id?: string
+          room_name?: string
+          room_number?: string | null
+          venue_id?: string
+          x_position?: number | null
+          y_position?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seminar_rooms_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seminar_rooms_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seminar_sessions: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          end_time: string
+          event_id: string
+          id: string
+          max_capacity: number | null
+          presenter_name: string | null
+          presenter_organization: string | null
+          presenter_title: string | null
+          registration_required: boolean | null
+          room_id: string
+          start_time: string
+          target_audience: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          end_time: string
+          event_id: string
+          id?: string
+          max_capacity?: number | null
+          presenter_name?: string | null
+          presenter_organization?: string | null
+          presenter_title?: string | null
+          registration_required?: boolean | null
+          room_id: string
+          start_time: string
+          target_audience?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          end_time?: string
+          event_id?: string
+          id?: string
+          max_capacity?: number | null
+          presenter_name?: string | null
+          presenter_organization?: string | null
+          presenter_title?: string | null
+          registration_required?: boolean | null
+          room_id?: string
+          start_time?: string
+          target_audience?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seminar_sessions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seminar_sessions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "seminar_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_items: {
         Row: {
           category: string | null
@@ -3881,6 +4127,51 @@ export type Database = {
           },
         ]
       }
+      user_booth_favorites: {
+        Row: {
+          booth_id: string
+          created_at: string
+          event_id: string
+          id: string
+          notes: string | null
+          user_id: string
+          visit_order: number | null
+        }
+        Insert: {
+          booth_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          user_id: string
+          visit_order?: number | null
+        }
+        Update: {
+          booth_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          user_id?: string
+          visit_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_booth_favorites_booth_id_fkey"
+            columns: ["booth_id"]
+            isOneToOne: false
+            referencedRelation: "booths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_booth_favorites_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_purchases: {
         Row: {
           created_at: string
@@ -3995,6 +4286,57 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      venue_amenities: {
+        Row: {
+          amenity_name: string | null
+          amenity_type: string
+          created_at: string
+          floor_plan_id: string | null
+          icon_name: string | null
+          id: string
+          venue_id: string
+          x_position: number
+          y_position: number
+        }
+        Insert: {
+          amenity_name?: string | null
+          amenity_type: string
+          created_at?: string
+          floor_plan_id?: string | null
+          icon_name?: string | null
+          id?: string
+          venue_id: string
+          x_position: number
+          y_position: number
+        }
+        Update: {
+          amenity_name?: string | null
+          amenity_type?: string
+          created_at?: string
+          floor_plan_id?: string | null
+          icon_name?: string | null
+          id?: string
+          venue_id?: string
+          x_position?: number
+          y_position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_amenities_floor_plan_id_fkey"
+            columns: ["floor_plan_id"]
+            isOneToOne: false
+            referencedRelation: "floor_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_amenities_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       venues: {
         Row: {

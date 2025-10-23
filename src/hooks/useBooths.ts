@@ -19,6 +19,21 @@ export interface Booth {
   longitude: number | null;
   qr_code_url: string | null;
   created_at: string;
+  // Direct booth properties from database
+  org_name: string;
+  logo_url: string | null;
+  org_type: string | null;
+  sponsor_tier: string | null;
+  table_no: string | null;
+  website_url: string | null;
+  offers_on_spot_admission: boolean;
+  waives_application_fee: boolean;
+  scholarship_info: string | null;
+  floor_plan_id: string | null;
+  x_position: number | null;
+  y_position: number | null;
+  booth_width: number | null;
+  booth_depth: number | null;
   sponsor?: {
     id: string;
     name: string;
