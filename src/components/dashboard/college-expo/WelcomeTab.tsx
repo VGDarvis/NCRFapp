@@ -94,13 +94,11 @@ export const WelcomeTab = () => {
             </div>
 
             <div className="flex gap-3">
-              {event.registration_url && (
-                <Button size="lg" className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700" asChild>
-                  <a href={event.registration_url} target="_blank" rel="noopener noreferrer">
-                    Register Now <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
-                </Button>
-              )}
+              <Button size="lg" className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700" asChild>
+                <a href="https://www.eventbrite.com/e/16th-annual-houston-black-college-expotm-tickets-1350818457369" target="_blank" rel="noopener noreferrer">
+                  Register Now <ExternalLink className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
             </div>
           </div>
 
