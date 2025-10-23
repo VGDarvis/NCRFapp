@@ -1,15 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { Home, Calendar, MapPin, Building2, BookmarkCheck, Heart, Grid3x3, Presentation } from 'lucide-react';
+import { Home, Calendar, MapPin, Building2, Heart } from 'lucide-react';
 import { useGuestAnalytics } from '@/hooks/useGuestAnalytics';
 import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
-import { MapTab } from './dashboard/college-expo/MapTab';
-import { FloorPlanTabWrapper } from './dashboard/college-expo/FloorPlanTabWrapper';
-import { SeminarsTabWrapper } from './dashboard/college-expo/SeminarsTabWrapper';
-import { ScheduleTabV2 } from './dashboard/college-expo/ScheduleTabV2';
+import { ExploreTab } from './dashboard/college-expo/ExploreTab';
+import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
 import { VendorsTabV2 } from './dashboard/college-expo/VendorsTabV2';
-import { MyScheduleTab } from './dashboard/college-expo/MyScheduleTab';
 import { DonorsTab } from './dashboard/college-expo/DonorsTab';
 import { DashboardHeader } from './DashboardHeader';
 import logoGreenClean from '@/assets/logo-green-clean.png';
@@ -19,7 +16,7 @@ interface CollegeExpoDashboardProps {
 }
 
 export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardProps) => {
-  const [activeTab, setActiveTab] = useState('welcome');
+  const [activeTab, setActiveTab] = useState('home');
   const [user, setUser] = useState<User | null>(null);
   const [eventId, setEventId] = useState<string | null>(null);
 
@@ -49,46 +46,28 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
 
   const tabs = [
     {
-      id: 'welcome',
-      label: 'Welcome',
+      id: 'home',
+      label: 'Home',
       icon: Home,
       component: WelcomeTab
     },
     {
-      id: 'map',
-      label: 'Map',
+      id: 'explore',
+      label: 'Explore',
       icon: MapPin,
-      component: MapTab
-    },
-    {
-      id: 'floor-plan',
-      label: 'Floor Plan',
-      icon: Grid3x3,
-      component: FloorPlanTabWrapper
-    },
-    {
-      id: 'seminars',
-      label: 'Seminars',
-      icon: Presentation,
-      component: SeminarsTabWrapper
+      component: ExploreTab
     },
     {
       id: 'schedule',
       label: 'Schedule',
       icon: Calendar,
-      component: ScheduleTabV2
+      component: ScheduleTab
     },
     {
       id: 'vendors',
       label: 'Vendors',
       icon: Building2,
       component: VendorsTabV2
-    },
-    {
-      id: 'my-schedule',
-      label: 'My Schedule',
-      icon: BookmarkCheck,
-      component: MyScheduleTab
     },
     {
       id: 'donors',
@@ -118,7 +97,7 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       
       {/* Bottom Navigation for Mobile */}
       <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border md:hidden z-50">
-        <div className="grid grid-cols-8 h-16">
+        <div className="grid grid-cols-5 h-16">
           {tabs.map((tab) => (
             <button
               key={tab.id}
