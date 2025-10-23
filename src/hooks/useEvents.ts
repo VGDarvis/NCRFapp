@@ -22,6 +22,23 @@ export function useEvents() {
     },
   });
 
+  const { data: eventsWithVenues, isLoading: isLoadingEventsWithVenues } = useQuery({
+    queryKey: ["events-with-venues"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select(`
+          *,
+          venue:venues(*)
+        `)
+        .not("venue_id", "is", null)
+        .order("start_at", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: upcomingEvents, isLoading: isLoadingUpcoming } = useQuery({
     queryKey: ["events-upcoming"],
     queryFn: async () => {
@@ -99,9 +116,11 @@ export function useEvents() {
 
   return {
     events,
+    eventsWithVenues,
     upcomingEvents,
     isLoading,
     isLoadingUpcoming,
+    isLoadingEventsWithVenues,
     createEvent,
     updateEvent,
     deleteEvent,
