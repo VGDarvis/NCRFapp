@@ -90,7 +90,12 @@ export const ExpoFlyersGallery = () => {
                 className="w-full h-auto rounded-lg"
               />
               <div className="flex gap-4">
-                <Button className="flex-1">Register Now</Button>
+                <Button 
+                  className="flex-1"
+                  onClick={() => window.open('https://www.eventbrite.com/e/16th-annual-houston-black-college-expotm-tickets-1350818457369', '_blank')}
+                >
+                  Register Now
+                </Button>
                 <Button variant="outline" className="flex-1" asChild>
                   <a href={selectedFlyer.image} download={`${selectedFlyer.id}-flyer.png`}>
                     Download Flyer
