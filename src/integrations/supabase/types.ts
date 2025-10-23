@@ -22,7 +22,7 @@ export type Database = {
           created_at: string
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           target_id: string | null
           target_type: string | null
@@ -36,7 +36,7 @@ export type Database = {
           created_at?: string
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           target_id?: string | null
           target_type?: string | null
@@ -50,7 +50,7 @@ export type Database = {
           created_at?: string
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           target_id?: string | null
           target_type?: string | null
@@ -65,7 +65,7 @@ export type Database = {
           admin_user_id: string
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           new_values: Json | null
           old_values: Json | null
           target_id: string | null
@@ -77,7 +77,7 @@ export type Database = {
           admin_user_id: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           target_id?: string | null
@@ -89,7 +89,7 @@ export type Database = {
           admin_user_id?: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           new_values?: Json | null
           old_values?: Json | null
           target_id?: string | null
@@ -130,7 +130,7 @@ export type Database = {
           created_at: string
           expires_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           last_activity: string
           session_token: string
           user_agent: string | null
@@ -140,7 +140,7 @@ export type Database = {
           created_at?: string
           expires_at: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           last_activity?: string
           session_token: string
           user_agent?: string | null
@@ -150,7 +150,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           last_activity?: string
           session_token?: string
           user_agent?: string | null
@@ -447,6 +447,112 @@ export type Database = {
             columns: ["scholarship_id"]
             isOneToOne: false
             referencedRelation: "scholarship_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booths: {
+        Row: {
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          event_id: string
+          floor_number: number | null
+          id: string
+          is_featured: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          offers_on_spot_admission: boolean | null
+          org_name: string
+          org_type: string | null
+          scholarship_info: string | null
+          sponsor_id: string | null
+          sponsor_tier: string | null
+          table_no: string | null
+          updated_at: string | null
+          venue_id: string | null
+          waives_application_fee: boolean | null
+          website_url: string | null
+          zone: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          event_id: string
+          floor_number?: number | null
+          id?: string
+          is_featured?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          offers_on_spot_admission?: boolean | null
+          org_name: string
+          org_type?: string | null
+          scholarship_info?: string | null
+          sponsor_id?: string | null
+          sponsor_tier?: string | null
+          table_no?: string | null
+          updated_at?: string | null
+          venue_id?: string | null
+          waives_application_fee?: boolean | null
+          website_url?: string | null
+          zone?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          event_id?: string
+          floor_number?: number | null
+          id?: string
+          is_featured?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          offers_on_spot_admission?: boolean | null
+          org_name?: string
+          org_type?: string | null
+          scholarship_info?: string | null
+          sponsor_id?: string | null
+          sponsor_tier?: string | null
+          table_no?: string | null
+          updated_at?: string | null
+          venue_id?: string | null
+          waives_application_fee?: boolean | null
+          website_url?: string | null
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booths_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booths_sponsor_id_fkey"
+            columns: ["sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "sponsors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booths_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -1417,6 +1523,162 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "expo_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_tags: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_tags_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          activities: Json | null
+          attendee_count: number | null
+          audience: string[] | null
+          capacity: number | null
+          category: string[] | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discord_link: string | null
+          end_at: string
+          event_flyer_url: string | null
+          event_type: string
+          highlights: Json | null
+          id: string
+          image_url: string | null
+          is_virtual: boolean | null
+          legacy_expo_event_id: string | null
+          max_attendees: number | null
+          nft_contract_address: string | null
+          registration_deadline: string | null
+          registration_required: boolean | null
+          registration_url: string | null
+          requires_wallet: boolean | null
+          schedule: Json | null
+          start_at: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          venue_id: string | null
+          virtual_link: string | null
+        }
+        Insert: {
+          activities?: Json | null
+          attendee_count?: number | null
+          audience?: string[] | null
+          capacity?: number | null
+          category?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discord_link?: string | null
+          end_at: string
+          event_flyer_url?: string | null
+          event_type?: string
+          highlights?: Json | null
+          id?: string
+          image_url?: string | null
+          is_virtual?: boolean | null
+          legacy_expo_event_id?: string | null
+          max_attendees?: number | null
+          nft_contract_address?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          registration_url?: string | null
+          requires_wallet?: boolean | null
+          schedule?: Json | null
+          start_at: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          venue_id?: string | null
+          virtual_link?: string | null
+        }
+        Update: {
+          activities?: Json | null
+          attendee_count?: number | null
+          audience?: string[] | null
+          capacity?: number | null
+          category?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discord_link?: string | null
+          end_at?: string
+          event_flyer_url?: string | null
+          event_type?: string
+          highlights?: Json | null
+          id?: string
+          image_url?: string | null
+          is_virtual?: boolean | null
+          legacy_expo_event_id?: string | null
+          max_attendees?: number | null
+          nft_contract_address?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          registration_url?: string | null
+          requires_wallet?: boolean | null
+          schedule?: Json | null
+          start_at?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          venue_id?: string | null
+          virtual_link?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_legacy_expo_event_id_fkey"
+            columns: ["legacy_expo_event_id"]
+            isOneToOne: false
+            referencedRelation: "expo_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -2432,6 +2694,139 @@ export type Database = {
         }
         Relationships: []
       }
+      registrations: {
+        Row: {
+          checked_in_at: string | null
+          checked_in_by: string | null
+          colleges_visited: string[] | null
+          confirmation_sent_at: string | null
+          created_at: string | null
+          email: string
+          event_id: string
+          feedback_rating: number | null
+          feedback_text: string | null
+          first_name: string
+          grade_level: string | null
+          graduation_year: number | null
+          id: string
+          last_name: string
+          nft_certificate_url: string | null
+          nft_minted_at: string | null
+          phone: string | null
+          qr_code: string
+          qr_code_image_url: string | null
+          registered_at: string | null
+          reminder_sent_at: string | null
+          role: string | null
+          school_name: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          colleges_visited?: string[] | null
+          confirmation_sent_at?: string | null
+          created_at?: string | null
+          email: string
+          event_id: string
+          feedback_rating?: number | null
+          feedback_text?: string | null
+          first_name: string
+          grade_level?: string | null
+          graduation_year?: number | null
+          id?: string
+          last_name: string
+          nft_certificate_url?: string | null
+          nft_minted_at?: string | null
+          phone?: string | null
+          qr_code: string
+          qr_code_image_url?: string | null
+          registered_at?: string | null
+          reminder_sent_at?: string | null
+          role?: string | null
+          school_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          colleges_visited?: string[] | null
+          confirmation_sent_at?: string | null
+          created_at?: string | null
+          email?: string
+          event_id?: string
+          feedback_rating?: number | null
+          feedback_text?: string | null
+          first_name?: string
+          grade_level?: string | null
+          graduation_year?: number | null
+          id?: string
+          last_name?: string
+          nft_certificate_url?: string | null
+          nft_minted_at?: string | null
+          phone?: string | null
+          qr_code?: string
+          qr_code_image_url?: string | null
+          registered_at?: string | null
+          reminder_sent_at?: string | null
+          role?: string | null
+          school_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_events: {
+        Row: {
+          created_at: string | null
+          event_id: string
+          id: string
+          notes: string | null
+          reminder_sent: boolean | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_id: string
+          id?: string
+          notes?: string | null
+          reminder_sent?: boolean | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          notes?: string | null
+          reminder_sent?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_events_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scholarship_applications: {
         Row: {
           application_date: string | null
@@ -2919,6 +3314,63 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsors: {
+        Row: {
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          sponsorship_amount: number | null
+          sponsorship_end_date: string | null
+          sponsorship_start_date: string | null
+          tier: string | null
+          updated_at: string | null
+          website_url: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          sponsorship_amount?: number | null
+          sponsorship_end_date?: string | null
+          sponsorship_start_date?: string | null
+          tier?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          sponsorship_amount?: number | null
+          sponsorship_end_date?: string | null
+          sponsorship_start_date?: string | null
+          tier?: string | null
+          updated_at?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string
@@ -2946,6 +3398,36 @@ export type Database = {
           setting_value?: Json
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          category: string | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          category?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -3514,6 +3996,78 @@ export type Database = {
         }
         Relationships: []
       }
+      venues: {
+        Row: {
+          accessibility_info: string | null
+          address: string
+          amenities: Json | null
+          capacity: number | null
+          city: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          floor_plans: Json | null
+          id: string
+          is_active: boolean | null
+          latitude: number | null
+          longitude: number | null
+          map_region: string | null
+          name: string
+          notes: string | null
+          parking_info: string | null
+          state: string
+          updated_at: string | null
+          venue_type: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          accessibility_info?: string | null
+          address: string
+          amenities?: Json | null
+          capacity?: number | null
+          city: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          floor_plans?: Json | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          map_region?: string | null
+          name: string
+          notes?: string | null
+          parking_info?: string | null
+          state: string
+          updated_at?: string | null
+          venue_type?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          accessibility_info?: string | null
+          address?: string
+          amenities?: Json | null
+          capacity?: number | null
+          city?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          floor_plans?: Json | null
+          id?: string
+          is_active?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          map_region?: string | null
+          name?: string
+          notes?: string | null
+          parking_info?: string | null
+          state?: string
+          updated_at?: string | null
+          venue_type?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       verification_history: {
         Row: {
           action: string
@@ -3781,12 +4335,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_expired_cache: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_cache: { Args: never; Returns: undefined }
       get_current_user_role: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
       has_role: {

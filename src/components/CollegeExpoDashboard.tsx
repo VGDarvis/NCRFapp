@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { Home, MapPin, GraduationCap, BookOpen, Users, Heart } from 'lucide-react';
-import { CollegeExpoHomeTab } from './dashboard/college-expo/HomeTab';
-import { EventsMapTab } from './dashboard/college-expo/EventsMapTab';
-import { ScholarshipsTab } from './dashboard/college-expo/ScholarshipsTab';
-import { CollegePrepTab } from './dashboard/college-expo/CollegePrepTab';
-import { ResourcesTab } from './dashboard/college-expo/ResourcesTab';
+import { Home, Calendar, MapPin, Building2, BookmarkCheck, Heart } from 'lucide-react';
+import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
+import { MapTab } from './dashboard/college-expo/MapTab';
+import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
+import { VendorsTab } from './dashboard/college-expo/VendorsTab';
+import { MyScheduleTab } from './dashboard/college-expo/MyScheduleTab';
 import { DonorsTab } from './dashboard/college-expo/DonorsTab';
 import { DashboardHeader } from './DashboardHeader';
 import logoGreenClean from '@/assets/logo-green-clean.png';
@@ -16,7 +16,7 @@ interface CollegeExpoDashboardProps {
 }
 
 export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardProps) => {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('welcome');
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -27,34 +27,34 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
 
   const tabs = [
     {
-      id: 'home',
-      label: 'Home',
+      id: 'welcome',
+      label: 'Welcome',
       icon: Home,
-      component: CollegeExpoHomeTab
+      component: WelcomeTab
     },
     {
-      id: 'events',
-      label: 'Events & Expos',
+      id: 'map',
+      label: 'Map',
       icon: MapPin,
-      component: EventsMapTab
+      component: MapTab
     },
     {
-      id: 'scholarships',
-      label: 'Scholarships',
-      icon: GraduationCap,
-      component: ScholarshipsTab
+      id: 'schedule',
+      label: 'Schedule',
+      icon: Calendar,
+      component: ScheduleTab
     },
     {
-      id: 'prep',
-      label: 'College Prep',
-      icon: BookOpen,
-      component: CollegePrepTab
+      id: 'vendors',
+      label: 'Vendors',
+      icon: Building2,
+      component: VendorsTab
     },
     {
-      id: 'resources',
-      label: 'Resources',
-      icon: Users,
-      component: ResourcesTab
+      id: 'my-schedule',
+      label: 'My Schedule',
+      icon: BookmarkCheck,
+      component: MyScheduleTab
     },
     {
       id: 'donors',
@@ -64,7 +64,7 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
     }
   ];
 
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || CollegeExpoHomeTab;
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || WelcomeTab;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-500/10 via-green-500/5 to-background flex flex-col">
