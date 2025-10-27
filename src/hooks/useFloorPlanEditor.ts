@@ -10,23 +10,33 @@ export interface BoothObject {
   boothData?: any;
 }
 
-export const useFloorPlanEditor = (floorPlanId: string | null, canvasRef: React.RefObject<HTMLCanvasElement>) => {
+export const useFloorPlanEditor = (
+  floorPlanId: string | null, 
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  isPanMode: boolean = false
+) => {
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [selectedBooth, setSelectedBooth] = useState<BoothObject | null>(null);
   const [booths, setBooths] = useState<BoothObject[]>([]);
   const [activeTool, setActiveTool] = useState<"select" | "draw">("select");
   const [isLoading, setIsLoading] = useState(false);
+  const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
 
   // Initialize Fabric canvas
   useEffect(() => {
     if (!canvasRef.current || fabricCanvas) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 1200,
-      height: 800,
+      width: canvasRef.current.clientWidth || 1200,
+      height: canvasRef.current.clientHeight || 800,
       backgroundColor: "#f8f9fa",
       selection: true,
     });
+
+    // Enable touch gestures
+    canvas.allowTouchScrolling = true;
+    canvas.perPixelTargetFind = true;
+    canvas.targetFindTolerance = 10;
 
     setFabricCanvas(canvas);
 
@@ -34,6 +44,63 @@ export const useFloorPlanEditor = (floorPlanId: string | null, canvasRef: React.
       canvas.dispose();
     };
   }, [canvasRef]);
+
+  // Handle pan mode
+  useEffect(() => {
+    if (!fabricCanvas) return;
+
+    fabricCanvas.selection = !isPanMode;
+    fabricCanvas.forEachObject((obj) => {
+      obj.selectable = !isPanMode;
+      obj.evented = !isPanMode;
+    });
+
+    if (isPanMode) {
+      fabricCanvas.defaultCursor = "grab";
+      fabricCanvas.hoverCursor = "grab";
+      
+      const handleMouseDown = (opt: any) => {
+        const evt = opt.e;
+        if (isPanMode) {
+          fabricCanvas.defaultCursor = "grabbing";
+          setLastPanPoint({ x: evt.clientX || evt.touches?.[0].clientX, y: evt.clientY || evt.touches?.[0].clientY });
+        }
+      };
+
+      const handleMouseMove = (opt: any) => {
+        if (isPanMode && lastPanPoint) {
+          const evt = opt.e;
+          const vpt = fabricCanvas.viewportTransform!;
+          const currentX = evt.clientX || evt.touches?.[0].clientX;
+          const currentY = evt.clientY || evt.touches?.[0].clientY;
+          
+          vpt[4] += currentX - lastPanPoint.x;
+          vpt[5] += currentY - lastPanPoint.y;
+          
+          fabricCanvas.requestRenderAll();
+          setLastPanPoint({ x: currentX, y: currentY });
+        }
+      };
+
+      const handleMouseUp = () => {
+        fabricCanvas.defaultCursor = "grab";
+        setLastPanPoint(null);
+      };
+
+      fabricCanvas.on("mouse:down", handleMouseDown);
+      fabricCanvas.on("mouse:move", handleMouseMove);
+      fabricCanvas.on("mouse:up", handleMouseUp);
+
+      return () => {
+        fabricCanvas.off("mouse:down", handleMouseDown);
+        fabricCanvas.off("mouse:move", handleMouseMove);
+        fabricCanvas.off("mouse:up", handleMouseUp);
+      };
+    } else {
+      fabricCanvas.defaultCursor = "default";
+      fabricCanvas.hoverCursor = "move";
+    }
+  }, [fabricCanvas, isPanMode, lastPanPoint]);
 
   // Load floor plan background
   const loadFloorPlanBackground = useCallback(async (imageUrl: string) => {

@@ -2,13 +2,15 @@ import { useRef, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, Save, Upload, Plus, Trash2, MousePointer, Square } from "lucide-react";
+import { Loader2, Save, Upload } from "lucide-react";
 import { useFloorPlanEditor } from "@/hooks/useFloorPlanEditor";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BoothPropertiesPanel } from "./BoothPropertiesPanel";
+import { BoothPropertiesDrawer } from "./BoothPropertiesDrawer";
 import { FloorPlanToolbar } from "./FloorPlanToolbar";
+import { MobileCanvasControls } from "./MobileCanvasControls";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FloorPlanEditorProps {
   eventId: string;
@@ -21,6 +23,9 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [currentFloorPlanId, setCurrentFloorPlanId] = useState<string | null>(floorPlanId);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isPanMode, setIsPanMode] = useState(false);
+  const isMobile = useIsMobile();
 
   const {
     fabricCanvas,
@@ -34,7 +39,14 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     deleteBooth,
     saveBooths,
     setSelectedBooth,
-  } = useFloorPlanEditor(currentFloorPlanId, canvasRef);
+  } = useFloorPlanEditor(currentFloorPlanId, canvasRef, isPanMode);
+
+  // Open drawer when booth is selected on mobile
+  useEffect(() => {
+    if (isMobile && selectedBooth) {
+      setDrawerOpen(true);
+    }
+  }, [selectedBooth, isMobile]);
 
   // Load existing booths when floor plan is set
   useEffect(() => {
@@ -121,11 +133,11 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
 
   return (
     <div className="space-y-4">
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-4">
+      <Card className="p-3 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold">Floor Plan Editor</h2>
-            <p className="text-muted-foreground">Design and configure booth layout</p>
+            <h2 className="text-xl md:text-2xl font-bold">Floor Plan Editor</h2>
+            <p className="text-sm text-muted-foreground">Design and configure booth layout</p>
           </div>
           <div className="flex gap-2">
             <Input
@@ -137,17 +149,35 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
             />
             <Button
               variant="outline"
+              size={isMobile ? "sm" : "default"}
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingImage}
+              className="h-11 min-w-[44px]"
             >
               {uploadingImage ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                <Loader2 className="w-4 h-4 animate-spin md:mr-2" />
               ) : (
-                <Upload className="w-4 h-4 mr-2" />
+                <Upload className="w-4 h-4 md:mr-2" />
               )}
-              Upload Floor Plan
+              <span className="hidden md:inline">Upload</span>
             </Button>
-            <Button onClick={handleSave} disabled={isLoading || !currentFloorPlanId}>
+            <Button 
+              onClick={handleSave} 
+              disabled={isLoading || !currentFloorPlanId}
+              size={isMobile ? "sm" : "default"}
+              className="h-11 min-w-[44px] md:hidden"
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={isLoading || !currentFloorPlanId}
+              className="hidden md:flex"
+            >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : (
@@ -167,29 +197,56 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
-          <div className="lg:col-span-3">
-            <Card className="p-4 bg-muted/50">
+          <div className="lg:col-span-3 relative">
+            <Card className="p-2 md:p-4 bg-muted/50">
               <canvas
                 ref={canvasRef}
-                className="border border-border rounded-lg w-full"
-                style={{ maxHeight: "600px" }}
+                className="border border-border rounded-lg w-full touch-none"
+                style={{ 
+                  height: isMobile ? "calc(100vh - 350px)" : "600px",
+                  minHeight: "400px"
+                }}
               />
             </Card>
+            
+            {isMobile && (
+              <MobileCanvasControls 
+                canvas={fabricCanvas}
+                isPanMode={isPanMode}
+                onTogglePanMode={() => setIsPanMode(!isPanMode)}
+              />
+            )}
           </div>
 
-          <div className="lg:col-span-1">
-            <BoothPropertiesPanel
-              selectedBooth={selectedBooth}
-              eventId={eventId}
-              onBoothUpdated={() => {
-                if (currentFloorPlanId) {
-                  loadBooths(eventId);
-                }
-              }}
-            />
-          </div>
+          {!isMobile && (
+            <div className="lg:col-span-1">
+              <BoothPropertiesPanel
+                selectedBooth={selectedBooth}
+                eventId={eventId}
+                onBoothUpdated={() => {
+                  if (currentFloorPlanId) {
+                    loadBooths(eventId);
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
       </Card>
+
+      {isMobile && (
+        <BoothPropertiesDrawer
+          selectedBooth={selectedBooth}
+          eventId={eventId}
+          onBoothUpdated={() => {
+            if (currentFloorPlanId) {
+              loadBooths(eventId);
+            }
+          }}
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+        />
+      )}
     </div>
   );
 };
