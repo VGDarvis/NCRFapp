@@ -14,7 +14,6 @@ import { RecentActivityFeed } from '@/components/admin/dashboard/RecentActivityF
 import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksWidget';
 import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { CRMModule } from '@/components/admin/crm/CRMModule';
 import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
 import { ExposModule } from '@/components/admin/expos/ExposModule';
@@ -91,16 +90,15 @@ export default function AdminDashboard() {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      <TooltipProvider>
-        <SessionWarningDialog 
-          open={showWarning} 
-          onContinue={() => {
-            resetActivity();
-            dismissWarning();
-          }} 
-        />
-        <SidebarProvider defaultOpen={true}>
-          <div className="min-h-screen w-full flex admin-gradient">
+      <SessionWarningDialog 
+        open={showWarning} 
+        onContinue={() => {
+          resetActivity();
+          dismissWarning();
+        }} 
+      />
+      <SidebarProvider defaultOpen={true}>
+        <div className="min-h-screen w-full flex admin-gradient">
           {/* Desktop Sidebar - Hidden on mobile */}
           <div className="hidden md:flex">
             <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
@@ -139,9 +137,8 @@ export default function AdminDashboard() {
           
           {/* Mobile Bottom Navigation */}
           <AdminMobileNav activeTab={activeTab} onTabChange={setActiveTab} />
-          </div>
-        </SidebarProvider>
-      </TooltipProvider>
+        </div>
+      </SidebarProvider>
     </ThemeProvider>
   );
 }
