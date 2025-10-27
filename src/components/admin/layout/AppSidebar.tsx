@@ -72,7 +72,6 @@ export function AppSidebar({ activeTab, onTabChange }: AppSidebarProps) {
                     <SidebarMenuButton
                       onClick={() => onTabChange(item.id)}
                       isActive={isActive}
-                      tooltip={item.label}
                       className={cn(
                         "transition-all",
                         isActive && "bg-primary/10 text-primary font-medium"
