@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, MessageSquare, Briefcase, GraduationCap, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, BarChart3, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminMobileNavProps {
@@ -8,10 +8,8 @@ interface AdminMobileNavProps {
 
 const tabs = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "expos", label: "Expos", icon: Calendar },
   { id: "crm", label: "CRM", icon: Users },
-  { id: "messages", label: "Messages", icon: MessageSquare },
-  { id: "hr", label: "HR", icon: Briefcase },
-  { id: "education", label: "Education", icon: GraduationCap },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
 ];
@@ -19,7 +17,7 @@ const tabs = [
 export function AdminMobileNav({ activeTab, onTabChange }: AdminMobileNavProps) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-premium border-t border-primary/20 md:hidden">
-      <div className="grid grid-cols-7 h-16">
+      <div className="grid grid-cols-5 h-16">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

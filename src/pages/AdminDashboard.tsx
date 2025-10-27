@@ -15,11 +15,8 @@ import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksW
 import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
 import { CRMModule } from '@/components/admin/crm/CRMModule';
-import { HRModule } from '@/components/admin/hr/HRModule';
-import { MessagesModule } from '@/components/admin/messages/MessagesModule';
 import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
-import { EducationModule } from '@/components/admin/education/EducationModule';
-import { EventsModule } from '@/components/admin/events/EventsModule';
+import { ExposModule } from '@/components/admin/expos/ExposModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -123,17 +120,11 @@ export default function AdminDashboard() {
                 </>
               )}
               
+              {activeTab === 'expos' && <ExposModule />}
+              
               {activeTab === 'crm' && <CRMModule />}
               
-              {activeTab === 'messages' && <MessagesModule />}
-              
-              {activeTab === 'hr' && <HRModule />}
-              
-              {activeTab === 'education' && <EducationModule />}
-              
               {activeTab === 'analytics' && <AnalyticsModule />}
-              
-              {activeTab === 'events' && <EventsModule />}
               
               {activeTab === 'settings' && (
                 <div className="glass-premium rounded-lg p-8 text-center">

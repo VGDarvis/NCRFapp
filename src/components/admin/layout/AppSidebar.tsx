@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, MessageSquare, Briefcase, GraduationCap, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, BarChart3, Settings } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -26,28 +26,16 @@ const navigationItems = [
     description: "Overview & metrics"
   },
   { 
+    id: "expos", 
+    label: "Expos", 
+    icon: Calendar,
+    description: "Floor plans & booth management"
+  },
+  { 
     id: "crm", 
     label: "CRM", 
     icon: Users,
     description: "Contacts & organizations"
-  },
-  { 
-    id: "messages", 
-    label: "Messages", 
-    icon: MessageSquare,
-    description: "Campaigns & templates"
-  },
-  { 
-    id: "hr", 
-    label: "HR", 
-    icon: Briefcase,
-    description: "Employees & onboarding"
-  },
-  { 
-    id: "education", 
-    label: "Education", 
-    icon: GraduationCap,
-    description: "School Finder & databases"
   },
   { 
     id: "analytics", 
