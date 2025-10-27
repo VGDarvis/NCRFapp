@@ -8,6 +8,9 @@ export interface FloorPlan {
   floor_name: string | null;
   svg_data: string | null;
   image_url: string | null;
+  background_image_url: string | null;
+  canvas_width: number | null;
+  canvas_height: number | null;
   width_meters: number | null;
   height_meters: number | null;
   scale_factor: number;

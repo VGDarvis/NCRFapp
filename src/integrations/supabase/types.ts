@@ -1881,6 +1881,9 @@ export type Database = {
       }
       floor_plans: {
         Row: {
+          background_image_url: string | null
+          canvas_height: number | null
+          canvas_width: number | null
           created_at: string
           floor_name: string | null
           floor_number: number
@@ -1894,6 +1897,9 @@ export type Database = {
           width_meters: number | null
         }
         Insert: {
+          background_image_url?: string | null
+          canvas_height?: number | null
+          canvas_width?: number | null
           created_at?: string
           floor_name?: string | null
           floor_number?: number
@@ -1907,6 +1913,9 @@ export type Database = {
           width_meters?: number | null
         }
         Update: {
+          background_image_url?: string | null
+          canvas_height?: number | null
+          canvas_width?: number | null
           created_at?: string
           floor_name?: string | null
           floor_number?: number
