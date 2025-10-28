@@ -24,7 +24,6 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [currentFloorPlanId, setCurrentFloorPlanId] = useState<string | null>(floorPlanId);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
   const [csvDialogOpen, setCsvDialogOpen] = useState(false);
@@ -33,6 +32,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const {
     fabricCanvas,
     selectedBooth,
+    booths,
     activeTool,
     isLoading,
     setActiveTool,
@@ -42,7 +42,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     deleteBooth,
     saveBooths,
     setSelectedBooth,
-  } = useFloorPlanEditor(currentFloorPlanId, canvasRef, isPanMode, eventId);
+  } = useFloorPlanEditor(floorPlanId, canvasRef, isPanMode, eventId);
 
   // Open drawer when booth is selected on mobile
   useEffect(() => {
@@ -51,12 +51,6 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     }
   }, [selectedBooth, isMobile]);
 
-  // Update currentFloorPlanId when prop changes (only for new floor plans)
-  useEffect(() => {
-    if (floorPlanId && !currentFloorPlanId) {
-      setCurrentFloorPlanId(floorPlanId);
-    }
-  }, [floorPlanId]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -80,11 +74,11 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
         .getPublicUrl(filePath);
 
       // Create or update floor plan record
-      if (currentFloorPlanId) {
+      if (floorPlanId) {
         const { error } = await supabase
           .from("floor_plans")
           .update({ background_image_url: publicUrl })
-          .eq("id", currentFloorPlanId);
+          .eq("id", floorPlanId);
 
         if (error) throw error;
       } else {
@@ -110,7 +104,6 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
 
         if (error) throw error;
         if (newFloorPlan) {
-          setCurrentFloorPlanId(newFloorPlan.id);
           onFloorPlanCreated?.(newFloorPlan.id);
         }
       }
@@ -127,14 +120,18 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   };
 
   const handleSave = async () => {
-    if (!currentFloorPlanId) {
+    if (!floorPlanId) {
       toast.error("Please upload a floor plan image first");
       return;
     }
     await saveBooths(eventId);
   };
 
-  if (!currentFloorPlanId) {
+  const handleAddBooth = () => {
+    addBooth(100, 100);
+  };
+
+  if (!floorPlanId) {
     return (
       <Card className="p-6">
         <div className="text-center py-12">
@@ -172,13 +169,20 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
           </div>
         </div>
 
-        <FloorPlanToolbar
-          activeTool={activeTool}
-          onToolChange={setActiveTool}
-          onAddBooth={() => addBooth(100, 100)}
-          onDeleteBooth={deleteBooth}
-          hasSelectedBooth={!!selectedBooth}
-        />
+        <div className="space-y-2">
+          <FloorPlanToolbar
+            activeTool={activeTool}
+            onToolChange={setActiveTool}
+            onAddBooth={handleAddBooth}
+            onDeleteBooth={deleteBooth}
+            hasSelectedBooth={!!selectedBooth}
+          />
+          {floorPlanId && (
+            <div className="text-sm text-muted-foreground px-4 py-2 bg-muted/50 rounded-md">
+              {isLoading ? "Loading booths..." : `${booths.length} booth${booths.length === 1 ? '' : 's'} loaded`}
+            </div>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
           <div className="lg:col-span-3 relative">
@@ -216,7 +220,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
                 selectedBooth={selectedBooth}
                 eventId={eventId}
                 onBoothUpdated={() => {
-                  if (currentFloorPlanId) {
+                  if (floorPlanId) {
                     loadBooths(eventId);
                   }
                 }}
@@ -231,7 +235,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
           selectedBooth={selectedBooth}
           eventId={eventId}
           onBoothUpdated={() => {
-            if (currentFloorPlanId) {
+            if (floorPlanId) {
               loadBooths(eventId);
             }
           }}

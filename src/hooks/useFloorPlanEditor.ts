@@ -52,6 +52,7 @@ export function useFloorPlanEditor(
 
     const autoLoadFloorPlan = async () => {
       try {
+        console.log('🎨 Auto-loading floor plan:', floorPlanId);
         const { data: floorPlan, error } = await supabase
           .from("floor_plans")
           .select("background_image_url")
@@ -75,6 +76,7 @@ export function useFloorPlanEditor(
   useEffect(() => {
     if (!fabricCanvas || !eventId) return;
     
+    console.log('📦 Auto-loading booths for event:', eventId);
     const autoLoadBooths = async () => {
       await loadBooths(eventId);
     };
@@ -166,6 +168,7 @@ export function useFloorPlanEditor(
       fabricCanvas.sendObjectToBack(img);
       fabricCanvas.renderAll();
       
+      console.log('✅ Floor plan image loaded successfully');
       toast.success("Floor plan loaded");
     } catch (error) {
       console.error("Error loading floor plan:", error);
@@ -238,6 +241,7 @@ export function useFloorPlanEditor(
       setBooths(loadedBooths);
       fabricCanvas.renderAll();
       
+      console.log('✅ Loaded', boothsData?.length, 'booths');
       if (loadedBooths.length > 0) {
         toast.success(`Loaded ${loadedBooths.length} booth${loadedBooths.length === 1 ? '' : 's'}`);
       }

@@ -1,7 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { MapPin, Calendar, Info } from "lucide-react";
+import { MapPin, Calendar, Info, Edit3 } from "lucide-react";
 import { FloorPlanManagement } from "../events/FloorPlanManagement";
+import { BoothEditorTab } from "./BoothEditorTab";
 import { useEvents } from "@/hooks/useEvents";
 
 export const ExposModule = () => {
@@ -24,6 +25,10 @@ export const ExposModule = () => {
             <MapPin className="w-4 h-4" />
             Floor Plan
           </TabsTrigger>
+          <TabsTrigger value="edit-booths" className="gap-2">
+            <Edit3 className="w-4 h-4" />
+            Edit Booths
+          </TabsTrigger>
           <TabsTrigger value="event-details" className="gap-2">
             <Calendar className="w-4 h-4" />
             Events
@@ -32,6 +37,10 @@ export const ExposModule = () => {
 
         <TabsContent value="floor-plan" className="space-y-4">
           <FloorPlanManagement />
+        </TabsContent>
+
+        <TabsContent value="edit-booths" className="space-y-4">
+          <BoothEditorTab />
         </TabsContent>
 
         <TabsContent value="event-details" className="space-y-4">
