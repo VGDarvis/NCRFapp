@@ -73,14 +73,14 @@ export function useFloorPlanEditor(
 
   // Auto-load booths when canvas and eventId are ready
   useEffect(() => {
-    if (!fabricCanvas || !eventId || !floorPlanId) return;
+    if (!fabricCanvas || !eventId) return;
     
     const autoLoadBooths = async () => {
       await loadBooths(eventId);
     };
     
     autoLoadBooths();
-  }, [fabricCanvas, eventId, floorPlanId]);
+  }, [fabricCanvas, eventId]);
 
   // Handle pan mode
   useEffect(() => {
@@ -175,15 +175,14 @@ export function useFloorPlanEditor(
 
   // Load existing booths from database
   const loadBooths = useCallback(async (eventId: string) => {
-    if (!fabricCanvas || !floorPlanId) return;
+    if (!fabricCanvas) return;
 
     setIsLoading(true);
     try {
       const { data: boothsData, error } = await supabase
         .from("booths")
         .select("*")
-        .eq("event_id", eventId)
-        .eq("floor_plan_id", floorPlanId);
+        .eq("event_id", eventId);
 
       if (error) throw error;
 
@@ -194,23 +193,24 @@ export function useFloorPlanEditor(
           const rect = new Rect({
             left: Number(booth.x_position),
             top: Number(booth.y_position),
-            width: Number(booth.booth_width || 60),
-            height: Number(booth.booth_depth || 60),
+            width: Number(booth.booth_width || 80),
+            height: Number(booth.booth_depth || 80),
             fill: booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.5)" : 
                   booth.sponsor_tier === "silver" ? "rgba(192, 192, 192, 0.5)" :
                   booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.5)" :
                   "rgba(59, 130, 246, 0.5)",
             stroke: "#1e40af",
-            strokeWidth: 2,
+            strokeWidth: 3,
             cornerColor: "#3b82f6",
-            cornerSize: 10,
+            cornerSize: 12,
             transparentCorners: false,
+            padding: 10,
           });
 
           const label = new Text(booth.table_no || "---", {
-            left: Number(booth.x_position) + Number(booth.booth_width || 60) / 2,
-            top: Number(booth.y_position) + Number(booth.booth_depth || 60) / 2,
-            fontSize: 14,
+            left: Number(booth.x_position) + Number(booth.booth_width || 80) / 2,
+            top: Number(booth.y_position) + Number(booth.booth_depth || 80) / 2,
+            fontSize: 16,
             fill: "#1e40af",
             fontWeight: "bold",
             originX: "center",
@@ -237,14 +237,17 @@ export function useFloorPlanEditor(
 
       setBooths(loadedBooths);
       fabricCanvas.renderAll();
-      toast.success(`Loaded ${loadedBooths.length} booths`);
+      
+      if (loadedBooths.length > 0) {
+        toast.success(`Loaded ${loadedBooths.length} booth${loadedBooths.length === 1 ? '' : 's'}`);
+      }
     } catch (error) {
       console.error("Error loading booths:", error);
       toast.error("Failed to load booths");
     } finally {
       setIsLoading(false);
     }
-  }, [fabricCanvas, floorPlanId]);
+  }, [fabricCanvas]);
 
   // Add new booth
   const addBooth = useCallback((x: number = 100, y: number = 100) => {
@@ -253,20 +256,21 @@ export function useFloorPlanEditor(
     const rect = new Rect({
       left: x,
       top: y,
-      width: 60,
-      height: 60,
+      width: 80,
+      height: 80,
       fill: "rgba(59, 130, 246, 0.5)",
       stroke: "#1e40af",
-      strokeWidth: 2,
+      strokeWidth: 3,
       cornerColor: "#3b82f6",
-      cornerSize: 10,
+      cornerSize: 12,
       transparentCorners: false,
+      padding: 10,
     });
 
     const label = new Text("New", {
-      left: x + 30,
-      top: y + 30,
-      fontSize: 14,
+      left: x + 40,
+      top: y + 40,
+      fontSize: 16,
       fill: "#1e40af",
       fontWeight: "bold",
       originX: "center",
@@ -317,55 +321,46 @@ export function useFloorPlanEditor(
 
   // Save all booths to database
   const saveBooths = useCallback(async (eventId: string) => {
-    if (!fabricCanvas || !floorPlanId) return;
+    if (!fabricCanvas) return;
 
     setIsLoading(true);
     try {
-      const updates = booths.map((booth) => {
-        const rect = booth.rect;
-        return {
-          id: booth.boothData?.id,
-          event_id: eventId,
-          floor_plan_id: floorPlanId,
-          x_position: rect.left,
-          y_position: rect.top,
-          booth_width: rect.width! * rect.scaleX!,
-          booth_depth: rect.height! * rect.scaleY!,
-          table_no: booth.boothData?.table_no || booth.label.text,
-          org_name: booth.boothData?.org_name || "Unassigned",
-        };
-      });
+      // Only save booths that have existing database records
+      const updates = booths
+        .filter(booth => booth.boothData?.id)
+        .map((booth) => {
+          const rect = booth.rect;
+          return {
+            id: booth.boothData.id,
+            x_position: rect.left,
+            y_position: rect.top,
+            booth_width: rect.width! * rect.scaleX!,
+            booth_depth: rect.height! * rect.scaleY!,
+          };
+        });
 
-      for (const update of updates) {
-        if (update.id) {
-          const { error } = await supabase
-            .from("booths")
-            .update({
-              x_position: update.x_position,
-              y_position: update.y_position,
-              booth_width: update.booth_width,
-              booth_depth: update.booth_depth,
-            })
-            .eq("id", update.id);
-
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from("booths")
-            .insert(update);
-
-          if (error) throw error;
-        }
+      if (updates.length > 0) {
+        // Batch update for efficiency
+        const { error } = await supabase
+          .from("booths")
+          .upsert(updates);
+          
+        if (error) throw error;
+        toast.success(`Saved ${updates.length} booth position(s)`);
       }
-
-      toast.success("Floor plan saved successfully");
+      
+      // Warn about unsaved new booths
+      const unsavedCount = booths.length - updates.length;
+      if (unsavedCount > 0) {
+        toast.warning(`${unsavedCount} new booth(s) need details before saving to database`);
+      }
     } catch (error) {
       console.error("Error saving booths:", error);
       toast.error("Failed to save floor plan");
     } finally {
       setIsLoading(false);
     }
-  }, [fabricCanvas, booths, floorPlanId]);
+  }, [fabricCanvas, booths]);
 
   return {
     fabricCanvas,

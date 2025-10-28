@@ -57,8 +57,9 @@ export const FloorPlanManagement = () => {
       if (eventData?.venue_id) {
         const { data: floorPlanData } = await supabase
           .from("floor_plans")
-          .select("id")
+          .select("id, background_image_url")
           .eq("venue_id", eventData.venue_id)
+          .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
 
