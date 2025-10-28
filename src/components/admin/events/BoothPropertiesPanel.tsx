@@ -59,6 +59,10 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
           .eq("id", selectedBooth.boothData.id);
 
         if (error) throw error;
+        
+        // Update the label on canvas immediately
+        selectedBooth.label.set({ text: formData.table_no });
+        selectedBooth.label.canvas?.renderAll();
       } else {
         // Create new booth
         const { error } = await supabase
@@ -114,7 +118,6 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
               value={formData.table_no}
               onChange={(e) => setFormData({ ...formData, table_no: e.target.value })}
               placeholder="e.g., 101"
-              readOnly
             />
           </div>
 

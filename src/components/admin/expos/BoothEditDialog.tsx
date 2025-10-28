@@ -20,6 +20,7 @@ interface BoothEditDialogProps {
 export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothEditDialogProps) {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
+    table_no: booth.table_no || "",
     org_name: booth.org_name || "",
     description: booth.description || "",
     notes: booth.notes || "",
@@ -34,6 +35,7 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       const { error } = await supabase
         .from("booths")
         .update({
+          table_no: formData.table_no,
           org_name: formData.org_name,
           description: formData.description,
           notes: formData.notes,
@@ -61,6 +63,17 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="table_no">Booth Number *</Label>
+            <Input
+              id="table_no"
+              value={formData.table_no}
+              onChange={(e) => setFormData({ ...formData, table_no: e.target.value })}
+              placeholder="e.g., 101"
+              required
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="org_name">Organization Name *</Label>
             <Input

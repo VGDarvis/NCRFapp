@@ -46,101 +46,6 @@ export function useFloorPlanEditor(
     };
   }, [canvasRef]);
 
-  // Auto-load floor plan background when floorPlanId changes
-  useEffect(() => {
-    if (!fabricCanvas || !floorPlanId) return;
-
-    const autoLoadFloorPlan = async () => {
-      try {
-        console.log('🎨 Auto-loading floor plan:', floorPlanId);
-        const { data: floorPlan, error } = await supabase
-          .from("floor_plans")
-          .select("background_image_url")
-          .eq("id", floorPlanId)
-          .single();
-
-        if (error) throw error;
-        
-        if (floorPlan?.background_image_url) {
-          await loadFloorPlanBackground(floorPlan.background_image_url);
-        }
-      } catch (error) {
-        console.error("Error auto-loading floor plan:", error);
-      }
-    };
-
-    autoLoadFloorPlan();
-  }, [fabricCanvas, floorPlanId]);
-
-  // Auto-load booths when canvas and eventId are ready
-  useEffect(() => {
-    if (!fabricCanvas || !eventId) return;
-    
-    console.log('📦 Auto-loading booths for event:', eventId);
-    const autoLoadBooths = async () => {
-      await loadBooths(eventId);
-    };
-    
-    autoLoadBooths();
-  }, [fabricCanvas, eventId]);
-
-  // Handle pan mode
-  useEffect(() => {
-    if (!fabricCanvas) return;
-
-    fabricCanvas.selection = !isPanMode;
-    fabricCanvas.forEachObject((obj) => {
-      obj.selectable = !isPanMode;
-      obj.evented = !isPanMode;
-    });
-
-    if (isPanMode) {
-      fabricCanvas.defaultCursor = "grab";
-      fabricCanvas.hoverCursor = "grab";
-      
-      const handleMouseDown = (opt: any) => {
-        const evt = opt.e;
-        if (isPanMode) {
-          fabricCanvas.defaultCursor = "grabbing";
-          setLastPanPoint({ x: evt.clientX || evt.touches?.[0].clientX, y: evt.clientY || evt.touches?.[0].clientY });
-        }
-      };
-
-      const handleMouseMove = (opt: any) => {
-        if (isPanMode && lastPanPoint) {
-          const evt = opt.e;
-          const vpt = fabricCanvas.viewportTransform!;
-          const currentX = evt.clientX || evt.touches?.[0].clientX;
-          const currentY = evt.clientY || evt.touches?.[0].clientY;
-          
-          vpt[4] += currentX - lastPanPoint.x;
-          vpt[5] += currentY - lastPanPoint.y;
-          
-          fabricCanvas.requestRenderAll();
-          setLastPanPoint({ x: currentX, y: currentY });
-        }
-      };
-
-      const handleMouseUp = () => {
-        fabricCanvas.defaultCursor = "grab";
-        setLastPanPoint(null);
-      };
-
-      fabricCanvas.on("mouse:down", handleMouseDown);
-      fabricCanvas.on("mouse:move", handleMouseMove);
-      fabricCanvas.on("mouse:up", handleMouseUp);
-
-      return () => {
-        fabricCanvas.off("mouse:down", handleMouseDown);
-        fabricCanvas.off("mouse:move", handleMouseMove);
-        fabricCanvas.off("mouse:up", handleMouseUp);
-      };
-    } else {
-      fabricCanvas.defaultCursor = "default";
-      fabricCanvas.hoverCursor = "move";
-    }
-  }, [fabricCanvas, isPanMode, lastPanPoint]);
-
   // Load floor plan background
   const loadFloorPlanBackground = useCallback(async (imageUrl: string) => {
     if (!fabricCanvas) return;
@@ -251,7 +156,102 @@ export function useFloorPlanEditor(
     } finally {
       setIsLoading(false);
     }
-  }, [fabricCanvas]);
+  }, [fabricCanvas, setBooths, setIsLoading]);
+
+  // Auto-load floor plan background when floorPlanId changes
+  useEffect(() => {
+    if (!fabricCanvas || !floorPlanId) return;
+
+    const autoLoadFloorPlan = async () => {
+      try {
+        console.log('🎨 Auto-loading floor plan:', floorPlanId);
+        const { data: floorPlan, error } = await supabase
+          .from("floor_plans")
+          .select("background_image_url")
+          .eq("id", floorPlanId)
+          .single();
+
+        if (error) throw error;
+        
+        if (floorPlan?.background_image_url) {
+          await loadFloorPlanBackground(floorPlan.background_image_url);
+        }
+      } catch (error) {
+        console.error("Error auto-loading floor plan:", error);
+      }
+    };
+
+    autoLoadFloorPlan();
+  }, [fabricCanvas, floorPlanId, loadFloorPlanBackground]);
+
+  // Auto-load booths when canvas and eventId are ready
+  useEffect(() => {
+    if (!fabricCanvas || !eventId) return;
+    
+    console.log('📦 Auto-loading booths for event:', eventId);
+    const autoLoadBooths = async () => {
+      await loadBooths(eventId);
+    };
+    
+    autoLoadBooths();
+  }, [fabricCanvas, eventId, loadBooths]);
+
+  // Handle pan mode
+  useEffect(() => {
+    if (!fabricCanvas) return;
+
+    fabricCanvas.selection = !isPanMode;
+    fabricCanvas.forEachObject((obj) => {
+      obj.selectable = !isPanMode;
+      obj.evented = !isPanMode;
+    });
+
+    if (isPanMode) {
+      fabricCanvas.defaultCursor = "grab";
+      fabricCanvas.hoverCursor = "grab";
+      
+      const handleMouseDown = (opt: any) => {
+        const evt = opt.e;
+        if (isPanMode) {
+          fabricCanvas.defaultCursor = "grabbing";
+          setLastPanPoint({ x: evt.clientX || evt.touches?.[0].clientX, y: evt.clientY || evt.touches?.[0].clientY });
+        }
+      };
+
+      const handleMouseMove = (opt: any) => {
+        if (isPanMode && lastPanPoint) {
+          const evt = opt.e;
+          const vpt = fabricCanvas.viewportTransform!;
+          const currentX = evt.clientX || evt.touches?.[0].clientX;
+          const currentY = evt.clientY || evt.touches?.[0].clientY;
+          
+          vpt[4] += currentX - lastPanPoint.x;
+          vpt[5] += currentY - lastPanPoint.y;
+          
+          fabricCanvas.requestRenderAll();
+          setLastPanPoint({ x: currentX, y: currentY });
+        }
+      };
+
+      const handleMouseUp = () => {
+        fabricCanvas.defaultCursor = "grab";
+        setLastPanPoint(null);
+      };
+
+      fabricCanvas.on("mouse:down", handleMouseDown);
+      fabricCanvas.on("mouse:move", handleMouseMove);
+      fabricCanvas.on("mouse:up", handleMouseUp);
+
+      return () => {
+        fabricCanvas.off("mouse:down", handleMouseDown);
+        fabricCanvas.off("mouse:move", handleMouseMove);
+        fabricCanvas.off("mouse:up", handleMouseUp);
+      };
+    } else {
+      fabricCanvas.defaultCursor = "default";
+      fabricCanvas.hoverCursor = "move";
+    }
+  }, [fabricCanvas, isPanMode, lastPanPoint]);
 
   // Add new booth
   const addBooth = useCallback((x: number = 100, y: number = 100) => {
