@@ -332,6 +332,8 @@ export function useFloorPlanEditor(
           const rect = booth.rect;
           return {
             id: booth.boothData.id,
+            event_id: eventId,
+            org_name: booth.boothData.org_name,
             x_position: rect.left,
             y_position: rect.top,
             booth_width: rect.width! * rect.scaleX!,
