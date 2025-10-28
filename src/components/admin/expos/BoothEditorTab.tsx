@@ -2,14 +2,20 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Edit, Loader2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Edit, Loader2, Trash2 } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths, type Booth } from "@/hooks/useBooths";
 import { BoothEditDialog } from "./BoothEditDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export function BoothEditorTab() {
   const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [editingBooth, setEditingBooth] = useState<Booth | null>(null);
+  const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  
   const { events, isLoading: eventsLoading } = useEvents();
   const { data: booths, isLoading: boothsLoading, refetch } = useBooths(selectedEventId);
 
@@ -25,6 +31,27 @@ export function BoothEditorTab() {
   const handleBoothUpdated = () => {
     refetch();
     setEditingBooth(null);
+  };
+
+  const handleDelete = async (booth: any) => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("booths")
+        .delete()
+        .eq("id", booth.id);
+
+      if (error) throw error;
+
+      toast.success(`Booth #${booth.table_no} deleted successfully`);
+      setDeletingBoothId(null);
+      refetch();
+    } catch (error) {
+      console.error("Error deleting booth:", error);
+      toast.error("Failed to delete booth");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -72,6 +99,7 @@ export function BoothEditorTab() {
                       <th className="p-3 text-left text-sm font-medium">Organization</th>
                       <th className="p-3 text-left text-sm font-medium">Sponsorship</th>
                       <th className="p-3 text-right text-sm font-medium">Actions</th>
+                      <th className="p-3 text-center text-sm font-medium w-20">Delete</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -99,6 +127,16 @@ export function BoothEditorTab() {
                             Edit
                           </Button>
                         </td>
+                        <td className="p-3 text-center">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setDeletingBoothId(booth.id)}
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -121,6 +159,34 @@ export function BoothEditorTab() {
           onBoothUpdated={handleBoothUpdated}
         />
       )}
+
+      <AlertDialog open={!!deletingBoothId} onOpenChange={(open) => !open && setDeletingBoothId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Booth</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete Booth #
+              {booths?.find(b => b.id === deletingBoothId)?.table_no} (
+              {booths?.find(b => b.id === deletingBoothId)?.org_name})? 
+              This action cannot be undone and will remove the booth from all views including the floor plan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const booth = booths?.find(b => b.id === deletingBoothId);
+                if (booth) handleDelete(booth);
+              }}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

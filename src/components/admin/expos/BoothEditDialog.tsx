@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import type { Booth } from "@/hooks/useBooths";
 
 interface BoothEditDialogProps {
@@ -19,6 +20,8 @@ interface BoothEditDialogProps {
 
 export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothEditDialogProps) {
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [formData, setFormData] = useState({
     table_no: booth.table_no || "",
     org_name: booth.org_name || "",
@@ -55,8 +58,54 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
     }
   };
 
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("booths")
+        .delete()
+        .eq("id", booth.id);
+
+      if (error) throw error;
+
+      toast.success(`Booth #${booth.table_no} deleted successfully`);
+      setShowDeleteConfirm(false);
+      onClose();
+      onBoothUpdated();
+    } catch (error) {
+      console.error("Error deleting booth:", error);
+      toast.error("Failed to delete booth");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <>
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Booth</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete Booth #{booth.table_no} ({booth.org_name})? 
+              This action cannot be undone and will remove the booth from all views.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Booth #{booth.table_no || "Unknown"}</DialogTitle>
@@ -125,17 +174,30 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
             </Select>
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-              Cancel
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button 
+              type="button" 
+              variant="destructive" 
+              onClick={() => setShowDeleteConfirm(true)} 
+              disabled={saving || deleting}
+              className="sm:mr-auto"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Booth
             </Button>
-            <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Save Changes
-            </Button>
+            <div className="flex gap-2 sm:ml-auto">
+              <Button type="button" variant="outline" onClick={onClose} disabled={saving || deleting}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={saving || deleting}>
+                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Save Changes
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

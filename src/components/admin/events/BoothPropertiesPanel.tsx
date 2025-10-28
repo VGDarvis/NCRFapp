@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { BoothObject } from "@/hooks/useFloorPlanEditor";
@@ -18,6 +19,8 @@ interface BoothPropertiesPanelProps {
 
 export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }: BoothPropertiesPanelProps) => {
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [formData, setFormData] = useState({
     table_no: "",
     org_name: "",
@@ -89,6 +92,37 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedBooth?.boothData?.id) {
+      toast.error("Cannot delete unsaved booth");
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("booths")
+        .delete()
+        .eq("id", selectedBooth.boothData.id);
+
+      if (error) throw error;
+
+      // Remove from canvas
+      selectedBooth.rect.canvas?.remove(selectedBooth.rect);
+      selectedBooth.label.canvas?.remove(selectedBooth.label);
+      selectedBooth.rect.canvas?.renderAll();
+
+      toast.success("Booth deleted successfully");
+      setShowDeleteConfirm(false);
+      onBoothUpdated();
+    } catch (error) {
+      console.error("Error deleting booth:", error);
+      toast.error("Failed to delete booth");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (!selectedBooth) {
     return (
       <Card>
@@ -105,7 +139,8 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
   }
 
   return (
-    <Card>
+    <>
+      <Card>
       <CardHeader>
         <CardTitle>Edit Booth</CardTitle>
       </CardHeader>
@@ -174,16 +209,54 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
             </Select>
           </div>
 
-          <Button
-            onClick={handleSave}
-            disabled={loading || !formData.org_name}
-            className="w-full"
-          >
-            {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-            Save Changes
-          </Button>
+          <div className="space-y-2">
+            <Button
+              onClick={handleSave}
+              disabled={loading || deleting || !formData.org_name}
+              className="w-full"
+            >
+              {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Save Changes
+            </Button>
+            
+            {selectedBooth.boothData?.id && (
+              <Button 
+                onClick={() => setShowDeleteConfirm(true)} 
+                disabled={loading || deleting}
+                variant="destructive"
+                className="w-full"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Booth
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Booth</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete Booth #{formData.table_no} ({formData.org_name})? 
+              This action cannot be undone and will remove the booth from all views.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
