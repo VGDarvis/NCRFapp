@@ -10,11 +10,12 @@ export interface BoothObject {
   boothData?: any;
 }
 
-export const useFloorPlanEditor = (
-  floorPlanId: string | null, 
+export function useFloorPlanEditor(
+  floorPlanId: string | null,
   canvasRef: React.RefObject<HTMLCanvasElement>,
-  isPanMode: boolean = false
-) => {
+  isPanMode: boolean,
+  eventId?: string
+) {
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [selectedBooth, setSelectedBooth] = useState<BoothObject | null>(null);
   const [booths, setBooths] = useState<BoothObject[]>([]);
@@ -44,6 +45,42 @@ export const useFloorPlanEditor = (
       canvas.dispose();
     };
   }, [canvasRef]);
+
+  // Auto-load floor plan background when floorPlanId changes
+  useEffect(() => {
+    if (!fabricCanvas || !floorPlanId) return;
+
+    const autoLoadFloorPlan = async () => {
+      try {
+        const { data: floorPlan, error } = await supabase
+          .from("floor_plans")
+          .select("background_image_url")
+          .eq("id", floorPlanId)
+          .single();
+
+        if (error) throw error;
+        
+        if (floorPlan?.background_image_url) {
+          await loadFloorPlanBackground(floorPlan.background_image_url);
+        }
+      } catch (error) {
+        console.error("Error auto-loading floor plan:", error);
+      }
+    };
+
+    autoLoadFloorPlan();
+  }, [fabricCanvas, floorPlanId]);
+
+  // Auto-load booths when canvas and eventId are ready
+  useEffect(() => {
+    if (!fabricCanvas || !eventId || !floorPlanId) return;
+    
+    const autoLoadBooths = async () => {
+      await loadBooths(eventId);
+    };
+    
+    autoLoadBooths();
+  }, [fabricCanvas, eventId, floorPlanId]);
 
   // Handle pan mode
   useEffect(() => {

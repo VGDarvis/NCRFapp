@@ -523,6 +523,7 @@ export type Database = {
           scholarship_info: string | null
           sponsor_id: string | null
           sponsor_tier: string | null
+          stage_description: string | null
           table_no: string | null
           updated_at: string | null
           venue_id: string | null
@@ -555,6 +556,7 @@ export type Database = {
           scholarship_info?: string | null
           sponsor_id?: string | null
           sponsor_tier?: string | null
+          stage_description?: string | null
           table_no?: string | null
           updated_at?: string | null
           venue_id?: string | null
@@ -587,6 +589,7 @@ export type Database = {
           scholarship_info?: string | null
           sponsor_id?: string | null
           sponsor_tier?: string | null
+          stage_description?: string | null
           table_no?: string | null
           updated_at?: string | null
           venue_id?: string | null

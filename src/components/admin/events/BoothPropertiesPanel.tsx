@@ -21,27 +21,19 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
   const [formData, setFormData] = useState({
     table_no: "",
     org_name: "",
-    org_type: "college",
-    description: "",
     sponsor_tier: "",
-    contact_name: "",
-    contact_email: "",
-    contact_phone: "",
-    website_url: "",
+    description: "",
+    stage_description: "",
   });
 
   useEffect(() => {
-    if (selectedBooth?.boothData) {
+    if (selectedBooth) {
       setFormData({
-        table_no: selectedBooth.boothData.table_no || "",
-        org_name: selectedBooth.boothData.org_name || "",
-        org_type: selectedBooth.boothData.org_type || "college",
-        description: selectedBooth.boothData.description || "",
-        sponsor_tier: selectedBooth.boothData.sponsor_tier || "",
-        contact_name: selectedBooth.boothData.contact_name || "",
-        contact_email: selectedBooth.boothData.contact_email || "",
-        contact_phone: selectedBooth.boothData.contact_phone || "",
-        website_url: selectedBooth.boothData.website_url || "",
+        table_no: selectedBooth.boothData?.table_no || "",
+        org_name: selectedBooth.boothData?.org_name || "",
+        sponsor_tier: selectedBooth.boothData?.sponsor_tier || "",
+        description: selectedBooth.boothData?.description || "",
+        stage_description: selectedBooth.boothData?.stage_description || "",
       });
     }
   }, [selectedBooth]);
@@ -51,11 +43,19 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
 
     setLoading(true);
     try {
+      const updateData = {
+        table_no: formData.table_no,
+        org_name: formData.org_name,
+        sponsor_tier: formData.sponsor_tier || null,
+        description: formData.description || null,
+        stage_description: formData.stage_description || null,
+      };
+
       if (selectedBooth.boothData?.id) {
         // Update existing booth
         const { error } = await supabase
           .from("booths")
-          .update(formData)
+          .update(updateData)
           .eq("id", selectedBooth.boothData.id);
 
         if (error) throw error;
@@ -64,7 +64,7 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
         const { error } = await supabase
           .from("booths")
           .insert({
-            ...formData,
+            ...updateData,
             event_id: eventId,
             x_position: selectedBooth.rect.left,
             y_position: selectedBooth.rect.top,
@@ -93,7 +93,7 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Select a booth to edit its properties
+            Tap a booth to edit its details
           </p>
         </CardContent>
       </Card>
@@ -103,118 +103,83 @@ export const BoothPropertiesPanel = ({ selectedBooth, eventId, onBoothUpdated }:
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Booth Properties</CardTitle>
+        <CardTitle>Edit Booth</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="table_no">Booth Number</Label>
-          <Input
-            id="table_no"
-            value={formData.table_no}
-            onChange={(e) => setFormData({ ...formData, table_no: e.target.value })}
-            placeholder="e.g., 100"
-          />
-        </div>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="table-no">Booth Number</Label>
+            <Input
+              id="table-no"
+              value={formData.table_no}
+              onChange={(e) => setFormData({ ...formData, table_no: e.target.value })}
+              placeholder="e.g., 101"
+              readOnly
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="org_name">Organization Name</Label>
-          <Input
-            id="org_name"
-            value={formData.org_name}
-            onChange={(e) => setFormData({ ...formData, org_name: e.target.value })}
-            placeholder="College or Organization"
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="org-name">Booth Title</Label>
+            <Input
+              id="org-name"
+              value={formData.org_name}
+              onChange={(e) => setFormData({ ...formData, org_name: e.target.value })}
+              placeholder="Organization name"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="org_type">Organization Type</Label>
-          <Select value={formData.org_type} onValueChange={(value) => setFormData({ ...formData, org_type: value })}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="college">College/University</SelectItem>
-              <SelectItem value="hbcu">HBCU</SelectItem>
-              <SelectItem value="military">Military</SelectItem>
-              <SelectItem value="trade_school">Trade School</SelectItem>
-              <SelectItem value="sponsor">Sponsor</SelectItem>
-              <SelectItem value="nonprofit">Nonprofit</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Special offers like:
+- Accepting applications on the spot
+- Application fee waived
+- Free admission"
+              className="min-h-[120px]"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="sponsor_tier">Sponsor Tier</Label>
-          <Select value={formData.sponsor_tier} onValueChange={(value) => setFormData({ ...formData, sponsor_tier: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select tier" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="gold">Gold</SelectItem>
-              <SelectItem value="silver">Silver</SelectItem>
-              <SelectItem value="bronze">Bronze</SelectItem>
-              <SelectItem value="standard">Standard</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="stage-description">Stage/Special Notes</Label>
+            <Textarea
+              id="stage-description"
+              value={formData.stage_description}
+              onChange={(e) => setFormData({ ...formData, stage_description: e.target.value })}
+              placeholder="e.g., Seminar at 2pm in Room A"
+              className="min-h-[80px]"
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Brief description"
-            rows={3}
-          />
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="sponsor-tier">Sponsorship Level</Label>
+            <Select
+              value={formData.sponsor_tier}
+              onValueChange={(value) => setFormData({ ...formData, sponsor_tier: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select tier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Gold">Gold</SelectItem>
+                <SelectItem value="Silver">Silver</SelectItem>
+                <SelectItem value="Bronze">Bronze</SelectItem>
+                <SelectItem value="">None</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="contact_name">Contact Name</Label>
-          <Input
-            id="contact_name"
-            value={formData.contact_name}
-            onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
-            placeholder="Contact person"
-          />
+          <Button
+            onClick={handleSave}
+            disabled={loading || !formData.org_name}
+            className="w-full"
+          >
+            {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+            Save Changes
+          </Button>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="contact_email">Contact Email</Label>
-          <Input
-            id="contact_email"
-            type="email"
-            value={formData.contact_email}
-            onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-            placeholder="email@example.com"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="contact_phone">Contact Phone</Label>
-          <Input
-            id="contact_phone"
-            value={formData.contact_phone}
-            onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-            placeholder="(123) 456-7890"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="website_url">Website</Label>
-          <Input
-            id="website_url"
-            type="url"
-            value={formData.website_url}
-            onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
-            placeholder="https://example.com"
-          />
-        </div>
-
-        <Button onClick={handleSave} disabled={loading} className="w-full">
-          {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          Save Booth
-        </Button>
       </CardContent>
     </Card>
   );

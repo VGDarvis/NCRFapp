@@ -42,7 +42,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     deleteBooth,
     saveBooths,
     setSelectedBooth,
-  } = useFloorPlanEditor(currentFloorPlanId, canvasRef, isPanMode);
+  } = useFloorPlanEditor(currentFloorPlanId, canvasRef, isPanMode, eventId);
 
   // Open drawer when booth is selected on mobile
   useEffect(() => {
@@ -51,12 +51,12 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     }
   }, [selectedBooth, isMobile]);
 
-  // Load existing booths when floor plan is set
+  // Auto-load floor plan when it changes
   useEffect(() => {
-    if (fabricCanvas && currentFloorPlanId && eventId) {
-      loadBooths(eventId);
+    if (floorPlanId && floorPlanId !== currentFloorPlanId) {
+      setCurrentFloorPlanId(floorPlanId);
     }
-  }, [fabricCanvas, currentFloorPlanId, eventId]);
+  }, [floorPlanId]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -134,87 +134,38 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     await saveBooths(eventId);
   };
 
+  if (!currentFloorPlanId) {
+    return (
+      <Card className="p-6">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-4">No floor plan found for this event</p>
+          <p className="text-sm text-muted-foreground">Please contact a technical administrator to upload the floor plan image and import booth data</p>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <Card className="p-3 md:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold">Floor Plan Editor</h2>
-            <p className="text-sm text-muted-foreground">Design and configure booth layout</p>
+            <h2 className="text-xl md:text-2xl font-bold">Event Day Floor Plan</h2>
+            <p className="text-sm text-muted-foreground">Tap any booth to edit information or add/remove booths</p>
           </div>
           <div className="flex gap-2">
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
+            <Button 
+              onClick={handleSave} 
+              disabled={isLoading}
               size={isMobile ? "sm" : "default"}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingImage}
               className="h-11 min-w-[44px]"
             >
-              {uploadingImage ? (
+              {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin md:mr-2" />
               ) : (
-                <Upload className="w-4 h-4 md:mr-2" />
+                <Save className="w-4 h-4 md:mr-2" />
               )}
-              <span className="hidden md:inline">Upload</span>
-            </Button>
-            
-            <Dialog open={csvDialogOpen} onOpenChange={setCsvDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size={isMobile ? "sm" : "default"}
-                  className="h-11 min-w-[44px]"
-                >
-                  <FileSpreadsheet className="w-4 h-4 md:mr-2" />
-                  <span className="hidden md:inline">Import CSV</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Import Booths from CSV</DialogTitle>
-                </DialogHeader>
-                <BoothCSVImporter 
-                  eventId={eventId}
-                  onImportComplete={() => {
-                    setCsvDialogOpen(false);
-                    if (currentFloorPlanId) {
-                      loadBooths(eventId);
-                    }
-                    toast.success("Booths imported successfully!");
-                  }}
-                />
-              </DialogContent>
-            </Dialog>
-            <Button 
-              onClick={handleSave} 
-              disabled={isLoading || !currentFloorPlanId}
-              size={isMobile ? "sm" : "default"}
-              className="h-11 min-w-[44px] md:hidden"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
-            </Button>
-            <Button 
-              onClick={handleSave} 
-              disabled={isLoading || !currentFloorPlanId}
-              className="hidden md:flex"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <Save className="w-4 h-4 mr-2" />
-              )}
-              Save Changes
+              <span className="hidden md:inline">Save Changes</span>
             </Button>
           </div>
         </div>
