@@ -4,18 +4,22 @@ export interface ValidationResult {
 }
 
 export interface BoothCSVRow {
-  booth_number: string;
+  table_no: string;
   org_name: string;
   org_type: string;
-  tier?: string;
-  contact_email?: string;
-  phone?: string;
-  website?: string;
   x_position?: string;
   y_position?: string;
+  booth_width?: string;
+  booth_depth?: string;
+  zone?: string;
+  sponsor_tier?: string;
   offers_on_spot_admission?: string;
   waives_application_fee?: string;
   scholarship_info?: string;
+  description?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  website_url?: string;
 }
 
 export interface SeminarCSVRow {
@@ -33,8 +37,8 @@ export function validateBoothRow(row: BoothCSVRow): ValidationResult {
   const errors: string[] = [];
 
   // Required fields
-  if (!row.booth_number?.trim()) {
-    errors.push('Booth number is required');
+  if (!row.table_no?.trim()) {
+    errors.push('Table number is required');
   }
   if (!row.org_name?.trim()) {
     errors.push('Organization name is required');
@@ -44,16 +48,16 @@ export function validateBoothRow(row: BoothCSVRow): ValidationResult {
   }
 
   // Validate org_type
-  const validOrgTypes = ['university', 'community_college', 'hbcu', 'military', 'trade_school', 'scholarship_org', 'other'];
+  const validOrgTypes = ['university', 'community_college', 'hbcu', 'military', 'corporate', 'government', 'nonprofit', 'other'];
   if (row.org_type && !validOrgTypes.includes(row.org_type.toLowerCase())) {
     errors.push(`Invalid org_type. Must be one of: ${validOrgTypes.join(', ')}`);
   }
 
-  // Validate tier
-  if (row.tier) {
+  // Validate sponsor_tier
+  if (row.sponsor_tier) {
     const validTiers = ['platinum', 'gold', 'silver', 'bronze'];
-    if (!validTiers.includes(row.tier.toLowerCase())) {
-      errors.push(`Invalid tier. Must be one of: ${validTiers.join(', ')}`);
+    if (!validTiers.includes(row.sponsor_tier.toLowerCase())) {
+      errors.push(`Invalid sponsor_tier. Must be one of: ${validTiers.join(', ')}`);
     }
   }
 
@@ -68,6 +72,12 @@ export function validateBoothRow(row: BoothCSVRow): ValidationResult {
   }
   if (row.y_position && isNaN(Number(row.y_position))) {
     errors.push('y_position must be a number');
+  }
+  if (row.booth_width && isNaN(Number(row.booth_width))) {
+    errors.push('booth_width must be a number');
+  }
+  if (row.booth_depth && isNaN(Number(row.booth_depth))) {
+    errors.push('booth_depth must be a number');
   }
 
   return {

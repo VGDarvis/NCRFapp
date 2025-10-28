@@ -2,7 +2,8 @@ import { useRef, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Save, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Loader2, Save, Upload, FileSpreadsheet } from "lucide-react";
 import { useFloorPlanEditor } from "@/hooks/useFloorPlanEditor";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +11,7 @@ import { BoothPropertiesPanel } from "./BoothPropertiesPanel";
 import { BoothPropertiesDrawer } from "./BoothPropertiesDrawer";
 import { FloorPlanToolbar } from "./FloorPlanToolbar";
 import { MobileCanvasControls } from "./MobileCanvasControls";
+import { BoothCSVImporter } from "./BoothCSVImporter";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FloorPlanEditorProps {
@@ -25,6 +27,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const [currentFloorPlanId, setCurrentFloorPlanId] = useState<string | null>(floorPlanId);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
+  const [csvDialogOpen, setCsvDialogOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const {
@@ -161,6 +164,34 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
               )}
               <span className="hidden md:inline">Upload</span>
             </Button>
+            
+            <Dialog open={csvDialogOpen} onOpenChange={setCsvDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size={isMobile ? "sm" : "default"}
+                  className="h-11 min-w-[44px]"
+                >
+                  <FileSpreadsheet className="w-4 h-4 md:mr-2" />
+                  <span className="hidden md:inline">Import CSV</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Import Booths from CSV</DialogTitle>
+                </DialogHeader>
+                <BoothCSVImporter 
+                  eventId={eventId}
+                  onImportComplete={() => {
+                    setCsvDialogOpen(false);
+                    if (currentFloorPlanId) {
+                      loadBooths(eventId);
+                    }
+                    toast.success("Booths imported successfully!");
+                  }}
+                />
+              </DialogContent>
+            </Dialog>
             <Button 
               onClick={handleSave} 
               disabled={isLoading || !currentFloorPlanId}

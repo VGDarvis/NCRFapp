@@ -59,48 +59,25 @@ export function BoothCSVImporter({ eventId, onImportComplete }: BoothCSVImporter
     setIsImporting(true);
 
     try {
-      // First, create sponsors for organizations
-      const sponsorPromises = previewData.map(async (row) => {
-        // Check if sponsor already exists
-        const { data: existing } = await supabase
-          .from('sponsors')
-          .select('id')
-          .eq('name', row.org_name)
-          .single();
-
-        if (existing) return existing.id;
-
-        // Create new sponsor
-        const { data: newSponsor, error } = await supabase
-          .from('sponsors')
-          .insert({
-            name: row.org_name,
-            tier: row.tier?.toLowerCase() || 'bronze',
-            contact_email: row.contact_email,
-            contact_phone: row.phone,
-            website: row.website,
-          })
-          .select('id')
-          .single();
-
-        if (error) throw error;
-        return newSponsor.id;
-      });
-
-      const sponsorIds = await Promise.all(sponsorPromises);
-
-      // Then create booths
-      const boothInserts = previewData.map((row, index) => ({
+      // Create booths with all fields
+      const boothInserts = previewData.map((row) => ({
         event_id: eventId,
-        sponsor_id: sponsorIds[index],
-        booth_number: row.booth_number,
+        table_no: row.table_no,
         org_name: row.org_name,
-        org_type: row.org_type,
+        org_type: row.org_type?.toLowerCase() || 'other',
         x_position: row.x_position ? parseFloat(row.x_position) : null,
         y_position: row.y_position ? parseFloat(row.y_position) : null,
+        booth_width: row.booth_width ? parseFloat(row.booth_width) : 40,
+        booth_depth: row.booth_depth ? parseFloat(row.booth_depth) : 40,
+        zone: row.zone || null,
+        sponsor_tier: row.sponsor_tier?.toLowerCase() || 'bronze',
         offers_on_spot_admission: row.offers_on_spot_admission?.toLowerCase() === 'true',
         waives_application_fee: row.waives_application_fee?.toLowerCase() === 'true',
-        special_offers: row.scholarship_info ? [row.scholarship_info] : [],
+        scholarship_info: row.scholarship_info || null,
+        description: row.description || null,
+        contact_email: row.contact_email || null,
+        contact_phone: row.contact_phone || null,
+        website_url: row.website_url || null,
       }));
 
       const { error: boothError } = await supabase
@@ -126,9 +103,9 @@ export function BoothCSVImporter({ eventId, onImportComplete }: BoothCSVImporter
   };
 
   const downloadTemplate = () => {
-    const template = `booth_number,org_name,org_type,tier,contact_email,phone,website,x_position,y_position,offers_on_spot_admission,waives_application_fee,scholarship_info
-A-101,Texas Southern University,hbcu,platinum,admissions@tsu.edu,(713) 313-7420,https://tsu.edu,100,50,true,true,Full scholarships available
-A-102,University of Houston,university,gold,info@uh.edu,(713) 743-1000,https://uh.edu,150,50,false,true,Merit-based aid`;
+    const template = `table_no,org_name,org_type,x_position,y_position,booth_width,booth_depth,zone,sponsor_tier,offers_on_spot_admission,waives_application_fee,scholarship_info,description,contact_email,contact_phone,website_url
+100,Texas Southern University,hbcu,80,480,40,60,Left Wall,gold,true,true,Full scholarships available,Major HBCU in Houston Texas,admissions@tsu.edu,(713) 313-7420,https://tsu.edu
+102,University of Houston,university,80,410,40,60,Left Wall,silver,true,false,Merit-based aid,Public research university in Houston,info@uh.edu,(713) 743-1000,https://uh.edu`;
     
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -198,8 +175,8 @@ A-102,University of Houston,university,gold,info@uh.edu,(713) 743-1000,https://u
               <div className="space-y-2">
                 {previewData.slice(0, 5).map((row, i) => (
                   <div key={i} className="text-sm border-b pb-2">
-                    <p className="font-semibold">{row.booth_number} - {row.org_name}</p>
-                    <p className="text-muted-foreground">{row.org_type} | {row.tier || 'bronze'}</p>
+                    <p className="font-semibold">{row.table_no} - {row.org_name}</p>
+                    <p className="text-muted-foreground">{row.org_type} | {row.sponsor_tier || 'bronze'}</p>
                   </div>
                 ))}
                 {previewData.length > 5 && (
