@@ -24,7 +24,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [currentFloorPlanId, setCurrentFloorPlanId] = useState<string | null>(floorPlanId);
+  const [currentFloorPlanId, setCurrentFloorPlanId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
   const [csvDialogOpen, setCsvDialogOpen] = useState(false);
@@ -51,12 +51,12 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     }
   }, [selectedBooth, isMobile]);
 
-  // Auto-load floor plan when it changes
+  // Sync currentFloorPlanId with floorPlanId prop
   useEffect(() => {
-    if (floorPlanId && floorPlanId !== currentFloorPlanId) {
+    if (floorPlanId !== currentFloorPlanId) {
       setCurrentFloorPlanId(floorPlanId);
     }
-  }, [floorPlanId]);
+  }, [floorPlanId, currentFloorPlanId]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
