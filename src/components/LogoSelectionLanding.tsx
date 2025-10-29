@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ParticleBackground } from './ParticleBackground';
 import { RotatingLogoCircle } from './RotatingLogoCircle';
-import { VideoSection } from './VideoSection';
+import { InstagramFeedSection } from './InstagramFeedSection';
 import { Button } from './ui/button';
 import { Shield, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -60,8 +60,8 @@ export const LogoSelectionLanding = () => {
           </h1>
         </motion.div>
 
-        {/* Video Section */}
-        <VideoSection />
+        {/* Instagram Feed Section */}
+        <InstagramFeedSection />
 
         {/* Rotating Logo Circle with Glass Container */}
         <div className="my-8 md:my-12">
