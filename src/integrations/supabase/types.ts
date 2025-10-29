@@ -499,6 +499,47 @@ export type Database = {
           },
         ]
       }
+      booth_presets: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          event_id: string | null
+          id: string
+          is_active: boolean | null
+          preset_type: string
+          preset_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          event_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          preset_type: string
+          preset_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          event_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          preset_type?: string
+          preset_value?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booth_presets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booths: {
         Row: {
           booth_depth: number | null

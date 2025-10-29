@@ -28,12 +28,11 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
   const [csvDialogOpen, setCsvDialogOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'edit' | 'view'>('edit');
   const [floorPlanData, setFloorPlanData] = useState<any>(null);
   const [boothsData, setBoothsData] = useState<any[]>([]);
   const isMobile = useIsMobile();
 
-  console.log("🎨 FloorPlanEditor mounted", { eventId, floorPlanId, viewMode });
+  console.log("🎨 FloorPlanEditor mounted", { eventId, floorPlanId });
 
   const {
     fabricCanvas,
@@ -50,16 +49,16 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     setSelectedBooth,
   } = useFloorPlanEditor(floorPlanId, canvasRef, isPanMode, eventId);
 
-  // Load floor plan data for view mode
+  // Load floor plan data for attendee view
   useEffect(() => {
-    if (floorPlanId && viewMode === 'view') {
+    if (floorPlanId) {
       loadFloorPlanData();
     }
-  }, [floorPlanId, viewMode]);
+  }, [floorPlanId]);
 
   const loadFloorPlanData = async () => {
     try {
-      console.log("📊 Loading floor plan data for view mode...");
+      console.log("📊 Loading floor plan data for attendee view...");
       const { data: floorPlan, error: fpError } = await supabase
         .from("floor_plans")
         .select("*")
@@ -76,7 +75,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
 
       if (boothError) throw boothError;
       setBoothsData(booths || []);
-      console.log("✅ Loaded floor plan and", booths?.length || 0, "booths for view mode");
+      console.log("✅ Loaded floor plan and", booths?.length || 0, "booths");
     } catch (error) {
       console.error("❌ Error loading floor plan data:", error);
     }
@@ -185,161 +184,42 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
       <Card className="p-3 md:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-xl md:text-2xl font-bold">Event Day Floor Plan</h2>
+            <h2 className="text-xl md:text-2xl font-bold">Floor Plan - Attendee View</h2>
             <p className="text-sm text-muted-foreground">
-              Tap any booth to edit information • Drag booths to reposition
+              This is what attendees see. Click any booth to view details. Edit booths in the "Edit Booths" tab.
             </p>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant={viewMode === 'view' ? 'default' : 'outline'}
-              onClick={() => {
-                const newMode = viewMode === 'edit' ? 'view' : 'edit';
-                setViewMode(newMode);
-                console.log("🔄 Switched to", newMode, "mode");
-              }}
-              size={isMobile ? "sm" : "default"}
-              className="h-11 min-w-[44px]"
-            >
-              {viewMode === 'edit' ? (
-                <>
-                  <Eye className="w-4 h-4 md:mr-2" />
-                  <span className="hidden md:inline">View Mode</span>
-                </>
-              ) : (
-                <>
-                  <Edit3 className="w-4 h-4 md:mr-2" />
-                  <span className="hidden md:inline">Edit Mode</span>
-                </>
-              )}
-            </Button>
-            {viewMode === 'edit' && (
-              <Button 
-                onClick={handleSave} 
-                disabled={isLoading}
-                size={isMobile ? "sm" : "default"}
-                className="h-11 min-w-[44px]"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin md:mr-2" />
-                ) : (
-                  <Save className="w-4 h-4 md:mr-2" />
-                )}
-                <span className="hidden md:inline">Save Changes</span>
-              </Button>
-            )}
           </div>
         </div>
 
-        {viewMode === 'edit' && (
-          <div className="space-y-2">
-            <FloorPlanToolbar
-              activeTool={activeTool}
-              onToolChange={setActiveTool}
-              onAddBooth={handleAddBooth}
-              onDeleteBooth={deleteBooth}
-              hasSelectedBooth={!!selectedBooth}
+        <div className="text-sm text-muted-foreground px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-md mb-4">
+          👁️ <strong>Attendee View:</strong> Changes made in "Edit Booths" will appear here automatically.
+        </div>
+
+        <div>
+          {floorPlanData && boothsData.length > 0 ? (
+            <FloorPlanViewer
+              floorPlan={floorPlanData}
+              booths={boothsData}
+              onBoothClick={(boothId) => {
+                const booth = boothsData.find(b => b.id === boothId);
+                console.log("📍 Admin clicked booth:", booth);
+                if (booth) {
+                  toast.info(`Booth ${booth.table_no}: ${booth.org_name || 'No organization'}`, {
+                    description: "Go to Edit Booths tab to make changes"
+                  });
+                }
+              }}
             />
-            {floorPlanId && (
-              <div className="text-sm text-muted-foreground px-4 py-2 bg-muted/50 rounded-md">
-                {isLoading ? "Loading booths..." : `${booths.length} booth${booths.length === 1 ? '' : 's'} loaded`}
+          ) : (
+            <Card className="p-8">
+              <div className="text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Loading floor plan...</p>
               </div>
-            )}
-          </div>
-        )}
-
-        {viewMode === 'view' && (
-          <div className="text-sm text-muted-foreground px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-md">
-            👁️ <strong>View Mode:</strong> This is exactly what attendees see. Switch to Edit Mode to make changes.
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
-          <div className="lg:col-span-3 relative">
-            {viewMode === 'edit' ? (
-              <>
-                <Card className="p-2 md:p-4 bg-muted/50">
-                  {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10 rounded-lg">
-                      <div className="text-center">
-                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">Loading floor plan...</p>
-                      </div>
-                    </div>
-                  )}
-                  <canvas
-                    ref={canvasRef}
-                    className="border border-border rounded-lg w-full touch-none"
-                    style={{ 
-                      height: isMobile ? "calc(100vh - 350px)" : "600px",
-                      minHeight: "400px"
-                    }}
-                  />
-                </Card>
-                
-                {isMobile && (
-                  <MobileCanvasControls 
-                    canvas={fabricCanvas}
-                    isPanMode={isPanMode}
-                    onTogglePanMode={() => setIsPanMode(!isPanMode)}
-                  />
-                )}
-              </>
-            ) : (
-              <div>
-                {floorPlanData && boothsData.length > 0 ? (
-                  <FloorPlanViewer
-                    floorPlan={floorPlanData}
-                    booths={boothsData}
-                    onBoothClick={(boothId) => {
-                      const booth = boothsData.find(b => b.id === boothId);
-                      console.log("📍 Admin clicked booth:", booth);
-                      if (booth) {
-                        toast.info(`Booth ${booth.table_no}: ${booth.org_name || 'No organization'}`);
-                      }
-                    }}
-                  />
-                ) : (
-                  <Card className="p-8">
-                    <div className="text-center">
-                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Loading attendee view...</p>
-                    </div>
-                  </Card>
-                )}
-              </div>
-            )}
-          </div>
-
-          {!isMobile && (
-            <div className="lg:col-span-1">
-              <BoothPropertiesPanel
-                selectedBooth={selectedBooth}
-                eventId={eventId}
-                onBoothUpdated={() => {
-                  if (floorPlanId) {
-                    loadBooths(eventId);
-                  }
-                }}
-              />
-            </div>
+            </Card>
           )}
         </div>
       </Card>
-
-      {isMobile && (
-        <BoothPropertiesDrawer
-          selectedBooth={selectedBooth}
-          eventId={eventId}
-          onBoothUpdated={() => {
-            if (floorPlanId) {
-              loadBooths(eventId);
-            }
-          }}
-          open={drawerOpen}
-          onOpenChange={setDrawerOpen}
-        />
-      )}
     </div>
   );
 };

@@ -2,54 +2,50 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Trash2 } from "lucide-react";
-import type { Booth } from "@/hooks/useBooths";
+import { Loader2 } from "lucide-react";
 import { useAvailableBoothNumbers, useOrganizationOptions } from "@/hooks/useBoothPresets";
 import { useBooths } from "@/hooks/useBooths";
 
-interface BoothEditDialogProps {
-  booth: Booth;
+interface BoothAddDialogProps {
+  eventId: string;
   open: boolean;
   onClose: () => void;
-  onBoothUpdated: () => void;
+  onBoothAdded: () => void;
 }
 
-export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothEditDialogProps) {
+export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAddDialogProps) {
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [formData, setFormData] = useState({
-    table_no: booth.table_no || "",
-    org_name: booth.org_name || "",
-    description: booth.description || "",
-    notes: booth.notes || "",
-    sponsor_tier: booth.sponsor_tier || "standard",
+    table_no: "",
+    org_name: "",
+    description: "",
+    notes: "",
+    sponsor_tier: "standard",
   });
 
-  const { boothNumbers, isLoading: boothNumbersLoading } = useAvailableBoothNumbers(booth.event_id);
-  const { organizations, isLoading: orgsLoading } = useOrganizationOptions(booth.event_id);
-  const { data: existingBooths } = useBooths(booth.event_id);
+  const { boothNumbers, isLoading: boothNumbersLoading } = useAvailableBoothNumbers(eventId);
+  const { organizations, isLoading: orgsLoading } = useOrganizationOptions(eventId);
+  const { data: existingBooths } = useBooths(eventId);
 
-  // Get assigned booth numbers (excluding current booth)
-  const assignedBoothNumbers = new Set(
-    existingBooths?.filter(b => b.id !== booth.id).map(b => b.table_no) || []
-  );
+  // Get assigned booth numbers
+  const assignedBoothNumbers = new Set(existingBooths?.map(b => b.table_no) || []);
 
-  // Update form when booth changes
+  // Reset form when dialog opens
   useEffect(() => {
-    setFormData({
-      table_no: booth.table_no || "",
-      org_name: booth.org_name || "",
-      description: booth.description || "",
-      notes: booth.notes || "",
-      sponsor_tier: booth.sponsor_tier || "standard",
-    });
-  }, [booth]);
+    if (open) {
+      setFormData({
+        table_no: "",
+        org_name: "",
+        description: "",
+        notes: "",
+        sponsor_tier: "standard",
+      });
+    }
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,78 +54,35 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
     try {
       const { error } = await supabase
         .from("booths")
-        .update({
+        .insert({
+          event_id: eventId,
           table_no: formData.table_no,
           org_name: formData.org_name,
           description: formData.description,
           notes: formData.notes,
           sponsor_tier: formData.sponsor_tier,
-        })
-        .eq("id", booth.id);
+        });
 
       if (error) throw error;
 
-      toast.success(`Booth #${booth.table_no} updated successfully`);
-      onBoothUpdated();
+      toast.success(`Booth #${formData.table_no} added successfully`, {
+        description: `${formData.org_name} has been assigned to booth #${formData.table_no}`,
+      });
+      onBoothAdded();
+      onClose();
     } catch (error) {
-      console.error("Error updating booth:", error);
-      toast.error("Failed to update booth");
+      console.error("Error adding booth:", error);
+      toast.error("Failed to add booth");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async () => {
-    setDeleting(true);
-    try {
-      const { error } = await supabase
-        .from("booths")
-        .delete()
-        .eq("id", booth.id);
-
-      if (error) throw error;
-
-      toast.success(`Booth #${booth.table_no} deleted successfully`);
-      setShowDeleteConfirm(false);
-      onClose();
-      onBoothUpdated();
-    } catch (error) {
-      console.error("Error deleting booth:", error);
-      toast.error("Failed to delete booth");
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   return (
-    <>
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Booth</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete Booth #{booth.table_no} ({booth.org_name})? 
-              This action cannot be undone and will remove the booth from all views.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={deleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Booth #{booth.table_no || "Unknown"}</DialogTitle>
+          <DialogTitle>Add New Booth</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -152,20 +105,22 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                 <SelectContent className="max-h-[300px]">
                   {boothNumbers.map((boothNum) => {
                     const isAssigned = assignedBoothNumbers.has(boothNum);
-                    const isCurrent = boothNum === booth.table_no;
                     return (
                       <SelectItem 
                         key={boothNum} 
                         value={boothNum}
-                        disabled={isAssigned && !isCurrent}
+                        disabled={isAssigned}
                       >
-                        {boothNum} {isAssigned && !isCurrent && "• Already Assigned"}
+                        {boothNum} {isAssigned && "• Already Assigned"}
                       </SelectItem>
                     );
                   })}
                 </SelectContent>
               </Select>
             )}
+            <p className="text-xs text-muted-foreground">
+              {boothNumbers.length - assignedBoothNumbers.size} available booths
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -193,27 +148,30 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                 </SelectContent>
               </Select>
             )}
+            <p className="text-xs text-muted-foreground">
+              {organizations.length} organizations available
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Description (Optional)</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Enter booth description"
-              rows={4}
+              rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Special Notes</Label>
+            <Label htmlFor="notes">Special Notes (Optional)</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="Enter special notes or stage information"
-              rows={3}
+              rows={2}
             />
           </div>
 
@@ -235,30 +193,17 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
             </Select>
           </div>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button 
-              type="button" 
-              variant="destructive" 
-              onClick={() => setShowDeleteConfirm(true)} 
-              disabled={saving || deleting}
-              className="sm:mr-auto"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Booth
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
+              Cancel
             </Button>
-            <div className="flex gap-2 sm:ml-auto">
-              <Button type="button" variant="outline" onClick={onClose} disabled={saving || deleting}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving || deleting}>
-                {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Save Changes
-              </Button>
-            </div>
+            <Button type="submit" disabled={saving || !formData.table_no || !formData.org_name}>
+              {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Add Booth
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-    </>
   );
 }

@@ -3,16 +3,18 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Edit, Loader2, Trash2 } from "lucide-react";
+import { Edit, Loader2, Trash2, Plus } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths, type Booth } from "@/hooks/useBooths";
 import { BoothEditDialog } from "./BoothEditDialog";
+import { BoothAddDialog } from "./BoothAddDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export function BoothEditorTab() {
   const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [editingBooth, setEditingBooth] = useState<Booth | null>(null);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   
@@ -83,7 +85,13 @@ export function BoothEditorTab() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Booths</h3>
-              {boothsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+              <div className="flex items-center gap-2">
+                {boothsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                <Button onClick={() => setAddDialogOpen(true)} size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Booth
+                </Button>
+              </div>
             </div>
 
             {boothsLoading ? (
@@ -157,6 +165,15 @@ export function BoothEditorTab() {
           open={!!editingBooth}
           onClose={() => setEditingBooth(null)}
           onBoothUpdated={handleBoothUpdated}
+        />
+      )}
+
+      {addDialogOpen && (
+        <BoothAddDialog
+          eventId={selectedEventId}
+          open={addDialogOpen}
+          onClose={() => setAddDialogOpen(false)}
+          onBoothAdded={handleBoothUpdated}
         />
       )}
 
