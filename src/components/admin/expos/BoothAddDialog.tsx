@@ -77,30 +77,65 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
     setSaving(true);
 
     try {
+      // Validation 1: Check event ID
+      if (!eventId) {
+        toast.error("No event selected", {
+          description: "Please select an event before adding booths",
+        });
+        setSaving(false);
+        return;
+      }
+
+      // Validation 2: Verify user is authenticated
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        toast.error("Authentication required", {
+          description: "Please log in again to add booths",
+        });
+        setSaving(false);
+        return;
+      }
+
+      console.log("✅ Auth check passed - User ID:", user.id);
+      console.log("✅ Event ID:", eventId);
+      console.log("✅ Booth data:", formData);
+
       const positions = calculateBoothPosition(formData.table_no);
       
-      const { error } = await supabase
-        .from("booths")
-        .insert({
-          event_id: eventId,
-          table_no: formData.table_no,
-          org_name: formData.org_name,
-          description: formData.description,
-          notes: formData.notes,
-          sponsor_tier: formData.sponsor_tier,
-          ...positions,
-        });
+      const boothData = {
+        event_id: eventId,
+        table_no: formData.table_no,
+        org_name: formData.org_name,
+        description: formData.description || null,
+        notes: formData.notes || null,
+        sponsor_tier: formData.sponsor_tier,
+        ...positions,
+      };
 
-      if (error) throw error;
+      console.log("📤 Inserting booth data:", boothData);
+
+      const { data, error } = await supabase
+        .from("booths")
+        .insert(boothData)
+        .select();
+
+      if (error) {
+        console.error("❌ Insert error:", error);
+        throw error;
+      }
+
+      console.log("✅ Booth inserted successfully:", data);
 
       toast.success(`Booth #${formData.table_no} added successfully`, {
         description: `${formData.org_name} has been assigned to booth #${formData.table_no}`,
       });
       onBoothAdded();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding booth:", error);
-      toast.error("Failed to add booth");
+      toast.error("Failed to add booth", {
+        description: error.message || error.toString() || "Unknown error occurred",
+      });
     } finally {
       setSaving(false);
     }
