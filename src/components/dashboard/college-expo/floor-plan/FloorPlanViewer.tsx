@@ -58,7 +58,14 @@ export const FloorPlanViewer = ({
               </div>
             </div>
 
-            <div className="relative bg-muted rounded-lg overflow-hidden" style={{ height: "600px" }}>
+            <div 
+              className="relative bg-muted rounded-lg overflow-hidden mx-auto" 
+              style={{ 
+                height: "600px",
+                width: "900px",
+                maxWidth: "100%"
+              }}
+            >
               <TransformComponent
                 wrapperStyle={{ width: "100%", height: "100%" }}
                 contentStyle={{ width: "100%", height: "100%" }}
@@ -79,7 +86,7 @@ export const FloorPlanViewer = ({
                   height="800"
                   viewBox="0 0 1200 800"
                   className="absolute inset-0 w-full h-full"
-                  preserveAspectRatio="xMidYMid meet"
+                  preserveAspectRatio="none"
                 >
                   {boothsWithPositions.map((booth) => {
                     const isHighlighted = highlightedBoothIds.includes(booth.id);

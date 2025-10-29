@@ -26,9 +26,16 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
           queryClient.invalidateQueries({ queryKey: ["booths", eventId] });
           
           if (payload.eventType === "UPDATE") {
-            toast.info("🔄 Floor plan updated", {
-              description: "Refreshing booth positions...",
-              duration: 3000,
+            const updatedBooth = payload.new as any;
+            const tableNo = updatedBooth?.table_no || "Unknown";
+            
+            toast.info(`📍 Booth ${tableNo} repositioned`, {
+              description: "Floor plan updated by admin",
+              duration: 2500,
+            });
+          } else if (payload.eventType === "INSERT") {
+            toast.info("🆕 New booth added to floor plan", {
+              duration: 2000,
             });
           }
         }

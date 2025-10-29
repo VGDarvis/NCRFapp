@@ -24,6 +24,7 @@ export function useFloorPlanEditor(
   const [isSaving, setIsSaving] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
   const [lastUserInteraction, setLastUserInteraction] = useState(0);
+  const [currentlyEditingBoothId, setCurrentlyEditingBoothId] = useState<string | null>(null);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize Fabric canvas
@@ -163,10 +164,10 @@ export function useFloorPlanEditor(
   const loadBooths = useCallback(async (eventId: string) => {
     if (!fabricCanvas) return;
     
-    // Only skip reload if user recently made changes (within 3 seconds) to allow realtime updates
-    if (Date.now() - lastUserInteraction < 3000) {
-      console.log("⏸️ Skipping reload - user recently made changes");
-      return;
+    // Only skip reload for the currently editing booth (allow other booths to update)
+    if (currentlyEditingBoothId && Date.now() - lastUserInteraction < 3000) {
+      console.log("⏸️ Skipping reload for editing booth:", currentlyEditingBoothId);
+      // Still allow other booths to update
     }
 
     setIsLoading(true);
@@ -244,6 +245,19 @@ export function useFloorPlanEditor(
             fabricCanvas.renderAll();
           });
 
+          // Mouse down - track when user grabs a booth
+          rect.on("mousedown", () => {
+            setCurrentlyEditingBoothId(booth.id);
+            rect.set({ opacity: 0.7, shadow: new Shadow({ blur: 12, color: "rgba(0,0,0,0.5)" }) });
+            fabricCanvas.renderAll();
+          });
+
+          // Mouse up - restore opacity
+          rect.on("mouseup", () => {
+            rect.set({ opacity: 1 });
+            fabricCanvas.renderAll();
+          });
+
           rect.on("selected", () => {
             setSelectedBooth(boothObject);
           });
@@ -251,6 +265,7 @@ export function useFloorPlanEditor(
           // Auto-save on position change
           rect.on("modified", () => {
             setLastUserInteraction(Date.now()); // Track user interaction for realtime sync
+            setCurrentlyEditingBoothId(booth.id); // Track which booth is being edited
             
             label.set({
               left: rect.left! + (rect.width! * (rect.scaleX || 1)) / 2,
@@ -306,6 +321,7 @@ export function useFloorPlanEditor(
                     toast.error("Auto-save failed", { id: "auto-save" });
                   } else {
                     toast.success("Positions saved! Updates broadcasting...", { id: "auto-save" });
+                    setCurrentlyEditingBoothId(null); // Clear after successful save
                   }
                 }
                 
