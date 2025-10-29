@@ -10,7 +10,7 @@ const tabs = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "expos", label: "Expos", icon: Calendar },
   { id: "crm", label: "CRM", icon: Users },
-  { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "exhibitors", label: "Exhibitors", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 

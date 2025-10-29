@@ -38,10 +38,10 @@ const navigationItems = [
     description: "Contacts & organizations"
   },
   { 
-    id: "analytics", 
-    label: "Analytics", 
+    id: "exhibitors", 
+    label: "Exhibitors", 
     icon: BarChart3,
-    description: "Reports & insights"
+    description: "Manage exhibitors & imports"
   },
   { 
     id: "settings", 

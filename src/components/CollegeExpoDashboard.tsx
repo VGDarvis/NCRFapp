@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { Home, Calendar, MapPin, Building2, Heart } from 'lucide-react';
+import { Home, Calendar, MapPin, GraduationCap, Heart } from 'lucide-react';
 import { useGuestAnalytics } from '@/hooks/useGuestAnalytics';
 import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
 import { ExploreTab } from './dashboard/college-expo/ExploreTab';
@@ -65,8 +65,8 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
     },
     {
       id: 'vendors',
-      label: 'Vendors',
-      icon: Building2,
+      label: 'Colleges',
+      icon: GraduationCap,
       component: VendorsTabV2
     },
     {

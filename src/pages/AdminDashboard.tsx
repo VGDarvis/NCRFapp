@@ -15,8 +15,8 @@ import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksW
 import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
 import { CRMModule } from '@/components/admin/crm/CRMModule';
-import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
 import { ExposModule } from '@/components/admin/expos/ExposModule';
+import { ExhibitorsModule } from '@/components/admin/expos/ExhibitorsModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
               
               {activeTab === 'crm' && <CRMModule />}
               
-              {activeTab === 'analytics' && <AnalyticsModule />}
+              {activeTab === 'exhibitors' && <ExhibitorsModule />}
               
               {activeTab === 'settings' && (
                 <div className="glass-premium rounded-lg p-8 text-center">
