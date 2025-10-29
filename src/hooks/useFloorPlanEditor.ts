@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Canvas as FabricCanvas, Rect, Text, FabricImage } from "fabric";
+import { Canvas as FabricCanvas, Rect, Text, FabricImage, Shadow, Point } from "fabric";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,31 +23,89 @@ export function useFloorPlanEditor(
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
+  const [lastUserInteraction, setLastUserInteraction] = useState(0);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize Fabric canvas
   useEffect(() => {
     if (!canvasRef.current || fabricCanvas) return;
 
-    const isMobile = window.innerWidth < 768;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: isMobile ? window.innerWidth - 32 : 1400,
-      height: isMobile ? 600 : 900,
+      width: 1200,  // Fixed size to match attendee viewer SVG
+      height: 800,  // Fixed size to match attendee viewer SVG
       backgroundColor: "#f8f9fa",
       selection: true,
       enablePointerEvents: true,
       stopContextMenu: true,
+      renderOnAddRemove: !isMobile,
+      perPixelTargetFind: !isMobile,
     });
 
     // Enable touch gestures
     canvas.allowTouchScrolling = true;
-    canvas.perPixelTargetFind = !isMobile;
     canvas.targetFindTolerance = isMobile ? 15 : 10;
 
-    console.log("✅ Fabric.js canvas initialized", { width: 1400, height: 900 });
+    // Add pinch-to-zoom for mobile using mouse wheel event as proxy
+    let lastDistance = 0;
+    let isPinching = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        isPinching = true;
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        lastDistance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+          Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isPinching && e.touches.length === 2) {
+        e.preventDefault();
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const distance = Math.sqrt(
+          Math.pow(touch2.clientX - touch1.clientX, 2) +
+          Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+
+        if (lastDistance > 0) {
+          const delta = distance - lastDistance;
+          const zoom = canvas.getZoom();
+          let newZoom = zoom + delta / 500;
+          newZoom = Math.max(0.5, Math.min(3, newZoom));
+          
+          const centerX = (touch1.clientX + touch2.clientX) / 2;
+          const centerY = (touch1.clientY + touch2.clientY) / 2;
+          canvas.zoomToPoint(new Point(centerX, centerY), newZoom);
+        }
+        lastDistance = distance;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isPinching = false;
+      lastDistance = 0;
+    };
+
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener('touchstart', handleTouchStart, { passive: false });
+      canvasRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
+      canvasRef.current.addEventListener('touchend', handleTouchEnd);
+    }
+
+    console.log("✅ Fabric.js canvas initialized", { width: 1200, height: 800 });
     setFabricCanvas(canvas);
 
     return () => {
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('touchstart', handleTouchStart);
+        canvasRef.current.removeEventListener('touchmove', handleTouchMove);
+        canvasRef.current.removeEventListener('touchend', handleTouchEnd);
+      }
       console.log("🧹 Cleaning up Fabric.js canvas");
       canvas.dispose();
     };
@@ -77,14 +135,14 @@ export function useFloorPlanEditor(
       });
       
       // Scale image to fit canvas
-      const scaleX = (fabricCanvas.width || 1400) / (img.width || 1);
-      const scaleY = (fabricCanvas.height || 900) / (img.height || 1);
+      const scaleX = (fabricCanvas.width || 1200) / (img.width || 1);
+      const scaleY = (fabricCanvas.height || 800) / (img.height || 1);
       const scale = Math.min(scaleX, scaleY) * 0.9;
       
       img.scale(scale);
       img.set({
-        left: ((fabricCanvas.width || 1400) - (img.width || 0) * scale) / 2,
-        top: ((fabricCanvas.height || 900) - (img.height || 0) * scale) / 2,
+        left: ((fabricCanvas.width || 1200) - (img.width || 0) * scale) / 2,
+        top: ((fabricCanvas.height || 800) - (img.height || 0) * scale) / 2,
         selectable: false,
         evented: false,
       });
@@ -105,9 +163,9 @@ export function useFloorPlanEditor(
   const loadBooths = useCallback(async (eventId: string) => {
     if (!fabricCanvas) return;
     
-    // Skip loading if we're currently saving to prevent infinite loop
-    if (isSaving || autoSaveTimeoutRef.current) {
-      console.log("⏸️ Skipping booth reload - save in progress");
+    // Only skip reload if user recently made changes (within 3 seconds) to allow realtime updates
+    if (Date.now() - lastUserInteraction < 3000) {
+      console.log("⏸️ Skipping reload - user recently made changes");
       return;
     }
 
@@ -122,25 +180,30 @@ export function useFloorPlanEditor(
 
       const loadedBooths: BoothObject[] = [];
 
-      const isMobile = window.innerWidth < 768;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       
       boothsData?.forEach((booth) => {
         if (booth.x_position && booth.y_position) {
+          const tierColor = booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.7)" : 
+                  booth.sponsor_tier === "silver" ? "rgba(192, 192, 192, 0.7)" :
+                  booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.7)" :
+                  "rgba(59, 130, 246, 0.7)";
+          
           const rect = new Rect({
             left: Number(booth.x_position),
             top: Number(booth.y_position),
             width: Number(booth.booth_width || 120),
             height: Number(booth.booth_depth || 120),
-            fill: booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.7)" : 
-                  booth.sponsor_tier === "silver" ? "rgba(192, 192, 192, 0.7)" :
-                  booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.7)" :
-                  "rgba(59, 130, 246, 0.7)",
+            fill: tierColor,
             stroke: "#1e40af",
             strokeWidth: isMobile ? 2 : 3,
             cornerColor: "#3b82f6",
-            cornerSize: isMobile ? 16 : 12,
+            cornerSize: isMobile ? 20 : 12,
             transparentCorners: false,
-            padding: isMobile ? 15 : 10,
+            padding: isMobile ? 20 : 10,
+            hasControls: true,
+            hasBorders: true,
+            shadow: isMobile ? undefined : new Shadow({ blur: 4, color: 'rgba(0,0,0,0.2)', offsetX: 2, offsetY: 2 }),
           });
 
           const label = new Text(booth.table_no || "---", {
@@ -172,7 +235,7 @@ export function useFloorPlanEditor(
 
           // Hover effect
           rect.on("mouseover", () => {
-            rect.set({ strokeWidth: 5, shadow: { blur: 8, color: "rgba(0,0,0,0.3)", offsetX: 0, offsetY: 4 } });
+            rect.set({ strokeWidth: 5, shadow: new Shadow({ blur: 8, color: "rgba(0,0,0,0.3)", offsetX: 0, offsetY: 4 }) });
             fabricCanvas.renderAll();
           });
 
@@ -187,6 +250,8 @@ export function useFloorPlanEditor(
 
           // Auto-save on position change
           rect.on("modified", () => {
+            setLastUserInteraction(Date.now()); // Track user interaction for realtime sync
+            
             label.set({
               left: rect.left! + (rect.width! * (rect.scaleX || 1)) / 2,
               top: rect.top! + (rect.height! * (rect.scaleY || 1)) / 2,
@@ -195,11 +260,21 @@ export function useFloorPlanEditor(
             
             // Trigger auto-save with debounce (only if not already saving)
             if (eventId && !isSaving) {
-              if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
-              autoSaveTimeoutRef.current = setTimeout(async () => {
-                setIsSaving(true);
-                console.log("💾 Auto-saving booth positions...");
-                toast.loading("Auto-saving positions...", { id: "auto-save" });
+          if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          const saveDelay = isMobile ? 3000 : 2000; // Longer delay on mobile
+          
+          autoSaveTimeoutRef.current = setTimeout(async () => {
+            setIsSaving(true);
+            
+            // Disable object interaction during save
+            loadedBooths.forEach(b => {
+              b.rect.set({ selectable: false, evented: false });
+            });
+            fabricCanvas.renderAll();
+            
+            console.log("💾 Auto-saving booth positions...");
+            toast.loading("Auto-saving positions...", { id: "auto-save" });
                 
                 // Disable object modification during save
                 fabricCanvas.forEachObject((obj) => {
@@ -230,7 +305,7 @@ export function useFloorPlanEditor(
                     console.error("Auto-save error:", error);
                     toast.error("Auto-save failed", { id: "auto-save" });
                   } else {
-                    toast.success("Positions saved!", { id: "auto-save" });
+                    toast.success("Positions saved! Updates broadcasting...", { id: "auto-save" });
                   }
                 }
                 
@@ -241,8 +316,14 @@ export function useFloorPlanEditor(
                   }
                 });
                 
+                // Re-enable booth interaction
+                loadedBooths.forEach(b => {
+                  b.rect.set({ selectable: true, evented: true });
+                });
+                fabricCanvas.renderAll();
+                
                 setIsSaving(false);
-              }, 2000);
+              }, saveDelay);
             }
           });
         }
@@ -261,7 +342,7 @@ export function useFloorPlanEditor(
     } finally {
       setIsLoading(false);
     }
-  }, [fabricCanvas, setBooths, setIsLoading, isSaving]);
+  }, [fabricCanvas, setBooths, setIsLoading, lastUserInteraction]);
 
   // Auto-load floor plan background when floorPlanId changes
   useEffect(() => {

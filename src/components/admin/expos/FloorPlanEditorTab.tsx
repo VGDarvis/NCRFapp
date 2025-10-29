@@ -206,13 +206,34 @@ export const FloorPlanEditorTab = () => {
         </div>
 
         <div 
-          className="border rounded-lg overflow-auto bg-muted/20 touch-manipulation relative" 
+          className="border rounded-lg overflow-auto bg-muted/20 relative" 
           style={{ 
-            maxHeight: "calc(100vh - 350px)",
-            WebkitOverflowScrolling: "touch"
+            maxHeight: "calc(100vh - 250px)",
+            width: "100%",
+            overflowX: "auto",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
           }}
         >
-          <canvas ref={canvasRef} />
+          <div style={{ 
+            minWidth: "1200px",
+            minHeight: "800px",
+            position: "relative"
+          }}>
+            <canvas ref={canvasRef} />
+          </div>
+        </div>
+        
+        {/* Mobile Tips */}
+        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm md:hidden">
+          <p className="font-semibold mb-1">📱 Mobile Editor Tips:</p>
+          <ul className="text-xs space-y-1 text-muted-foreground">
+            <li>• Touch and hold booth to drag</li>
+            <li>• Pinch to zoom in/out</li>
+            <li>• Two-finger drag to pan</li>
+            <li>• Auto-saves 3 seconds after you stop</li>
+            <li>• Changes broadcast to all attendees</li>
+          </ul>
         </div>
 
         <MobileCanvasControls 
@@ -221,15 +242,14 @@ export const FloorPlanEditorTab = () => {
           onTogglePanMode={() => setIsPanMode(!isPanMode)}
         />
 
-        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm">
+        <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm hidden md:block">
           <p className="font-semibold mb-1">💡 How to use:</p>
           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li className="md:hidden">Touch and drag booth numbers to reposition</li>
-            <li className="md:hidden">Pinch to zoom, two-finger drag to pan</li>
-            <li className="hidden md:list-item">Click and drag booth numbers to reposition</li>
+            <li>Click and drag booth numbers to reposition</li>
             <li>Positions auto-save 2 seconds after you stop dragging</li>
             <li>Use Pan mode to navigate large floor plans</li>
-            <li className="hidden md:list-item">Zoom in/out for precise positioning</li>
+            <li>Zoom in/out for precise positioning</li>
+            <li>Changes automatically broadcast to all attendees</li>
           </ul>
         </div>
       </Card>
