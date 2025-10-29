@@ -21,6 +21,7 @@ export function useFloorPlanEditor(
   const [booths, setBooths] = useState<BoothObject[]>([]);
   const [activeTool, setActiveTool] = useState<"select" | "draw">("select");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -28,17 +29,20 @@ export function useFloorPlanEditor(
   useEffect(() => {
     if (!canvasRef.current || fabricCanvas) return;
 
+    const isMobile = window.innerWidth < 768;
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 1400,
-      height: 900,
+      width: isMobile ? window.innerWidth - 32 : 1400,
+      height: isMobile ? 600 : 900,
       backgroundColor: "#f8f9fa",
       selection: true,
+      enablePointerEvents: true,
+      stopContextMenu: true,
     });
 
     // Enable touch gestures
     canvas.allowTouchScrolling = true;
-    canvas.perPixelTargetFind = true;
-    canvas.targetFindTolerance = 10;
+    canvas.perPixelTargetFind = !isMobile;
+    canvas.targetFindTolerance = isMobile ? 15 : 10;
 
     console.log("✅ Fabric.js canvas initialized", { width: 1400, height: 900 });
     setFabricCanvas(canvas);
@@ -100,6 +104,12 @@ export function useFloorPlanEditor(
   // Load existing booths from database
   const loadBooths = useCallback(async (eventId: string) => {
     if (!fabricCanvas) return;
+    
+    // Skip loading if we're currently saving to prevent infinite loop
+    if (isSaving || autoSaveTimeoutRef.current) {
+      console.log("⏸️ Skipping booth reload - save in progress");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -112,23 +122,25 @@ export function useFloorPlanEditor(
 
       const loadedBooths: BoothObject[] = [];
 
+      const isMobile = window.innerWidth < 768;
+      
       boothsData?.forEach((booth) => {
         if (booth.x_position && booth.y_position) {
           const rect = new Rect({
             left: Number(booth.x_position),
             top: Number(booth.y_position),
-            width: Number(booth.booth_width || 100),
-            height: Number(booth.booth_depth || 100),
+            width: Number(booth.booth_width || 120),
+            height: Number(booth.booth_depth || 120),
             fill: booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.7)" : 
                   booth.sponsor_tier === "silver" ? "rgba(192, 192, 192, 0.7)" :
                   booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.7)" :
                   "rgba(59, 130, 246, 0.7)",
             stroke: "#1e40af",
-            strokeWidth: 3,
+            strokeWidth: isMobile ? 2 : 3,
             cornerColor: "#3b82f6",
-            cornerSize: 12,
+            cornerSize: isMobile ? 16 : 12,
             transparentCorners: false,
-            padding: 10,
+            padding: isMobile ? 15 : 10,
           });
 
           const label = new Text(booth.table_no || "---", {
@@ -181,12 +193,20 @@ export function useFloorPlanEditor(
             });
             fabricCanvas.renderAll();
             
-            // Trigger auto-save with debounce
-            if (eventId) {
+            // Trigger auto-save with debounce (only if not already saving)
+            if (eventId && !isSaving) {
               if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
-              autoSaveTimeoutRef.current = setTimeout(() => {
+              autoSaveTimeoutRef.current = setTimeout(async () => {
+                setIsSaving(true);
                 console.log("💾 Auto-saving booth positions...");
                 toast.loading("Auto-saving positions...", { id: "auto-save" });
+                
+                // Disable object modification during save
+                fabricCanvas.forEachObject((obj) => {
+                  if (obj.type === "rect") {
+                    obj.set({ selectable: false, evented: false });
+                  }
+                });
                 
                 // Perform save inline
                 const updates = loadedBooths
@@ -202,18 +222,26 @@ export function useFloorPlanEditor(
                   }));
 
                 if (updates.length > 0) {
-                  supabase
+                  const { error } = await supabase
                     .from("booths")
-                    .upsert(updates)
-                    .then(({ error }) => {
-                      if (error) {
-                        console.error("Auto-save error:", error);
-                        toast.error("Auto-save failed", { id: "auto-save" });
-                      } else {
-                        toast.success("Positions saved!", { id: "auto-save" });
-                      }
-                    });
+                    .upsert(updates);
+                    
+                  if (error) {
+                    console.error("Auto-save error:", error);
+                    toast.error("Auto-save failed", { id: "auto-save" });
+                  } else {
+                    toast.success("Positions saved!", { id: "auto-save" });
+                  }
                 }
+                
+                // Re-enable object modification after save
+                fabricCanvas.forEachObject((obj) => {
+                  if (obj.type === "rect") {
+                    obj.set({ selectable: true, evented: true });
+                  }
+                });
+                
+                setIsSaving(false);
               }, 2000);
             }
           });
@@ -233,7 +261,7 @@ export function useFloorPlanEditor(
     } finally {
       setIsLoading(false);
     }
-  }, [fabricCanvas, setBooths, setIsLoading]);
+  }, [fabricCanvas, setBooths, setIsLoading, isSaving]);
 
   // Auto-load floor plan background when floorPlanId changes
   useEffect(() => {

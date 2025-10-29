@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Save, Hand, MousePointer, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { useFloorPlanEditor } from "@/hooks/useFloorPlanEditor";
+import { MobileCanvasControls } from "@/components/admin/events/MobileCanvasControls";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useEvents } from "@/hooks/useEvents";
@@ -94,13 +95,13 @@ export const FloorPlanEditorTab = () => {
       <Card className="p-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
           <div>
-            <h2 className="text-2xl font-bold">Floor Plan Editor</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-xl md:text-2xl font-bold">Floor Plan Editor</h2>
+            <p className="text-xs md:text-sm text-muted-foreground">
               Drag and drop booth numbers to position them on the floor plan
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="hidden md:flex flex-wrap items-center gap-2">
             <Select value={selectedEventId || ""} onValueChange={setSelectedEventId}>
               <SelectTrigger className="w-[250px]">
                 <SelectValue placeholder="Select event..." />
@@ -197,17 +198,38 @@ export const FloorPlanEditorTab = () => {
           </Card>
         )}
 
-        <div className="border rounded-lg overflow-auto bg-muted/20" style={{ maxHeight: "calc(100vh - 350px)" }}>
+        <div className="flex md:hidden items-center justify-between mb-4">
+          <h3 className="text-lg font-bold">Floor Plan</h3>
+          <div className="flex gap-2">
+            <Badge variant="secondary">{positionedBooths + unpositionedBooths}</Badge>
+          </div>
+        </div>
+
+        <div 
+          className="border rounded-lg overflow-auto bg-muted/20 touch-manipulation relative" 
+          style={{ 
+            maxHeight: "calc(100vh - 350px)",
+            WebkitOverflowScrolling: "touch"
+          }}
+        >
           <canvas ref={canvasRef} />
         </div>
+
+        <MobileCanvasControls 
+          canvas={fabricCanvas} 
+          isPanMode={isPanMode}
+          onTogglePanMode={() => setIsPanMode(!isPanMode)}
+        />
 
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm">
           <p className="font-semibold mb-1">💡 How to use:</p>
           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Click and drag booth numbers to reposition them</li>
+            <li className="md:hidden">Touch and drag booth numbers to reposition</li>
+            <li className="md:hidden">Pinch to zoom, two-finger drag to pan</li>
+            <li className="hidden md:list-item">Click and drag booth numbers to reposition</li>
             <li>Positions auto-save 2 seconds after you stop dragging</li>
             <li>Use Pan mode to navigate large floor plans</li>
-            <li>Zoom in/out for precise positioning</li>
+            <li className="hidden md:list-item">Zoom in/out for precise positioning</li>
           </ul>
         </div>
       </Card>
