@@ -48,11 +48,15 @@ export const FloorPlanManagement = () => {
 
   const loadFloorPlan = async (eventId: string) => {
     try {
+      console.log("🔍 Loading floor plan for event:", eventId);
+      
       const { data: eventData } = await supabase
         .from("events")
         .select("venue_id")
         .eq("id", eventId)
         .single();
+
+      console.log("📍 Event venue_id:", eventData?.venue_id);
 
       if (eventData?.venue_id) {
         const { data: floorPlanData } = await supabase
@@ -63,10 +67,19 @@ export const FloorPlanManagement = () => {
           .limit(1)
           .maybeSingle();
 
-        setFloorPlanId(floorPlanData?.id || null);
+        console.log("🗺️ Floor plan data:", floorPlanData);
+        
+        if (floorPlanData) {
+          setFloorPlanId(floorPlanData.id);
+          console.log("✅ Floor plan ID set:", floorPlanData.id);
+          console.log("🖼️ Background URL:", floorPlanData.background_image_url);
+        } else {
+          console.warn("⚠️ No floor plan found for venue:", eventData.venue_id);
+          setFloorPlanId(null);
+        }
       }
     } catch (error) {
-      console.error("Error loading floor plan:", error);
+      console.error("❌ Error loading floor plan:", error);
     }
   };
 

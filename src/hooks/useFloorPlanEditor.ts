@@ -28,8 +28,8 @@ export function useFloorPlanEditor(
     if (!canvasRef.current || fabricCanvas) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: canvasRef.current.clientWidth || 1200,
-      height: canvasRef.current.clientHeight || 800,
+      width: 1200,
+      height: 800,
       backgroundColor: "#f8f9fa",
       selection: true,
     });
@@ -39,32 +39,47 @@ export function useFloorPlanEditor(
     canvas.perPixelTargetFind = true;
     canvas.targetFindTolerance = 10;
 
+    console.log("✅ Fabric.js canvas initialized", { width: 1200, height: 800 });
     setFabricCanvas(canvas);
 
     return () => {
+      console.log("🧹 Cleaning up Fabric.js canvas");
       canvas.dispose();
     };
   }, [canvasRef]);
 
   // Load floor plan background
   const loadFloorPlanBackground = useCallback(async (imageUrl: string) => {
-    if (!fabricCanvas) return;
+    if (!fabricCanvas) {
+      console.warn("⚠️ Cannot load background: Canvas not ready");
+      return;
+    }
 
+    console.log("🖼️ Loading floor plan image:", imageUrl);
+    
     try {
       const img = await FabricImage.fromURL(imageUrl, {
         crossOrigin: "anonymous",
       });
+
+      if (!img) {
+        throw new Error("Failed to load image from URL");
+      }
+
+      console.log("✅ Image loaded successfully", {
+        width: img.width,
+        height: img.height,
+      });
       
       // Scale image to fit canvas
-      const scale = Math.min(
-        fabricCanvas.width! / img.width!,
-        fabricCanvas.height! / img.height!
-      );
+      const scaleX = (fabricCanvas.width || 1200) / (img.width || 1);
+      const scaleY = (fabricCanvas.height || 800) / (img.height || 1);
+      const scale = Math.min(scaleX, scaleY) * 0.9;
       
-      img.scale(scale * 0.9);
+      img.scale(scale);
       img.set({
-        left: (fabricCanvas.width! - img.width! * scale * 0.9) / 2,
-        top: (fabricCanvas.height! - img.height! * scale * 0.9) / 2,
+        left: ((fabricCanvas.width || 1200) - (img.width || 0) * scale) / 2,
+        top: ((fabricCanvas.height || 800) - (img.height || 0) * scale) / 2,
         selectable: false,
         evented: false,
       });
@@ -73,11 +88,11 @@ export function useFloorPlanEditor(
       fabricCanvas.sendObjectToBack(img);
       fabricCanvas.renderAll();
       
-      console.log('✅ Floor plan image loaded successfully');
+      console.log('✅ Floor plan background set on canvas');
       toast.success("Floor plan loaded");
     } catch (error) {
-      console.error("Error loading floor plan:", error);
-      toast.error("Failed to load floor plan");
+      console.error("❌ Error loading floor plan background:", error);
+      toast.error("Failed to load floor plan image. Please refresh the page.");
     }
   }, [fabricCanvas]);
 
