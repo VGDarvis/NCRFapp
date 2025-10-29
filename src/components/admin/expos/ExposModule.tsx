@@ -1,8 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { MapPin, Calendar, Info, Edit3 } from "lucide-react";
+import { MapPin, Calendar, Info, Edit3, MousePointerClick } from "lucide-react";
 import { FloorPlanManagement } from "../events/FloorPlanManagement";
 import { BoothEditorTab } from "./BoothEditorTab";
+import { FloorPlanEditorTab } from "./FloorPlanEditorTab";
 import { useEvents } from "@/hooks/useEvents";
 
 export const ExposModule = () => {
@@ -19,15 +20,19 @@ export const ExposModule = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="floor-plan" className="space-y-4">
+      <Tabs defaultValue="floor-plan-editor" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="floor-plan" className="gap-2">
-            <MapPin className="w-4 h-4" />
-            Floor Plan
+          <TabsTrigger value="floor-plan-editor" className="gap-2">
+            <MousePointerClick className="w-4 h-4" />
+            Floor Plan Editor
           </TabsTrigger>
           <TabsTrigger value="edit-booths" className="gap-2">
             <Edit3 className="w-4 h-4" />
             Edit Booths
+          </TabsTrigger>
+          <TabsTrigger value="floor-plan" className="gap-2">
+            <MapPin className="w-4 h-4" />
+            Attendee View
           </TabsTrigger>
           <TabsTrigger value="event-details" className="gap-2">
             <Calendar className="w-4 h-4" />
@@ -35,12 +40,16 @@ export const ExposModule = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="floor-plan" className="space-y-4">
-          <FloorPlanManagement />
+        <TabsContent value="floor-plan-editor" className="space-y-4">
+          <FloorPlanEditorTab />
         </TabsContent>
 
         <TabsContent value="edit-booths" className="space-y-4">
           <BoothEditorTab />
+        </TabsContent>
+
+        <TabsContent value="floor-plan" className="space-y-4">
+          <FloorPlanManagement />
         </TabsContent>
 
         <TabsContent value="event-details" className="space-y-4">

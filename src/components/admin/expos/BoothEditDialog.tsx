@@ -234,53 +234,8 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
             </Select>
           </div>
 
-          <div className="border-t pt-4 mt-4">
-            <h3 className="text-sm font-medium mb-3">Floor Plan Position (Optional)</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="x_position">X Position</Label>
-                <Input
-                  id="x_position"
-                  type="number"
-                  value={formData.x_position}
-                  onChange={(e) => setFormData({ ...formData, x_position: e.target.value })}
-                  placeholder="e.g. 100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="y_position">Y Position</Label>
-                <Input
-                  id="y_position"
-                  type="number"
-                  value={formData.y_position}
-                  onChange={(e) => setFormData({ ...formData, y_position: e.target.value })}
-                  placeholder="e.g. 200"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="booth_width">Width</Label>
-                <Input
-                  id="booth_width"
-                  type="number"
-                  value={formData.booth_width}
-                  onChange={(e) => setFormData({ ...formData, booth_width: e.target.value })}
-                  placeholder="60"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="booth_depth">Depth</Label>
-                <Input
-                  id="booth_depth"
-                  type="number"
-                  value={formData.booth_depth}
-                  onChange={(e) => setFormData({ ...formData, booth_depth: e.target.value })}
-                  placeholder="60"
-                />
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Leave positions empty to remove booth from floor plan view
-            </p>
+          <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm">
+            💡 <strong>Tip:</strong> Reposition this booth using the "Floor Plan Editor" tab
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-2">

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Canvas as FabricCanvas, Rect, Text, FabricImage } from "fabric";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,14 +22,15 @@ export function useFloorPlanEditor(
   const [activeTool, setActiveTool] = useState<"select" | "draw">("select");
   const [isLoading, setIsLoading] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number; y: number } | null>(null);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize Fabric canvas
   useEffect(() => {
     if (!canvasRef.current || fabricCanvas) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 1200,
-      height: 800,
+      width: 1400,
+      height: 900,
       backgroundColor: "#f8f9fa",
       selection: true,
     });
@@ -39,7 +40,7 @@ export function useFloorPlanEditor(
     canvas.perPixelTargetFind = true;
     canvas.targetFindTolerance = 10;
 
-    console.log("✅ Fabric.js canvas initialized", { width: 1200, height: 800 });
+    console.log("✅ Fabric.js canvas initialized", { width: 1400, height: 900 });
     setFabricCanvas(canvas);
 
     return () => {
@@ -72,14 +73,14 @@ export function useFloorPlanEditor(
       });
       
       // Scale image to fit canvas
-      const scaleX = (fabricCanvas.width || 1200) / (img.width || 1);
-      const scaleY = (fabricCanvas.height || 800) / (img.height || 1);
+      const scaleX = (fabricCanvas.width || 1400) / (img.width || 1);
+      const scaleY = (fabricCanvas.height || 900) / (img.height || 1);
       const scale = Math.min(scaleX, scaleY) * 0.9;
       
       img.scale(scale);
       img.set({
-        left: ((fabricCanvas.width || 1200) - (img.width || 0) * scale) / 2,
-        top: ((fabricCanvas.height || 800) - (img.height || 0) * scale) / 2,
+        left: ((fabricCanvas.width || 1400) - (img.width || 0) * scale) / 2,
+        top: ((fabricCanvas.height || 900) - (img.height || 0) * scale) / 2,
         selectable: false,
         evented: false,
       });
@@ -116,12 +117,12 @@ export function useFloorPlanEditor(
           const rect = new Rect({
             left: Number(booth.x_position),
             top: Number(booth.y_position),
-            width: Number(booth.booth_width || 80),
-            height: Number(booth.booth_depth || 80),
-            fill: booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.5)" : 
-                  booth.sponsor_tier === "silver" ? "rgba(192, 192, 192, 0.5)" :
-                  booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.5)" :
-                  "rgba(59, 130, 246, 0.5)",
+            width: Number(booth.booth_width || 100),
+            height: Number(booth.booth_depth || 100),
+            fill: booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.7)" : 
+                  booth.sponsor_tier === "silver" ? "rgba(192, 192, 192, 0.7)" :
+                  booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.7)" :
+                  "rgba(59, 130, 246, 0.7)",
             stroke: "#1e40af",
             strokeWidth: 3,
             cornerColor: "#3b82f6",
@@ -131,11 +132,14 @@ export function useFloorPlanEditor(
           });
 
           const label = new Text(booth.table_no || "---", {
-            left: Number(booth.x_position) + Number(booth.booth_width || 80) / 2,
-            top: Number(booth.y_position) + Number(booth.booth_depth || 80) / 2,
-            fontSize: 16,
+            left: Number(booth.x_position) + Number(booth.booth_width || 100) / 2,
+            top: Number(booth.y_position) + Number(booth.booth_depth || 100) / 2,
+            fontSize: 20,
             fill: "#1e40af",
             fontWeight: "bold",
+            stroke: "#ffffff",
+            strokeWidth: 3,
+            paintFirst: "stroke",
             originX: "center",
             originY: "center",
             selectable: false,
@@ -145,15 +149,73 @@ export function useFloorPlanEditor(
           fabricCanvas.add(rect);
           fabricCanvas.add(label);
 
-          loadedBooths.push({
+          const boothObject = {
             id: booth.id,
             rect,
             label,
             boothData: booth,
+          };
+
+          loadedBooths.push(boothObject);
+
+          // Hover effect
+          rect.on("mouseover", () => {
+            rect.set({ strokeWidth: 5, shadow: { blur: 8, color: "rgba(0,0,0,0.3)", offsetX: 0, offsetY: 4 } });
+            fabricCanvas.renderAll();
+          });
+
+          rect.on("mouseout", () => {
+            rect.set({ strokeWidth: 3, shadow: null });
+            fabricCanvas.renderAll();
           });
 
           rect.on("selected", () => {
-            setSelectedBooth({ id: booth.id, rect, label, boothData: booth });
+            setSelectedBooth(boothObject);
+          });
+
+          // Auto-save on position change
+          rect.on("modified", () => {
+            label.set({
+              left: rect.left! + (rect.width! * (rect.scaleX || 1)) / 2,
+              top: rect.top! + (rect.height! * (rect.scaleY || 1)) / 2,
+            });
+            fabricCanvas.renderAll();
+            
+            // Trigger auto-save with debounce
+            if (eventId) {
+              if (autoSaveTimeoutRef.current) clearTimeout(autoSaveTimeoutRef.current);
+              autoSaveTimeoutRef.current = setTimeout(() => {
+                console.log("💾 Auto-saving booth positions...");
+                toast.loading("Auto-saving positions...", { id: "auto-save" });
+                
+                // Perform save inline
+                const updates = loadedBooths
+                  .filter(b => b.boothData?.id)
+                  .map((b) => ({
+                    id: b.boothData.id,
+                    event_id: eventId,
+                    org_name: b.boothData.org_name,
+                    x_position: b.rect.left,
+                    y_position: b.rect.top,
+                    booth_width: b.rect.width! * (b.rect.scaleX || 1),
+                    booth_depth: b.rect.height! * (b.rect.scaleY || 1),
+                  }));
+
+                if (updates.length > 0) {
+                  supabase
+                    .from("booths")
+                    .upsert(updates)
+                    .then(({ error }) => {
+                      if (error) {
+                        console.error("Auto-save error:", error);
+                        toast.error("Auto-save failed", { id: "auto-save" });
+                      } else {
+                        toast.success("Positions saved!", { id: "auto-save" });
+                      }
+                    });
+                }
+              }, 2000);
+            }
           });
         }
       });

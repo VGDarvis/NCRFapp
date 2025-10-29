@@ -242,6 +242,10 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
             </Select>
           </div>
 
+          <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm">
+            💡 <strong>Tip:</strong> Position this booth on the floor plan using the "Floor Plan Editor" tab
+          </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
               Cancel
