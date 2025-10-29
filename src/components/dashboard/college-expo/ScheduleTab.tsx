@@ -30,7 +30,7 @@ export const ScheduleTab = () => {
         </TabsContent>
 
         <TabsContent value="my-schedule" className="mt-0">
-          <MyScheduleTab />
+          <MyScheduleTab eventId="houston-2025" />
         </TabsContent>
 
         <TabsContent value="seminars" className="mt-0">

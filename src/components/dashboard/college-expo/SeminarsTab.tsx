@@ -2,10 +2,19 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, MapPin, Users, Video, Filter } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { 
+  Clock, MapPin, Users, ChevronDown, ChevronUp, 
+  Heart, Info, Calendar as CalendarIcon, Share2
+} from "lucide-react";
 import { useSeminarSessions } from "@/hooks/useSeminarSessions";
-import { format, parseISO, isSameDay } from "date-fns";
+import { useSeminarFavorites } from "@/hooks/useSeminarFavorites";
+import { format, parseISO } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { createSeminarCalendarEvent, downloadICSFile } from "@/lib/calendar-utils";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SeminarsTabProps {
   eventId: string;
@@ -13,7 +22,15 @@ interface SeminarsTabProps {
 
 export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
   const { data: sessions, isLoading } = useSeminarSessions(eventId);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { isFavorite, toggleFavorite, isGuest } = useSeminarFavorites(eventId);
+  const [expandedSeminar, setExpandedSeminar] = useState<string | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<string>("all");
+  const [user, setUser] = useState<any>(null);
+
+  // Check user authentication
+  useState(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+  });
 
   if (isLoading) {
     return (
@@ -29,7 +46,7 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="p-12 text-center">
-          <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <CalendarIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-xl font-semibold mb-2">No Seminars Scheduled</h3>
           <p className="text-muted-foreground">
             Check back soon for workshop and seminar schedules.
@@ -39,141 +56,277 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
     );
   }
 
-  const categories = Array.from(new Set(sessions.map(s => s.category).filter(Boolean)));
-  const filteredSessions = selectedCategory
-    ? sessions.filter(s => s.category === selectedCategory)
-    : sessions;
+  // Get unique rooms
+  const rooms = Array.from(new Set(sessions.map(s => s.room?.room_number).filter(Boolean)));
+  
+  // Filter sessions by room
+  const filteredSessions = selectedRoom === "all" 
+    ? sessions 
+    : sessions.filter(s => s.room?.room_number === selectedRoom);
 
-  // Group by day
-  const sessionsByDay = filteredSessions.reduce((acc, session) => {
-    const day = format(parseISO(session.start_time), "yyyy-MM-dd");
-    if (!acc[day]) acc[day] = [];
-    acc[day].push(session);
-    return acc;
-  }, {} as Record<string, typeof sessions>);
+  const handleShare = async (session: any) => {
+    const shareData = {
+      title: session.title,
+      text: `Join me at "${session.title}" - ${format(parseISO(session.start_time), 'h:mm a')}`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled or share failed
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard");
+    }
+  };
+
+  const handleExportToCalendar = (session: any) => {
+    const calendarEvent = createSeminarCalendarEvent(session);
+    downloadICSFile(calendarEvent, `${session.title.replace(/\s+/g, '-')}.ics`);
+    toast.success("Calendar event downloaded");
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Seminars & Workshops</h1>
-        <p className="text-muted-foreground">
-          Learn from college admissions experts, financial aid counselors, and more
+        <h1 className="text-3xl font-bold mb-2">
+          Seminars & <span className="text-primary">Workshops</span>
+        </h1>
+        <p className="text-muted-foreground mb-4">
+          Click any seminar to view details. {isGuest ? "Sign in to save favorites to My Schedule." : "Click the heart to save to My Schedule."}
         </p>
+
+        {isGuest && (
+          <Alert className="mb-4">
+            <Info className="h-4 w-4" />
+            <AlertTitle>Viewing as Guest</AlertTitle>
+            <AlertDescription>
+              Favorites will be saved locally. Create an account to sync across devices and receive reminders.
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
-      {categories.length > 0 && (
+      {/* Room Filter */}
+      {rooms.length > 0 && (
         <div className="flex gap-2 mb-6 flex-wrap">
           <Button
-            variant={selectedCategory === null ? "default" : "outline"}
+            variant={selectedRoom === "all" ? "default" : "outline"}
             size="sm"
-            onClick={() => setSelectedCategory(null)}
+            onClick={() => setSelectedRoom("all")}
           >
-            All Categories
+            All Rooms
+            <Badge variant="secondary" className="ml-2">{sessions.length}</Badge>
           </Button>
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category?.replace(/_/g, " ")}
-            </Button>
-          ))}
+          {rooms.map((room) => {
+            const count = sessions.filter(s => s.room?.room_number === room).length;
+            return (
+              <Button
+                key={room}
+                variant={selectedRoom === room ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedRoom(room)}
+              >
+                {room}
+                <Badge variant="secondary" className="ml-2">{count}</Badge>
+              </Button>
+            );
+          })}
         </div>
       )}
 
-      <div className="space-y-8">
-        {Object.entries(sessionsByDay).map(([day, daySessions]) => (
-          <div key={day}>
-            <h2 className="text-xl font-semibold mb-4">
-              {format(parseISO(day), "EEEE, MMMM d, yyyy")}
-            </h2>
-            <div className="grid gap-4">
-              {daySessions.map((session) => (
-                <Card key={session.id} className="p-6 hover:border-primary transition-colors">
-                  <div className="flex flex-col md:flex-row gap-6">
-                    <div className="md:w-32 shrink-0">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2 text-sm font-medium">
-                          <Clock className="w-4 h-4" />
-                          {format(parseISO(session.start_time), "h:mm a")}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {format(parseISO(session.end_time), "h:mm a")}
-                        </div>
+      {/* Seminars List */}
+      <div className="space-y-4">
+        {filteredSessions.map((session) => {
+          const isExpanded = expandedSeminar === session.id;
+          const favorited = isFavorite(session.id);
+
+          return (
+            <Card
+              key={session.id}
+              className={cn(
+                "group cursor-pointer transition-all duration-200",
+                isExpanded && "ring-2 ring-primary",
+                "hover:border-primary hover:shadow-lg"
+              )}
+              onClick={() => setExpandedSeminar(isExpanded ? null : session.id)}
+            >
+              <div className="p-6">
+                {/* Top Row: Time + Room Number */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-5 h-5 text-primary shrink-0" />
+                    <div>
+                      <div className="font-bold text-lg">
+                        {format(parseISO(session.start_time), "h:mm a")}
                       </div>
-                    </div>
-
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold mb-2">{session.title}</h3>
-                      
-                      {session.description && (
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {session.description}
-                        </p>
-                      )}
-
-                      <div className="flex flex-wrap gap-3 mb-3">
-                        {session.presenter_name && (
-                          <div className="text-sm">
-                            <span className="text-muted-foreground">Presenter: </span>
-                            <span className="font-medium">{session.presenter_name}</span>
-                            {session.presenter_title && (
-                              <span className="text-muted-foreground">
-                                , {session.presenter_title}
-                              </span>
-                            )}
-                            {session.presenter_organization && (
-                              <span className="text-muted-foreground">
-                                {" "}
-                                at {session.presenter_organization}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {session.category && (
-                          <Badge variant="secondary">
-                            {session.category.replace(/_/g, " ")}
-                          </Badge>
-                        )}
-                        {session.target_audience?.map((audience) => (
-                          <Badge key={audience} variant="outline">
-                            {audience.replace(/_/g, " ")}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        {session.room && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            {session.room.room_name}
-                            {session.room.room_number && ` (${session.room.room_number})`}
-                          </div>
-                        )}
-                        {session.max_capacity && (
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            Capacity: {session.max_capacity}
-                          </div>
-                        )}
-                        {session.registration_required && (
-                          <Badge variant="outline" className="text-xs">
-                            Registration Required
-                          </Badge>
-                        )}
+                      <div className="text-xs text-muted-foreground">
+                        to {format(parseISO(session.end_time), "h:mm a")}
                       </div>
                     </div>
                   </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        ))}
+
+                  {/* PROMINENT ROOM NUMBER */}
+                  {session.room && (
+                    <Badge 
+                      variant="secondary" 
+                      className="text-base px-3 py-1.5 font-bold bg-primary/10 text-primary shrink-0"
+                    >
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {session.room.room_number}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                  {session.title}
+                </h3>
+
+                {/* Presenter (when collapsed) */}
+                {!isExpanded && session.presenter_name && (
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Presented by {session.presenter_name}
+                    {session.presenter_organization && ` - ${session.presenter_organization}`}
+                  </p>
+                )}
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {session.category && (
+                    <Badge variant="secondary">
+                      {session.category.replace(/_/g, " ")}
+                    </Badge>
+                  )}
+                  {session.target_audience?.slice(0, 2).map((audience) => (
+                    <Badge key={audience} variant="outline">
+                      {audience.replace(/_/g, " ")}
+                    </Badge>
+                  ))}
+                  {session.max_capacity && (
+                    <Badge variant="outline" className="gap-1">
+                      <Users className="w-3 h-3" />
+                      {session.max_capacity} seats
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Expanded Content */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-4 mt-4 border-t pt-4"
+                    >
+                      {/* Full Description */}
+                      {session.description && (
+                        <p className="text-muted-foreground">{session.description}</p>
+                      )}
+
+                      {/* Presenter Details */}
+                      {session.presenter_name && (
+                        <div className="bg-muted/50 p-4 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <Users className="w-5 h-5 text-primary mt-1 shrink-0" />
+                            <div className="flex-1">
+                              <p className="font-semibold">{session.presenter_name}</p>
+                              {session.presenter_title && (
+                                <p className="text-sm text-muted-foreground">
+                                  {session.presenter_title}
+                                </p>
+                              )}
+                              {session.presenter_organization && (
+                                <p className="text-sm text-muted-foreground">
+                                  {session.presenter_organization}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Location Details */}
+                      {session.room && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <MapPin className="w-4 h-4 text-primary" />
+                          <span className="font-medium">{session.room.room_name || session.room.room_number}</span>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <Button
+                          variant={favorited ? "default" : "outline"}
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(session.id);
+                          }}
+                        >
+                          <Heart 
+                            className={cn(
+                              "w-4 h-4 mr-2",
+                              favorited && "fill-current"
+                            )} 
+                          />
+                          {favorited ? "Saved to My Schedule" : "Save to My Schedule"}
+                        </Button>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleExportToCalendar(session);
+                          }}
+                        >
+                          <CalendarIcon className="w-4 h-4 mr-2" />
+                          Add to Calendar
+                        </Button>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShare(session);
+                          }}
+                        >
+                          <Share2 className="w-4 h-4 mr-2" />
+                          Share
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Expand/Collapse Indicator */}
+                <div className="flex items-center justify-center mt-3 pt-3 border-t">
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    {isExpanded ? (
+                      <>
+                        <ChevronUp className="w-4 h-4 mr-1" />
+                        Show Less
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4 mr-1" />
+                        View Details
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

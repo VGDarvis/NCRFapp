@@ -87,3 +87,40 @@ export const getAppleCalendarUrl = (event: CalendarEvent): string => {
   const blob = new Blob([icsContent], { type: 'text/calendar' });
   return URL.createObjectURL(blob);
 };
+
+// Seminar-specific calendar event creation
+export const createSeminarCalendarEvent = (seminar: {
+  title: string;
+  description?: string;
+  start_time: string;
+  end_time: string;
+  room?: {
+    room_name?: string;
+    room_number?: string;
+  };
+  presenter_name?: string;
+  presenter_organization?: string;
+}): CalendarEvent => {
+  const location = seminar.room
+    ? `${seminar.room.room_name || ""} - ${seminar.room.room_number || ""}`.trim()
+    : "TBD";
+
+  let description = seminar.description || "";
+  if (seminar.presenter_name) {
+    description += `\n\nPresenter: ${seminar.presenter_name}`;
+    if (seminar.presenter_organization) {
+      description += ` (${seminar.presenter_organization})`;
+    }
+  }
+
+  return {
+    title: seminar.title,
+    description,
+    location,
+    startDate: parseISO(seminar.start_time),
+    endDate: parseISO(seminar.end_time),
+  };
+};
+
+// Import parseISO from date-fns
+import { parseISO } from "date-fns";
