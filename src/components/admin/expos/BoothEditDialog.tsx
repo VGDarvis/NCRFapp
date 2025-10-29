@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -29,6 +30,10 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
     description: booth.description || "",
     notes: booth.notes || "",
     sponsor_tier: booth.sponsor_tier || "standard",
+    x_position: booth.x_position?.toString() || "",
+    y_position: booth.y_position?.toString() || "",
+    booth_width: booth.booth_width?.toString() || "60",
+    booth_depth: booth.booth_depth?.toString() || "60",
   });
 
   const { boothNumbers, isLoading: boothNumbersLoading } = useAvailableBoothNumbers(booth.event_id);
@@ -48,6 +53,10 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       description: booth.description || "",
       notes: booth.notes || "",
       sponsor_tier: booth.sponsor_tier || "standard",
+      x_position: booth.x_position?.toString() || "",
+      y_position: booth.y_position?.toString() || "",
+      booth_width: booth.booth_width?.toString() || "60",
+      booth_depth: booth.booth_depth?.toString() || "60",
     });
   }, [booth]);
 
@@ -64,6 +73,10 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
           description: formData.description,
           notes: formData.notes,
           sponsor_tier: formData.sponsor_tier,
+          x_position: formData.x_position ? parseFloat(formData.x_position) : null,
+          y_position: formData.y_position ? parseFloat(formData.y_position) : null,
+          booth_width: formData.booth_width ? parseFloat(formData.booth_width) : 60,
+          booth_depth: formData.booth_depth ? parseFloat(formData.booth_depth) : 60,
         })
         .eq("id", booth.id);
 
@@ -233,6 +246,55 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                 <SelectItem value="gold">Gold</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="border-t pt-4 mt-4">
+            <h3 className="text-sm font-medium mb-3">Floor Plan Position (Optional)</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="x_position">X Position</Label>
+                <Input
+                  id="x_position"
+                  type="number"
+                  value={formData.x_position}
+                  onChange={(e) => setFormData({ ...formData, x_position: e.target.value })}
+                  placeholder="e.g. 100"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="y_position">Y Position</Label>
+                <Input
+                  id="y_position"
+                  type="number"
+                  value={formData.y_position}
+                  onChange={(e) => setFormData({ ...formData, y_position: e.target.value })}
+                  placeholder="e.g. 200"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="booth_width">Width</Label>
+                <Input
+                  id="booth_width"
+                  type="number"
+                  value={formData.booth_width}
+                  onChange={(e) => setFormData({ ...formData, booth_width: e.target.value })}
+                  placeholder="60"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="booth_depth">Depth</Label>
+                <Input
+                  id="booth_depth"
+                  type="number"
+                  value={formData.booth_depth}
+                  onChange={(e) => setFormData({ ...formData, booth_depth: e.target.value })}
+                  placeholder="60"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Leave positions empty to remove booth from floor plan view
+            </p>
           </div>
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
