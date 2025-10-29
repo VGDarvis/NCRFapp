@@ -20,15 +20,22 @@ import { toast } from "sonner";
 import { BoothGridSelector } from "./BoothGridSelector";
 import { BulkMoveDialog } from "./BulkMoveDialog";
 import { LayoutCopier } from "./LayoutCopier";
-import { ZoneManager } from "./ZoneManager";
 import { useFloorPlans } from "@/hooks/useFloorPlans";
 import { useMobileDetection } from "@/hooks/useMobileDetection";
+import { cn } from "@/lib/utils";
 import {
   GridPosition,
   gridToCoordinates,
   getGridLabel,
   findNextAvailableCell,
 } from "@/hooks/useGridPositioning";
+
+// Haptic feedback helper
+const triggerHaptic = () => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50);
+  }
+};
 
 export const BoothListEditor = () => {
   const [selectedEvent, setSelectedEvent] = useState<string>("");
@@ -76,8 +83,8 @@ export const BoothListEditor = () => {
       return;
     }
 
-    setIsSaving(true);
     const coords = gridToCoordinates(selectedGridPosition);
+    toast.loading("Saving position...", { id: "save-position" });
 
     try {
       const { error } = await supabase
@@ -92,13 +99,65 @@ export const BoothListEditor = () => {
 
       if (error) throw error;
 
-      toast.success(`Booth positioned at ${getGridLabel(selectedGridPosition)}`);
+      toast.success(`Booth positioned at ${getGridLabel(selectedGridPosition)}`, {
+        id: "save-position",
+        description: "All attendees will see this change immediately",
+      });
+      
       setEditingBoothId(null);
       setSelectedGridPosition(null);
       refetchBooths();
     } catch (error: any) {
       console.error("Error updating booth position:", error);
-      toast.error("Failed to update booth position");
+      toast.error("Failed to update booth position", { id: "save-position" });
+    }
+  };
+
+  const handleSwapBooths = async (secondBoothId: string) => {
+    if (!firstBoothId) {
+      toast.error("No first booth selected");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const firstBooth = booths?.find((b) => b.id === firstBoothId);
+      const secondBooth = booths?.find((b) => b.id === secondBoothId);
+
+      if (!firstBooth || !secondBooth) {
+        throw new Error("Booths not found");
+      }
+
+      const { error: error1 } = await supabase
+        .from("booths")
+        .update({
+          grid_row: secondBooth.grid_row,
+          grid_col: secondBooth.grid_col,
+          x_position: secondBooth.x_position,
+          y_position: secondBooth.y_position,
+        })
+        .eq("id", firstBoothId);
+
+      const { error: error2 } = await supabase
+        .from("booths")
+        .update({
+          grid_row: firstBooth.grid_row,
+          grid_col: firstBooth.grid_col,
+          x_position: firstBooth.x_position,
+          y_position: firstBooth.y_position,
+        })
+        .eq("id", secondBoothId);
+
+      if (error1 || error2) throw error1 || error2;
+
+      toast.success(`Swapped Booth #${firstBooth.table_no} ↔ Booth #${secondBooth.table_no}`);
+      setSwapMode(false);
+      setFirstBoothId(null);
+      refetchBooths();
+    } catch (error: any) {
+      console.error("Error swapping booths:", error);
+      toast.error("Failed to swap booths");
     } finally {
       setIsSaving(false);
     }
@@ -227,22 +286,160 @@ export const BoothListEditor = () => {
         </div>
 
         {selectedEvent && booths && booths.length > 0 && (
-          <div className="flex gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Button
+              variant={swapMode ? "default" : "outline"}
+              size={isMobile ? "lg" : "sm"}
+              onClick={() => {
+                setSwapMode(!swapMode);
+                setFirstBoothId(null);
+                setSelectedBooths(new Set());
+                if (swapMode) {
+                  toast.info("Swap mode disabled");
+                } else {
+                  toast.info("Swap mode enabled. Select two booths to swap positions.");
+                }
+              }}
+              className={cn(isMobile && "min-h-[48px]")}
+            >
+              <Repeat className="w-4 h-4 mr-2" />
+              {swapMode ? "Exit Swap Mode" : "Swap Booths"}
+            </Button>
+
+            {selectedBooths.size > 0 && (
+              <>
+                <Button
+                  variant="default"
+                  size={isMobile ? "lg" : "sm"}
+                  onClick={() => setShowBulkMove(true)}
+                  className={cn(isMobile && "min-h-[48px]")}
+                >
+                  <Move className="w-4 h-4 mr-2" />
+                  Move {selectedBooths.size} Selected
+                </Button>
+                <Button
+                  variant="ghost"
+                  size={isMobile ? "lg" : "sm"}
+                  onClick={() => setSelectedBooths(new Set())}
+                  className={cn(isMobile && "min-h-[48px]")}
+                >
+                  Clear Selection
+                </Button>
+              </>
+            )}
+
+            {filteredBooths.length > 0 && !swapMode && (
+              <Button
+                variant="outline"
+                size={isMobile ? "lg" : "sm"}
+                onClick={() => {
+                  if (selectedBooths.size === filteredBooths.length) {
+                    setSelectedBooths(new Set());
+                  } else {
+                    setSelectedBooths(new Set(filteredBooths.map((b: any) => b.id)));
+                  }
+                }}
+                className={cn(isMobile && "min-h-[48px]")}
+              >
+                {selectedBooths.size === filteredBooths.length ? "Deselect All" : "Select All"}
+              </Button>
+            )}
+
             <Button 
               onClick={handleAutoArrangeAll} 
               variant="outline" 
-              size="sm"
+              size={isMobile ? "lg" : "sm"}
               disabled={isSaving}
+              className={cn(isMobile && "min-h-[48px]")}
             >
               <Grid className="w-4 h-4 mr-2" />
-              Auto-Arrange All Booths
+              Auto-Arrange All
             </Button>
-            <Badge variant="secondary">
+            
+            <Badge variant="secondary" className="flex items-center">
               {filteredBooths.length} booth{filteredBooths.length !== 1 ? "s" : ""}
             </Badge>
           </div>
         )}
       </Card>
+
+      {selectedEvent && booths && booths.length > 0 && (
+        <Card className="p-4">
+          <h3 className="text-lg font-semibold mb-3">Quick Tools</h3>
+          <div className="space-y-4">
+            <LayoutCopier
+              targetEventId={selectedEvent}
+              onSuccess={() => {
+                refetchBooths();
+                toast.success("Layout copied successfully!");
+              }}
+            />
+
+            {floorPlan?.zones && Array.isArray(floorPlan.zones) && floorPlan.zones.length > 0 && (
+              <div>
+                <label className="text-sm font-medium mb-2 block">Assign to Zone</label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Select booths above, then click a zone to auto-arrange them
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {floorPlan.zones.map((zone: any) => (
+                    <Button
+                      key={zone.name}
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        if (selectedBooths.size === 0) {
+                          toast.error("Select booths first");
+                          return;
+                        }
+                        
+                        const boothIds = Array.from(selectedBooths);
+                        const startRow = zone.startRow;
+                        const startCol = zone.startCol;
+                        
+                        toast.loading(`Assigning ${boothIds.length} booths to ${zone.name}...`, { id: "zone-assign" });
+                        
+                        try {
+                          for (let i = 0; i < boothIds.length; i++) {
+                            const row = startRow + Math.floor(i / zone.cols);
+                            const col = startCol + (i % zone.cols);
+                            
+                            if (row >= startRow + zone.rows) break;
+                            
+                            const coords = gridToCoordinates({ row, col });
+                            await supabase
+                              .from("booths")
+                              .update({
+                                grid_row: row,
+                                grid_col: col,
+                                x_position: coords.x,
+                                y_position: coords.y,
+                              })
+                              .eq("id", boothIds[i]);
+                          }
+                          
+                          toast.success(`Assigned ${boothIds.length} booths to ${zone.name}`, { id: "zone-assign" });
+                          setSelectedBooths(new Set());
+                          refetchBooths();
+                        } catch (error) {
+                          toast.error("Failed to assign booths", { id: "zone-assign" });
+                        }
+                      }}
+                      style={{ borderColor: zone.color }}
+                    >
+                      <div 
+                        className="w-3 h-3 rounded mr-2" 
+                        style={{ backgroundColor: zone.color }}
+                      />
+                      {zone.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       {selectedEvent && (
         <div className="space-y-3 max-h-[600px] overflow-y-auto">
@@ -253,15 +450,54 @@ export const BoothListEditor = () => {
                 : null;
 
             return (
-              <Card key={booth.id} className="p-4">
+              <Card 
+                key={booth.id} 
+                className={cn(
+                  "p-4 transition-all",
+                  swapMode && firstBoothId === booth.id && "ring-2 ring-primary",
+                  swapMode && "cursor-pointer hover:border-primary"
+                )}
+                onClick={() => {
+                  if (swapMode) {
+                    triggerHaptic();
+                    if (!firstBoothId) {
+                      setFirstBoothId(booth.id);
+                      toast.info(`First booth selected: #${booth.table_no}. Now select second booth.`);
+                    } else if (firstBoothId === booth.id) {
+                      setFirstBoothId(null);
+                      toast.info("First booth deselected");
+                    } else {
+                      handleSwapBooths(booth.id);
+                    }
+                  }
+                }}
+              >
                 <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold">
-                      Booth #{booth.table_no || "N/A"}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {booth.org_name}
-                    </p>
+                  <div className="flex items-start gap-3 flex-1">
+                    {!swapMode && (
+                      <Checkbox
+                        checked={selectedBooths.has(booth.id)}
+                        onCheckedChange={(checked) => {
+                          triggerHaptic();
+                          const newSelected = new Set(selectedBooths);
+                          if (checked) {
+                            newSelected.add(booth.id);
+                          } else {
+                            newSelected.delete(booth.id);
+                          }
+                          setSelectedBooths(newSelected);
+                        }}
+                        className="mt-1"
+                      />
+                    )}
+                    <div>
+                      <h3 className="font-semibold">
+                        Booth #{booth.table_no || "N/A"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {booth.org_name}
+                      </p>
+                    </div>
                   </div>
                   <div className="text-sm">
                     {currentGridPos ? (
@@ -274,58 +510,117 @@ export const BoothListEditor = () => {
                   </div>
                 </div>
 
-                {editingBoothId === booth.id ? (
-                  <div className="space-y-3 mt-3 pt-3 border-t">
-                    <BoothGridSelector
-                      selectedPosition={selectedGridPosition}
-                      occupiedPositions={occupiedGridPositions.filter(
-                        (pos) => pos.row !== currentGridPos?.row || pos.col !== currentGridPos?.col
-                      )}
-                      onSelectPosition={setSelectedGridPosition}
-                      backgroundImageUrl={floorPlan?.background_image_url || undefined}
-                    />
-
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => handleSavePosition(booth.id)}
-                        size="sm"
-                        disabled={!selectedGridPosition || isSaving}
-                        className="flex-1"
-                      >
-                        <Save className="w-4 h-4 mr-1" />
-                        {isSaving ? "Saving..." : "Save Position"}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
+                {editingBoothId === booth.id && (
+                  isMobile ? (
+                    <Drawer 
+                      open={true} 
+                      onOpenChange={(open) => {
+                        if (!open) {
                           setEditingBoothId(null);
                           setSelectedGridPosition(null);
-                        }}
-                      >
-                        Cancel
-                      </Button>
+                        }
+                      }}
+                    >
+                      <DrawerContent className="max-h-[85vh]">
+                        <DrawerHeader>
+                          <DrawerTitle>
+                            Position Booth #{booth.table_no}
+                          </DrawerTitle>
+                        </DrawerHeader>
+                        <div className="p-4 overflow-y-auto">
+                          <BoothGridSelector
+                            selectedPosition={selectedGridPosition}
+                            occupiedPositions={occupiedGridPositions.filter(
+                              (pos) => pos.row !== currentGridPos?.row || pos.col !== currentGridPos?.col
+                            )}
+                            onSelectPosition={setSelectedGridPosition}
+                            backgroundImageUrl={floorPlan?.background_image_url || undefined}
+                            zones={floorPlan?.zones || []}
+                            gridOpacity={floorPlan?.grid_opacity || 0.6}
+                          />
+                        </div>
+                        <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2">
+                          <Button
+                            onClick={() => handleSavePosition(booth.id)}
+                            size="lg"
+                            disabled={!selectedGridPosition}
+                            className="flex-1 min-h-[48px]"
+                          >
+                            <Save className="w-4 h-4 mr-2" />
+                            Save Position
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="lg"
+                            onClick={() => {
+                              setEditingBoothId(null);
+                              setSelectedGridPosition(null);
+                            }}
+                            className="min-h-[48px]"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
+                  ) : (
+                    <div className="space-y-3 mt-3 pt-3 border-t">
+                      <BoothGridSelector
+                        selectedPosition={selectedGridPosition}
+                        occupiedPositions={occupiedGridPositions.filter(
+                          (pos) => pos.row !== currentGridPos?.row || pos.col !== currentGridPos?.col
+                        )}
+                        onSelectPosition={setSelectedGridPosition}
+                        backgroundImageUrl={floorPlan?.background_image_url || undefined}
+                        zones={floorPlan?.zones || []}
+                        gridOpacity={floorPlan?.grid_opacity || 0.6}
+                      />
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleSavePosition(booth.id)}
+                          size="sm"
+                          disabled={!selectedGridPosition}
+                          className="flex-1"
+                        >
+                          <Save className="w-4 h-4 mr-1" />
+                          Save Position
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingBoothId(null);
+                            setSelectedGridPosition(null);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
+                  )
+                )}
+
+                {editingBoothId !== booth.id && !swapMode && (
                   <div className="flex gap-2 mt-2">
                     <Button
                       variant="outline"
-                      size="sm"
+                      size={isMobile ? "lg" : "sm"}
                       onClick={() => {
                         setEditingBoothId(booth.id);
                         setSelectedGridPosition(currentGridPos);
                       }}
-                      className="flex-1"
+                      className={cn("flex-1", isMobile && "min-h-[48px]")}
                     >
                       <MapPin className="w-4 h-4 mr-1" />
                       Edit Position
                     </Button>
                     <Button
                       variant="secondary"
-                      size="sm"
+                      size={isMobile ? "lg" : "sm"}
                       onClick={() => handleAutoAssign(booth.id)}
                       disabled={isSaving}
+                      className={cn(isMobile && "min-h-[48px]")}
                     >
                       Auto-Assign
                     </Button>
@@ -344,6 +639,18 @@ export const BoothListEditor = () => {
           </p>
         </Card>
       )}
+
+      <BulkMoveDialog
+        open={showBulkMove}
+        onClose={() => setShowBulkMove(false)}
+        boothIds={Array.from(selectedBooths)}
+        occupiedPositions={occupiedGridPositions}
+        onSuccess={() => {
+          setSelectedBooths(new Set());
+          setShowBulkMove(false);
+          refetchBooths();
+        }}
+      />
     </div>
   );
 };
