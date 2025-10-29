@@ -28,7 +28,6 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
     table_no: booth.table_no || "",
     org_name: booth.org_name || "",
     description: booth.description || "",
-    notes: booth.notes || "",
     sponsor_tier: booth.sponsor_tier || "standard",
     x_position: booth.x_position?.toString() || "",
     y_position: booth.y_position?.toString() || "",
@@ -51,7 +50,6 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       table_no: booth.table_no || "",
       org_name: booth.org_name || "",
       description: booth.description || "",
-      notes: booth.notes || "",
       sponsor_tier: booth.sponsor_tier || "standard",
       x_position: booth.x_position?.toString() || "",
       y_position: booth.y_position?.toString() || "",
@@ -71,7 +69,6 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
           table_no: formData.table_no,
           org_name: formData.org_name,
           description: formData.description,
-          notes: formData.notes,
           sponsor_tier: formData.sponsor_tier,
           x_position: formData.x_position ? parseFloat(formData.x_position) : null,
           y_position: formData.y_position ? parseFloat(formData.y_position) : null,
@@ -216,17 +213,6 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Enter booth description"
               rows={4}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Special Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Enter special notes or stage information"
-              rows={3}
             />
           </div>
 

@@ -13,7 +13,6 @@ export interface Booth {
   contact_name: string | null;
   contact_email: string | null;
   contact_phone: string | null;
-  notes: string | null;
   description: string | null;
   latitude: number | null;
   longitude: number | null;

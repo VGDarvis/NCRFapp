@@ -48,7 +48,6 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
     table_no: "",
     org_name: "",
     description: "",
-    notes: "",
     sponsor_tier: "standard",
   });
 
@@ -66,7 +65,6 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
         table_no: "",
         org_name: "",
         description: "",
-        notes: "",
         sponsor_tier: "standard",
       });
     }
@@ -107,7 +105,6 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
         table_no: formData.table_no,
         org_name: formData.org_name,
         description: formData.description || null,
-        notes: formData.notes || null,
         sponsor_tier: formData.sponsor_tier,
         ...positions,
       };
@@ -224,17 +221,6 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Enter booth description"
               rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Special Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Enter special notes or stage information"
-              rows={2}
             />
           </div>
 
