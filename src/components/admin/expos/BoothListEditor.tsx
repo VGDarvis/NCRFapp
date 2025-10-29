@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths } from "@/hooks/useBooths";
 import {
@@ -12,11 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Grid, MapPin, Save } from "lucide-react";
+import { Search, Grid, MapPin, Save, Repeat, Move } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BoothGridSelector } from "./BoothGridSelector";
+import { BulkMoveDialog } from "./BulkMoveDialog";
+import { LayoutCopier } from "./LayoutCopier";
+import { ZoneManager } from "./ZoneManager";
 import { useFloorPlans } from "@/hooks/useFloorPlans";
+import { useMobileDetection } from "@/hooks/useMobileDetection";
 import {
   GridPosition,
   gridToCoordinates,
@@ -30,6 +36,12 @@ export const BoothListEditor = () => {
   const [editingBoothId, setEditingBoothId] = useState<string | null>(null);
   const [selectedGridPosition, setSelectedGridPosition] = useState<GridPosition | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [swapMode, setSwapMode] = useState(false);
+  const [firstBoothId, setFirstBoothId] = useState<string | null>(null);
+  const [selectedBooths, setSelectedBooths] = useState<Set<string>>(new Set());
+  const [showBulkMove, setShowBulkMove] = useState(false);
+  
+  const { isMobile } = useMobileDetection();
 
   const { events } = useEvents();
   const { data: booths, refetch: refetchBooths } = useBooths(selectedEvent || null);

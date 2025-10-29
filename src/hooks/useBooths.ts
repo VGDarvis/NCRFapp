@@ -33,6 +33,8 @@ export interface Booth {
   y_position: number | null;
   booth_width: number | null;
   booth_depth: number | null;
+  grid_row: number | null;
+  grid_col: number | null;
   sponsor?: {
     id: string;
     name: string;

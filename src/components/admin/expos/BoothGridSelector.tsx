@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import {
   GRID_COLS,
   GRID_ROWS,
@@ -9,6 +11,8 @@ import {
   getGridLabel,
   getPresetPosition,
 } from "@/hooks/useGridPositioning";
+import { Zone } from "@/hooks/useZones";
+import { useMobileDetection } from "@/hooks/useMobileDetection";
 import { cn } from "@/lib/utils";
 
 interface BoothGridSelectorProps {
@@ -16,6 +20,9 @@ interface BoothGridSelectorProps {
   occupiedPositions: GridPosition[];
   onSelectPosition: (position: GridPosition) => void;
   backgroundImageUrl?: string;
+  zones?: Zone[];
+  gridOpacity?: number;
+  onGridOpacityChange?: (opacity: number) => void;
 }
 
 export const BoothGridSelector = ({
@@ -23,8 +30,17 @@ export const BoothGridSelector = ({
   occupiedPositions,
   onSelectPosition,
   backgroundImageUrl,
+  zones = [],
+  gridOpacity = 0.6,
+  onGridOpacityChange,
 }: BoothGridSelectorProps) => {
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
+  const { isMobile } = useMobileDetection();
+  
+  // Responsive cell size
+  const cellSize = isMobile ? 40 : 50;
+  const gridWidth = GRID_COLS * cellSize;
+  const gridHeight = GRID_ROWS * cellSize;
 
   const isCellOccupied = (row: number, col: number) => {
     return occupiedPositions.some((pos) => pos.row === row && pos.col === col);
@@ -36,6 +52,10 @@ export const BoothGridSelector = ({
 
   const handleCellClick = (row: number, col: number) => {
     if (!isCellOccupied(row, col)) {
+      // Haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
       onSelectPosition({ row, col });
     }
   };
@@ -137,12 +157,12 @@ export const BoothGridSelector = ({
           )}
         </div>
 
-        <div className="relative w-full overflow-x-auto">
+        <div className="relative w-full overflow-x-auto pb-6">
           <div
             className="relative mx-auto"
             style={{
-              width: `${GRID_COLS * 50}px`,
-              height: `${GRID_ROWS * 50}px`,
+              width: `${gridWidth}px`,
+              height: `${gridHeight}px`,
               minWidth: "320px",
             }}
           >
@@ -155,8 +175,40 @@ export const BoothGridSelector = ({
               />
             )}
 
+            {/* Zone overlays */}
+            {zones.map((zone) => (
+              <div
+                key={zone.id}
+                className="absolute border-2 pointer-events-none rounded"
+                style={{
+                  left: `${zone.startCol * cellSize}px`,
+                  top: `${zone.startRow * cellSize}px`,
+                  width: `${zone.cols * cellSize}px`,
+                  height: `${zone.rows * cellSize}px`,
+                  borderColor: zone.color,
+                  backgroundColor: `${zone.color}15`,
+                }}
+              >
+                <span
+                  className="absolute top-1 left-1 text-xs font-semibold px-1 rounded"
+                  style={{
+                    backgroundColor: zone.color,
+                    color: 'white',
+                  }}
+                >
+                  {zone.name}
+                </span>
+              </div>
+            ))}
+
             {/* Grid cells */}
-            <div className="relative grid" style={{ gridTemplateColumns: `repeat(${GRID_COLS}, 50px)` }}>
+            <div 
+              className="relative grid" 
+              style={{ 
+                gridTemplateColumns: `repeat(${GRID_COLS}, ${cellSize}px)`,
+                opacity: gridOpacity,
+              }}
+            >
               {Array.from({ length: GRID_ROWS }).map((_, row) =>
                 Array.from({ length: GRID_COLS }).map((_, col) => {
                   const occupied = isCellOccupied(row, col);
@@ -171,7 +223,7 @@ export const BoothGridSelector = ({
                       onMouseLeave={() => setHoveredCell(null)}
                       disabled={occupied}
                       className={cn(
-                        "w-[50px] h-[50px] border transition-all touch-manipulation",
+                        `w-[${cellSize}px] h-[${cellSize}px] border transition-all touch-manipulation`,
                         "hover:scale-105 active:scale-95",
                         occupied && "bg-destructive/20 border-destructive cursor-not-allowed",
                         !occupied && "bg-background border-border hover:bg-accent",
@@ -179,6 +231,8 @@ export const BoothGridSelector = ({
                         hovered && !occupied && !selected && "bg-secondary border-secondary"
                       )}
                       style={{
+                        width: `${cellSize}px`,
+                        height: `${cellSize}px`,
                         minWidth: "44px",
                         minHeight: "44px",
                       }}

@@ -1937,6 +1937,7 @@ export type Database = {
           created_at: string
           floor_name: string | null
           floor_number: number
+          grid_opacity: number | null
           height_meters: number | null
           id: string
           image_url: string | null
@@ -1945,6 +1946,7 @@ export type Database = {
           updated_at: string
           venue_id: string
           width_meters: number | null
+          zones: Json | null
         }
         Insert: {
           background_image_url?: string | null
@@ -1953,6 +1955,7 @@ export type Database = {
           created_at?: string
           floor_name?: string | null
           floor_number?: number
+          grid_opacity?: number | null
           height_meters?: number | null
           id?: string
           image_url?: string | null
@@ -1961,6 +1964,7 @@ export type Database = {
           updated_at?: string
           venue_id: string
           width_meters?: number | null
+          zones?: Json | null
         }
         Update: {
           background_image_url?: string | null
@@ -1969,6 +1973,7 @@ export type Database = {
           created_at?: string
           floor_name?: string | null
           floor_number?: number
+          grid_opacity?: number | null
           height_meters?: number | null
           id?: string
           image_url?: string | null
@@ -1977,6 +1982,7 @@ export type Database = {
           updated_at?: string
           venue_id?: string
           width_meters?: number | null
+          zones?: Json | null
         }
         Relationships: [
           {

@@ -1,16 +1,25 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { MapPin, Calendar, Info, Edit3, MousePointerClick, List } from "lucide-react";
+import { MapPin, Calendar, Info, Edit3, MousePointerClick, List, FolderTree, ImageIcon } from "lucide-react";
 import { FloorPlanManagement } from "../events/FloorPlanManagement";
 import { BoothEditorTab } from "./BoothEditorTab";
 import { FloorPlanEditorTab } from "./FloorPlanEditorTab";
 import { BoothListEditor } from "./BoothListEditor";
+import { ZoneManager } from "./ZoneManager";
+import { FloorPlanImageUpload } from "./FloorPlanImageUpload";
 import { useEvents } from "@/hooks/useEvents";
+import { useFloorPlans } from "@/hooks/useFloorPlans";
+import { useState } from "react";
 
 export const ExposModule = () => {
   const { events } = useEvents();
-
+  const [selectedEventForSettings, setSelectedEventForSettings] = useState<string>("");
+  
   const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
+  const selectedEventData = collegeExpos.find(e => e.id === selectedEventForSettings);
+  const venueId = selectedEventData?.venue?.id || null;
+  const { data: floorPlans } = useFloorPlans(venueId);
+  const floorPlan = floorPlans?.[0] || null;
 
   return (
     <div className="space-y-6">
@@ -27,9 +36,13 @@ export const ExposModule = () => {
             <List className="w-4 h-4" />
             Booth List Editor
           </TabsTrigger>
-          <TabsTrigger value="floor-plan-editor" className="gap-2">
-            <MousePointerClick className="w-4 h-4" />
-            Canvas Editor
+          <TabsTrigger value="zones" className="gap-2">
+            <FolderTree className="w-4 h-4" />
+            Zones
+          </TabsTrigger>
+          <TabsTrigger value="floor-plan-settings" className="gap-2">
+            <ImageIcon className="w-4 h-4" />
+            Floor Plan Settings
           </TabsTrigger>
           <TabsTrigger value="edit-booths" className="gap-2">
             <Edit3 className="w-4 h-4" />
@@ -49,8 +62,12 @@ export const ExposModule = () => {
           <BoothListEditor />
         </TabsContent>
 
-        <TabsContent value="floor-plan-editor" className="space-y-4">
-          <FloorPlanEditorTab />
+        <TabsContent value="zones" className="space-y-4">
+          <ZoneManager floorPlanId={floorPlan?.id || null} />
+        </TabsContent>
+
+        <TabsContent value="floor-plan-settings" className="space-y-4">
+          <FloorPlanImageUpload floorPlanId={floorPlan?.id || null} />
         </TabsContent>
 
         <TabsContent value="edit-booths" className="space-y-4">

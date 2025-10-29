@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useAvailableBoothNumbers, useOrganizationOptions } from "@/hooks/useBoothPresets";
 import { useBooths } from "@/hooks/useBooths";
+import { findNextAvailableCell, gridToCoordinates, getGridLabel, GridPosition } from "@/hooks/useGridPositioning";
 
 // Auto-calculate booth positions based on booth number
 const calculateBoothPosition = (boothNumber: string) => {
@@ -58,6 +59,11 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
   // Get assigned booth numbers
   const assignedBoothNumbers = new Set(existingBooths?.map(b => b.table_no) || []);
 
+  // Get occupied grid cells for auto-positioning
+  const occupiedCells: GridPosition[] = existingBooths
+    ?.filter((b: any) => b.grid_row !== null && b.grid_col !== null)
+    .map((b: any) => ({ row: b.grid_row!, col: b.grid_col! })) || [];
+
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
@@ -98,7 +104,17 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
       console.log("✅ Event ID:", eventId);
       console.log("✅ Booth data:", formData);
 
-      const positions = calculateBoothPosition(formData.table_no);
+      // Auto-assign to next available grid cell
+      const nextCell = findNextAvailableCell(occupiedCells);
+      if (!nextCell) {
+        toast.error("No available grid positions", {
+          description: "All grid cells are occupied",
+        });
+        setSaving(false);
+        return;
+      }
+
+      const coords = gridToCoordinates(nextCell);
       
       const boothData = {
         event_id: eventId,
@@ -106,7 +122,12 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
         org_name: formData.org_name,
         description: formData.description || null,
         sponsor_tier: formData.sponsor_tier,
-        ...positions,
+        grid_row: nextCell.row,
+        grid_col: nextCell.col,
+        x_position: coords.x,
+        y_position: coords.y,
+        booth_width: 100,
+        booth_depth: 100,
       };
 
       console.log("📤 Inserting booth data:", boothData);

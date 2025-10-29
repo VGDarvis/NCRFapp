@@ -80,6 +80,50 @@ export const findNextAvailableCell = (
 };
 
 /**
+ * Get multiple positions starting from a cell (for bulk moves)
+ */
+export const getBulkGridPositions = (
+  startCell: GridPosition,
+  count: number,
+  occupiedCells: GridPosition[]
+): GridPosition[] => {
+  const positions: GridPosition[] = [];
+  let row = startCell.row;
+  let col = startCell.col;
+
+  for (let i = 0; i < count; i++) {
+    positions.push({ row, col });
+    col++;
+    if (col >= GRID_COLS) {
+      col = 0;
+      row++;
+      if (row >= GRID_ROWS) {
+        break; // Can't fit all booths
+      }
+    }
+  }
+
+  return positions;
+};
+
+/**
+ * Check if a zone is valid
+ */
+export const isValidZone = (zone: {
+  startRow: number;
+  startCol: number;
+  rows: number;
+  cols: number;
+}): boolean => {
+  return (
+    zone.startRow >= 0 &&
+    zone.startRow + zone.rows <= GRID_ROWS &&
+    zone.startCol >= 0 &&
+    zone.startCol + zone.cols <= GRID_COLS
+  );
+};
+
+/**
  * Get position preset coordinates
  */
 export const getPresetPosition = (preset: string): GridPosition => {

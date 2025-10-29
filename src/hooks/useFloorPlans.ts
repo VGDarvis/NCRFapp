@@ -14,6 +14,8 @@ export interface FloorPlan {
   width_meters: number | null;
   height_meters: number | null;
   scale_factor: number;
+  grid_opacity: number | null;
+  zones: any | null;
   created_at: string;
   updated_at: string;
 }
