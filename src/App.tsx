@@ -17,6 +17,7 @@ import ShopCategory from "./pages/ShopCategory";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import SchoolFinder from "./pages/SchoolFinder";
+import ComingSoon from "./pages/ComingSoon";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,9 @@ function App() {
             
             {/* School Finder */}
             <Route path="/school-finder" element={<SchoolFinder />} />
+            
+            {/* Coming Soon */}
+            <Route path="/coming-soon" element={<ComingSoon />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

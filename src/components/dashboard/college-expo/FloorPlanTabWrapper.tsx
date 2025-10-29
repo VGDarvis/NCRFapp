@@ -41,7 +41,7 @@ export const FloorPlanTabWrapper = () => {
       <div className="container mx-auto px-4 py-8">
         <Card className="p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading floor plan...</p>
+          <p className="text-muted-foreground">Loading BCE Map...</p>
         </Card>
       </div>
     );
@@ -51,7 +51,7 @@ export const FloorPlanTabWrapper = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="p-12 text-center">
-          <h3 className="text-xl font-semibold mb-2">No Event Available</h3>
+          <h3 className="text-xl font-semibold mb-2">No BCE Map Available</h3>
           <p className="text-muted-foreground">
             There are no upcoming events at this time.
           </p>

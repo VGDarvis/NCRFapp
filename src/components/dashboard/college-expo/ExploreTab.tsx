@@ -14,7 +14,7 @@ export const ExploreTab = () => {
           </TabsTrigger>
           <TabsTrigger value="floor-plan" className="flex items-center gap-2">
             <Grid3x3 className="h-4 w-4" />
-            <span>Floor Plan</span>
+            <span>BCE Map</span>
           </TabsTrigger>
         </TabsList>
 

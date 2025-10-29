@@ -5,6 +5,7 @@ import { VideoSection } from './VideoSection';
 import { Button } from './ui/button';
 import { Shield, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export const LogoSelectionLanding = () => {
   const navigate = useNavigate();
@@ -23,7 +24,12 @@ export const LogoSelectionLanding = () => {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate('/shop')}
+          onClick={() => {
+            toast.info('Shop Coming Soon', {
+              description: 'Our merchandise store will be available soon!',
+              duration: 3000,
+            });
+          }}
           className="gap-2 glass-premium border-primary/30 hover:border-primary/60"
         >
           <ShoppingBag className="w-4 h-4" />
@@ -50,11 +56,8 @@ export const LogoSelectionLanding = () => {
           className="text-center mb-8 md:mb-12 glass-premium rounded-2xl p-8 md:p-12"
         >
           <h1 className="text-4xl md:text-6xl font-display font-bold cyber-text-glow mb-4">
-            National College Resources Foundation Programs
+            National College Resources Foundation
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Select your program to begin your journey
-          </p>
         </motion.div>
 
         {/* Video Section */}

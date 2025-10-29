@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 // Import logo assets
 import logoGreenClean from '@/assets/logo-green-clean.png';
@@ -64,7 +66,14 @@ export const RotatingLogoCircle = () => {
   const navigate = useNavigate();
 
   const handleProgramSelect = (program: Program) => {
-    navigate(program.route);
+    if (program.id === 'college-expo') {
+      navigate(program.route);
+    } else {
+      toast.info('Coming Soon', {
+        description: `${program.name} will be available when the full app launches. Stay tuned!`,
+        duration: 4000,
+      });
+    }
   };
 
   const circleRadius = 180; // Desktop radius
@@ -99,17 +108,26 @@ export const RotatingLogoCircle = () => {
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <div
-                  className="w-32 h-32 rounded-full glass-premium p-3 logo-glow glass-hover glass-glow transition-all duration-300 flex items-center justify-center"
-                  style={{
-                    boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
-                  }}
-                >
-                  <img
-                    src={program.logo}
-                    alt={program.name}
-                    className="w-full h-full object-contain"
-                  />
+                <div className="relative">
+                  <div
+                    className={`w-32 h-32 rounded-full glass-premium p-3 logo-glow glass-hover glass-glow transition-all duration-300 flex items-center justify-center ${
+                      program.id !== 'college-expo' ? 'opacity-60' : ''
+                    }`}
+                    style={{
+                      boxShadow: `0 0 25px ${program.color}40, 0 0 50px ${program.color}20`
+                    }}
+                  >
+                    <img
+                      src={program.logo}
+                      alt={program.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  {program.id !== 'college-expo' && (
+                    <Badge className="absolute -top-2 -right-2 text-[8px] px-1.5 py-0.5">
+                      Soon
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-xs text-center mt-2 text-foreground font-medium">
                   {program.name}
@@ -147,17 +165,26 @@ export const RotatingLogoCircle = () => {
                 }}
                 onClick={() => handleProgramSelect(program)}
               >
-                <div
-                  className="w-20 h-20 rounded-full glass-premium p-1.5 logo-glow glass-hover glass-glow transition-all duration-300 flex items-center justify-center"
-                  style={{
-                    boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
-                  }}
-                >
-                  <img
-                    src={program.logo}
-                    alt={program.name}
-                    className="w-full h-full object-contain"
-                  />
+                <div className="relative">
+                  <div
+                    className={`w-20 h-20 rounded-full glass-premium p-1.5 logo-glow glass-hover glass-glow transition-all duration-300 flex items-center justify-center ${
+                      program.id !== 'college-expo' ? 'opacity-60' : ''
+                    }`}
+                    style={{
+                      boxShadow: `0 0 18px ${program.color}40, 0 0 36px ${program.color}20`
+                    }}
+                  >
+                    <img
+                      src={program.logo}
+                      alt={program.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  {program.id !== 'college-expo' && (
+                    <Badge className="absolute -top-1 -right-1 text-[6px] px-1 py-0">
+                      Soon
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-[10px] text-center mt-1 text-foreground font-medium">
                   {program.name}
