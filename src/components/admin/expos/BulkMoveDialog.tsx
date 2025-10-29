@@ -11,6 +11,7 @@ interface BulkMoveDialogProps {
   onClose: () => void;
   boothIds: string[];
   occupiedPositions: GridPosition[];
+  booths?: any[];
   onSuccess: () => void;
 }
 
@@ -19,6 +20,7 @@ export function BulkMoveDialog({
   onClose,
   boothIds,
   occupiedPositions,
+  booths = [],
   onSuccess,
 }: BulkMoveDialogProps) {
   const [startPosition, setStartPosition] = useState<GridPosition | null>(null);
@@ -83,6 +85,7 @@ export function BulkMoveDialog({
               (pos) => !boothIds.some((id) => id === (pos as any).boothId)
             )}
             onSelectPosition={setStartPosition}
+            booths={booths}
           />
         </div>
 

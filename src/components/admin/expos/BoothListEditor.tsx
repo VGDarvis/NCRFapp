@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths } from "@/hooks/useBooths";
 import {
@@ -14,12 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Grid, MapPin, Save, Repeat, Move } from "lucide-react";
+import { Search, Grid, MapPin, Save, Repeat, Move, ChevronDown, Settings, FolderTree } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BoothGridSelector } from "./BoothGridSelector";
 import { BulkMoveDialog } from "./BulkMoveDialog";
 import { LayoutCopier } from "./LayoutCopier";
+import { ZoneManager } from "./ZoneManager";
+import { FloorPlanImageUpload } from "./FloorPlanImageUpload";
 import { useFloorPlans } from "@/hooks/useFloorPlans";
 import { useMobileDetection } from "@/hooks/useMobileDetection";
 import { cn } from "@/lib/utils";
@@ -37,7 +40,11 @@ const triggerHaptic = () => {
   }
 };
 
-export const BoothListEditor = () => {
+interface BoothListEditorProps {
+  floorPlanId?: string | null;
+}
+
+export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [editingBoothId, setEditingBoothId] = useState<string | null>(null);
@@ -47,6 +54,8 @@ export const BoothListEditor = () => {
   const [firstBoothId, setFirstBoothId] = useState<string | null>(null);
   const [selectedBooths, setSelectedBooths] = useState<Set<string>>(new Set());
   const [showBulkMove, setShowBulkMove] = useState(false);
+  const [floorPlanSettingsOpen, setFloorPlanSettingsOpen] = useState(false);
+  const [zoneManagerOpen, setZoneManagerOpen] = useState(false);
   
   const { isMobile } = useMobileDetection();
 
@@ -363,6 +372,44 @@ export const BoothListEditor = () => {
         )}
       </Card>
 
+      {selectedEvent && floorPlanId && (
+        <>
+          <Collapsible open={floorPlanSettingsOpen} onOpenChange={setFloorPlanSettingsOpen}>
+            <Card className="p-4">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between p-0 hover:bg-transparent">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    <h3 className="text-lg font-semibold">Floor Plan Settings</h3>
+                  </div>
+                  <ChevronDown className={cn("w-5 h-5 transition-transform", floorPlanSettingsOpen && "rotate-180")} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-4">
+                <FloorPlanImageUpload floorPlanId={floorPlanId} />
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+
+          <Collapsible open={zoneManagerOpen} onOpenChange={setZoneManagerOpen}>
+            <Card className="p-4">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="w-full justify-between p-0 hover:bg-transparent">
+                  <div className="flex items-center gap-2">
+                    <FolderTree className="w-5 h-5" />
+                    <h3 className="text-lg font-semibold">Zone Management</h3>
+                  </div>
+                  <ChevronDown className={cn("w-5 h-5 transition-transform", zoneManagerOpen && "rotate-180")} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-4">
+                <ZoneManager floorPlanId={floorPlanId} />
+              </CollapsibleContent>
+            </Card>
+          </Collapsible>
+        </>
+      )}
+
       {selectedEvent && booths && booths.length > 0 && (
         <Card className="p-4">
           <h3 className="text-lg font-semibold mb-3">Quick Tools</h3>
@@ -537,6 +584,7 @@ export const BoothListEditor = () => {
                             backgroundImageUrl={floorPlan?.background_image_url || undefined}
                             zones={floorPlan?.zones || []}
                             gridOpacity={floorPlan?.grid_opacity || 0.6}
+                            booths={booths}
                           />
                         </div>
                         <div className="sticky bottom-0 left-0 right-0 bg-background border-t p-4 flex gap-2">
@@ -574,6 +622,7 @@ export const BoothListEditor = () => {
                         backgroundImageUrl={floorPlan?.background_image_url || undefined}
                         zones={floorPlan?.zones || []}
                         gridOpacity={floorPlan?.grid_opacity || 0.6}
+                        booths={booths}
                       />
 
                       <div className="flex gap-2">
@@ -645,6 +694,7 @@ export const BoothListEditor = () => {
         onClose={() => setShowBulkMove(false)}
         boothIds={Array.from(selectedBooths)}
         occupiedPositions={occupiedGridPositions}
+        booths={booths || []}
         onSuccess={() => {
           setSelectedBooths(new Set());
           setShowBulkMove(false);

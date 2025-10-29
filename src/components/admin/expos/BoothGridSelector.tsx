@@ -23,6 +23,7 @@ interface BoothGridSelectorProps {
   zones?: Zone[];
   gridOpacity?: number;
   onGridOpacityChange?: (opacity: number) => void;
+  booths?: any[];
 }
 
 export const BoothGridSelector = ({
@@ -33,6 +34,7 @@ export const BoothGridSelector = ({
   zones = [],
   gridOpacity = 0.6,
   onGridOpacityChange,
+  booths = [],
 }: BoothGridSelectorProps) => {
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
   const { isMobile } = useMobileDetection();
@@ -41,6 +43,16 @@ export const BoothGridSelector = ({
   const cellSize = isMobile ? 40 : 50;
   const gridWidth = GRID_COLS * cellSize;
   const gridHeight = GRID_ROWS * cellSize;
+
+  // Helper to get booth info for a grid position
+  const getBoothInfo = (row: number, col: number) => {
+    return booths.find((b: any) => b.grid_row === row && b.grid_col === col);
+  };
+
+  const getBoothNumber = (row: number, col: number) => {
+    const booth = getBoothInfo(row, col);
+    return booth?.table_no || null;
+  };
 
   const isCellOccupied = (row: number, col: number) => {
     return occupiedPositions.some((pos) => pos.row === row && pos.col === col);
@@ -214,6 +226,8 @@ export const BoothGridSelector = ({
                   const occupied = isCellOccupied(row, col);
                   const selected = isCellSelected(row, col);
                   const hovered = hoveredCell?.row === row && hoveredCell?.col === col;
+                  const boothNumber = getBoothNumber(row, col);
+                  const boothInfo = getBoothInfo(row, col);
 
                   return (
                     <button
@@ -222,8 +236,9 @@ export const BoothGridSelector = ({
                       onMouseEnter={() => setHoveredCell({ row, col })}
                       onMouseLeave={() => setHoveredCell(null)}
                       disabled={occupied}
+                      title={boothInfo ? `Booth #${boothInfo.table_no} - ${boothInfo.org_name || 'No org'}` : undefined}
                       className={cn(
-                        `w-[${cellSize}px] h-[${cellSize}px] border transition-all touch-manipulation`,
+                        `w-[${cellSize}px] h-[${cellSize}px] border transition-all touch-manipulation flex flex-col items-center justify-center gap-0.5`,
                         "hover:scale-105 active:scale-95",
                         occupied && "bg-destructive/20 border-destructive cursor-not-allowed",
                         !occupied && "bg-background border-border hover:bg-accent",
@@ -237,8 +252,25 @@ export const BoothGridSelector = ({
                         minHeight: "44px",
                       }}
                     >
-                      {selected && <span className="text-xs font-bold">✓</span>}
-                      {occupied && !selected && <span className="text-xs">✕</span>}
+                      {boothNumber && (
+                        <span className={cn(
+                          "font-bold leading-none",
+                          isMobile ? "text-[8px]" : "text-[10px]"
+                        )}>
+                          {boothNumber.length > 4 ? `${boothNumber.slice(0, 3)}...` : boothNumber}
+                        </span>
+                      )}
+                      <div className="flex items-center justify-center">
+                        {selected && (
+                          <span className="w-2 h-2 rounded-full bg-green-500" title="Selected" />
+                        )}
+                        {occupied && !selected && (
+                          <span className="w-2 h-2 rounded-full bg-red-500" title="Occupied" />
+                        )}
+                        {!occupied && !selected && (
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground/30" title="Available" />
+                        )}
+                      </div>
                     </button>
                   );
                 })
