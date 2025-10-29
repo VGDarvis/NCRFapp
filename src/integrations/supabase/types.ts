@@ -553,6 +553,8 @@ export type Database = {
           event_id: string
           floor_number: number | null
           floor_plan_id: string | null
+          grid_col: number | null
+          grid_row: number | null
           id: string
           is_featured: boolean | null
           latitude: number | null
@@ -586,6 +588,8 @@ export type Database = {
           event_id: string
           floor_number?: number | null
           floor_plan_id?: string | null
+          grid_col?: number | null
+          grid_row?: number | null
           id?: string
           is_featured?: boolean | null
           latitude?: number | null
@@ -619,6 +623,8 @@ export type Database = {
           event_id?: string
           floor_number?: number | null
           floor_plan_id?: string | null
+          grid_col?: number | null
+          grid_row?: number | null
           id?: string
           is_featured?: boolean | null
           latitude?: number | null

@@ -61,9 +61,9 @@ export const FloorPlanViewer = ({
             <div 
               className="relative bg-muted rounded-lg overflow-hidden mx-auto" 
               style={{ 
-                height: "600px",
-                width: "900px",
-                maxWidth: "100%"
+                width: "100%",
+                maxWidth: "1200px",
+                aspectRatio: "3/2",
               }}
             >
               <TransformComponent
@@ -75,18 +75,18 @@ export const FloorPlanViewer = ({
                   <img
                     src={floorPlan.background_image_url}
                     alt="Floor plan"
-                    className="absolute inset-0 w-full h-full object-contain"
+                    className="absolute inset-0 w-full h-full object-cover"
                     style={{ pointerEvents: "none" }}
                   />
                 )}
 
                 {/* Render booths as interactive overlays using real coordinates */}
                 <svg
-                  width="1200"
-                  height="800"
+                  width="100%"
+                  height="100%"
                   viewBox="0 0 1200 800"
-                  className="absolute inset-0 w-full h-full"
-                  preserveAspectRatio="none"
+                  className="absolute inset-0"
+                  preserveAspectRatio="xMidYMid meet"
                 >
                   {boothsWithPositions.map((booth) => {
                     const isHighlighted = highlightedBoothIds.includes(booth.id);

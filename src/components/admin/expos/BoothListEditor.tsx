@@ -2,204 +2,191 @@ import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Save, Eye, Grid3x3, LayoutList, Columns } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths } from "@/hooks/useBooths";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Grid, MapPin, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BoothQuickPosition } from "./BoothQuickPosition";
+import { BoothGridSelector } from "./BoothGridSelector";
+import { useFloorPlans } from "@/hooks/useFloorPlans";
+import {
+  GridPosition,
+  gridToCoordinates,
+  getGridLabel,
+  findNextAvailableCell,
+} from "@/hooks/useGridPositioning";
 
 export const BoothListEditor = () => {
-  const { events } = useEvents();
-  const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
-  
-  const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [editingBoothId, setEditingBoothId] = useState<string | null>(null);
-  const [previewBoothId, setPreviewBoothId] = useState<string | null>(null);
-  const [customX, setCustomX] = useState("");
-  const [customY, setCustomY] = useState("");
+  const [selectedGridPosition, setSelectedGridPosition] = useState<GridPosition | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  const { data: booths, refetch } = useBooths(selectedEventId);
+  const { events } = useEvents();
+  const { data: booths, refetch: refetchBooths } = useBooths(selectedEvent || null);
+  
+  // Get venue_id from selected event
+  const selectedEventData = events?.find((e) => e.id === selectedEvent);
+  const venueId = selectedEventData?.venue?.id || null;
+  const { data: floorPlans } = useFloorPlans(venueId);
+  const floorPlan = floorPlans?.[0] || null;
+
+  const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
 
   const filteredBooths = useMemo(() => {
     if (!booths) return [];
-    return booths.filter((booth) => {
-      const searchLower = searchQuery.toLowerCase();
-      return (
-        booth.table_no?.toLowerCase().includes(searchLower) ||
-        booth.org_name?.toLowerCase().includes(searchLower)
-      );
-    });
+    return booths.filter(
+      (booth) =>
+        booth.table_no?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booth.org_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   }, [booths, searchQuery]);
 
-  const handleQuickPosition = async (boothId: string, x: number, y: number) => {
+  const occupiedGridPositions = useMemo((): GridPosition[] => {
+    if (!booths) return [];
+    return booths
+      .filter((b: any) => b.grid_row !== null && b.grid_col !== null)
+      .map((b: any) => ({ row: b.grid_row!, col: b.grid_col! }));
+  }, [booths]);
+
+  const handleSavePosition = async (boothId: string) => {
+    if (!selectedGridPosition) {
+      toast.error("Please select a grid position");
+      return;
+    }
+
     setIsSaving(true);
+    const coords = gridToCoordinates(selectedGridPosition);
+
     try {
       const { error } = await supabase
         .from("booths")
-        .update({ x_position: x, y_position: y })
+        .update({
+          grid_row: selectedGridPosition.row,
+          grid_col: selectedGridPosition.col,
+          x_position: coords.x,
+          y_position: coords.y,
+        })
         .eq("id", boothId);
 
       if (error) throw error;
 
-      toast.success("Booth position updated");
-      refetch();
+      toast.success(`Booth positioned at ${getGridLabel(selectedGridPosition)}`);
       setEditingBoothId(null);
-      setPreviewBoothId(null);
-    } catch (error) {
-      console.error("Error updating booth:", error);
+      setSelectedGridPosition(null);
+      refetchBooths();
+    } catch (error: any) {
+      console.error("Error updating booth position:", error);
       toast.error("Failed to update booth position");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleCustomPosition = async (boothId: string) => {
-    const x = parseFloat(customX);
-    const y = parseFloat(customY);
-
-    if (isNaN(x) || isNaN(y)) {
-      toast.error("Please enter valid X and Y coordinates");
+  const handleAutoAssign = async (boothId: string) => {
+    const nextCell = findNextAvailableCell(occupiedGridPositions);
+    if (!nextCell) {
+      toast.error("No available grid cells");
       return;
     }
 
-    if (x < 0 || x > 1200 || y < 0 || y > 800) {
-      toast.error("Position out of bounds (0-1200 for X, 0-800 for Y)");
-      return;
-    }
+    setIsSaving(true);
+    const coords = gridToCoordinates(nextCell);
 
-    await handleQuickPosition(boothId, x, y);
-    setCustomX("");
-    setCustomY("");
+    try {
+      const { error } = await supabase
+        .from("booths")
+        .update({
+          grid_row: nextCell.row,
+          grid_col: nextCell.col,
+          x_position: coords.x,
+          y_position: coords.y,
+        })
+        .eq("id", boothId);
+
+      if (error) throw error;
+
+      toast.success(`Booth auto-assigned to ${getGridLabel(nextCell)}`);
+      refetchBooths();
+    } catch (error: any) {
+      console.error("Error auto-assigning booth:", error);
+      toast.error("Failed to auto-assign booth");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleAutoArrangeGrid = async () => {
+  const handleAutoArrangeAll = async () => {
     if (!booths || booths.length === 0) {
       toast.error("No booths to arrange");
       return;
     }
 
     setIsSaving(true);
-    try {
-      const cols = Math.ceil(Math.sqrt(booths.length));
-      const rows = Math.ceil(booths.length / cols);
-      const spacingX = 1100 / cols;
-      const spacingY = 700 / rows;
-      const startX = 50;
-      const startY = 50;
+    const updates = [];
 
-      const updates = booths.map((booth, index) => {
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        return {
-          id: booth.id,
-          x_position: startX + col * spacingX,
-          y_position: startY + row * spacingY,
-        };
+    for (let i = 0; i < booths.length; i++) {
+      const row = Math.floor(i / 12); // 12 columns
+      const col = i % 12;
+      
+      if (row >= 8) break; // Only 8 rows available
+
+      const coords = gridToCoordinates({ row, col });
+      updates.push({
+        id: booths[i].id,
+        grid_row: row,
+        grid_col: col,
+        x_position: coords.x,
+        y_position: coords.y,
       });
-
-      for (const update of updates) {
-        await supabase
-          .from("booths")
-          .update({ x_position: update.x_position, y_position: update.y_position })
-          .eq("id", update.id);
-      }
-
-      toast.success(`Arranged ${booths.length} booths in ${rows}×${cols} grid`);
-      refetch();
-    } catch (error) {
-      console.error("Error arranging booths:", error);
-      toast.error("Failed to arrange booths");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleAutoArrangeRows = async () => {
-    if (!booths || booths.length === 0) {
-      toast.error("No booths to arrange");
-      return;
     }
 
-    setIsSaving(true);
     try {
-      const spacingY = 750 / booths.length;
-      const startX = 100;
-      const startY = 25;
-
-      const updates = booths.map((booth, index) => ({
-        id: booth.id,
-        x_position: startX,
-        y_position: startY + index * spacingY,
-      }));
-
       for (const update of updates) {
-        await supabase
+        const { error } = await supabase
           .from("booths")
-          .update({ x_position: update.x_position, y_position: update.y_position })
+          .update({
+            grid_row: update.grid_row,
+            grid_col: update.grid_col,
+            x_position: update.x_position,
+            y_position: update.y_position,
+          })
           .eq("id", update.id);
+
+        if (error) throw error;
       }
 
-      toast.success(`Arranged ${booths.length} booths in a single column`);
-      refetch();
-    } catch (error) {
-      console.error("Error arranging booths:", error);
-      toast.error("Failed to arrange booths");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleAutoArrangeCols = async () => {
-    if (!booths || booths.length === 0) {
-      toast.error("No booths to arrange");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const spacingX = 1100 / booths.length;
-      const startX = 50;
-      const startY = 400;
-
-      const updates = booths.map((booth, index) => ({
-        id: booth.id,
-        x_position: startX + index * spacingX,
-        y_position: startY,
-      }));
-
-      for (const update of updates) {
-        await supabase
-          .from("booths")
-          .update({ x_position: update.x_position, y_position: update.y_position })
-          .eq("id", update.id);
-      }
-
-      toast.success(`Arranged ${booths.length} booths in a single row`);
-      refetch();
-    } catch (error) {
-      console.error("Error arranging booths:", error);
-      toast.error("Failed to arrange booths");
+      toast.success(`Auto-arranged ${updates.length} booths in grid layout`);
+      refetchBooths();
+    } catch (error: any) {
+      console.error("Error auto-arranging booths:", error);
+      toast.error("Failed to auto-arrange booths");
     } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      {/* Event Selector & Search */}
+    <div className="container mx-auto p-4 space-y-4">
       <Card className="p-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label>Select Event</Label>
-            <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+        <h2 className="text-2xl font-bold mb-4">Booth List Editor</h2>
+        <p className="text-muted-foreground mb-6">
+          Position booths using the visual grid selector. Each cell represents a 100x100 pixel area.
+        </p>
+
+        <div className="grid gap-4 md:grid-cols-2 mb-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Select Event</label>
+            <Select value={selectedEvent} onValueChange={setSelectedEvent}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose an expo event..." />
               </SelectTrigger>
@@ -213,8 +200,8 @@ export const BoothListEditor = () => {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Search Booths</Label>
+          <div>
+            <label className="text-sm font-medium mb-2 block">Search Booths</label>
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -227,169 +214,122 @@ export const BoothListEditor = () => {
           </div>
         </div>
 
-        {/* Batch Operations */}
-        {selectedEventId && (
-          <div className="mt-4 flex gap-2 flex-wrap">
-            <Button
-              variant="outline"
+        {selectedEvent && booths && booths.length > 0 && (
+          <div className="flex gap-2 mb-4">
+            <Button 
+              onClick={handleAutoArrangeAll} 
+              variant="outline" 
               size="sm"
-              onClick={handleAutoArrangeGrid}
-              disabled={isSaving || !booths?.length}
+              disabled={isSaving}
             >
-              <Grid3x3 className="w-4 h-4 mr-2" />
-              Auto Grid
+              <Grid className="w-4 h-4 mr-2" />
+              Auto-Arrange All Booths
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAutoArrangeRows}
-              disabled={isSaving || !booths?.length}
-            >
-              <LayoutList className="w-4 h-4 mr-2" />
-              Single Column
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAutoArrangeCols}
-              disabled={isSaving || !booths?.length}
-            >
-              <Columns className="w-4 h-4 mr-2" />
-              Single Row
-            </Button>
+            <Badge variant="secondary">
+              {filteredBooths.length} booth{filteredBooths.length !== 1 ? "s" : ""}
+            </Badge>
           </div>
         )}
       </Card>
 
-      {/* Booth List */}
-      {selectedEventId && (
-        <Card>
-          <ScrollArea className="h-[600px]">
-            <div className="p-4 space-y-4">
-              {filteredBooths.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  {searchQuery ? "No booths found matching your search" : "No booths for this event"}
-                </p>
-              ) : (
-                filteredBooths.map((booth) => (
-                  <Card key={booth.id} className="p-4">
-                    <div className="space-y-3">
-                      {/* Booth Header */}
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-lg">
-                              Booth #{booth.table_no}
-                            </h4>
-                            {booth.sponsor_tier && (
-                              <Badge variant="outline" className="capitalize">
-                                {booth.sponsor_tier}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {booth.org_name || "No organization"}
-                          </p>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {booth.x_position !== null && booth.y_position !== null ? (
-                            <span>
-                              ({Math.round(booth.x_position)}, {Math.round(booth.y_position)})
-                            </span>
-                          ) : (
-                            <Badge variant="secondary">Not positioned</Badge>
-                          )}
-                        </div>
-                      </div>
+      {selectedEvent && (
+        <div className="space-y-3 max-h-[600px] overflow-y-auto">
+          {filteredBooths.map((booth: any) => {
+            const currentGridPos =
+              booth.grid_row !== null && booth.grid_col !== null
+                ? { row: booth.grid_row, col: booth.grid_col }
+                : null;
 
-                      <Separator />
+            return (
+              <Card key={booth.id} className="p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold">
+                      Booth #{booth.table_no || "N/A"}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {booth.org_name}
+                    </p>
+                  </div>
+                  <div className="text-sm">
+                    {currentGridPos ? (
+                      <Badge variant="secondary">
+                        {getGridLabel(currentGridPos)}
+                      </Badge>
+                    ) : (
+                      <Badge variant="destructive">Not positioned</Badge>
+                    )}
+                  </div>
+                </div>
 
-                      {/* Position Controls */}
-                      {editingBoothId === booth.id ? (
-                        <div className="space-y-4">
-                          <BoothQuickPosition
-                            onPositionSelect={(x, y) => handleQuickPosition(booth.id, x, y)}
-                            disabled={isSaving}
-                          />
-
-                          <div className="space-y-2">
-                            <p className="text-sm font-medium text-muted-foreground">
-                              Or enter exact coordinates:
-                            </p>
-                            <div className="flex gap-2">
-                              <div className="flex-1">
-                                <Label className="text-xs">X (0-1200)</Label>
-                                <Input
-                                  type="number"
-                                  placeholder="X"
-                                  value={customX}
-                                  onChange={(e) => setCustomX(e.target.value)}
-                                  min="0"
-                                  max="1200"
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <Label className="text-xs">Y (0-800)</Label>
-                                <Input
-                                  type="number"
-                                  placeholder="Y"
-                                  value={customY}
-                                  onChange={(e) => setCustomY(e.target.value)}
-                                  min="0"
-                                  max="800"
-                                />
-                              </div>
-                              <Button
-                                className="self-end"
-                                onClick={() => handleCustomPosition(booth.id)}
-                                disabled={isSaving}
-                              >
-                                <Save className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingBoothId(null);
-                              setCustomX("");
-                              setCustomY("");
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setEditingBoothId(booth.id);
-                              setCustomX(booth.x_position?.toString() || "");
-                              setCustomY(booth.y_position?.toString() || "");
-                            }}
-                          >
-                            Edit Position
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPreviewBoothId(booth.id)}
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            Preview
-                          </Button>
-                        </div>
+                {editingBoothId === booth.id ? (
+                  <div className="space-y-3 mt-3 pt-3 border-t">
+                    <BoothGridSelector
+                      selectedPosition={selectedGridPosition}
+                      occupiedPositions={occupiedGridPositions.filter(
+                        (pos) => pos.row !== currentGridPos?.row || pos.col !== currentGridPos?.col
                       )}
+                      onSelectPosition={setSelectedGridPosition}
+                      backgroundImageUrl={floorPlan?.background_image_url || undefined}
+                    />
+
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleSavePosition(booth.id)}
+                        size="sm"
+                        disabled={!selectedGridPosition || isSaving}
+                        className="flex-1"
+                      >
+                        <Save className="w-4 h-4 mr-1" />
+                        {isSaving ? "Saving..." : "Save Position"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingBoothId(null);
+                          setSelectedGridPosition(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
                     </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </ScrollArea>
+                  </div>
+                ) : (
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setEditingBoothId(booth.id);
+                        setSelectedGridPosition(currentGridPos);
+                      }}
+                      className="flex-1"
+                    >
+                      <MapPin className="w-4 h-4 mr-1" />
+                      Edit Position
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleAutoAssign(booth.id)}
+                      disabled={isSaving}
+                    >
+                      Auto-Assign
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {selectedEvent && filteredBooths.length === 0 && (
+        <Card className="p-8">
+          <p className="text-center text-muted-foreground">
+            {searchQuery ? "No booths found matching your search" : "No booths for this event"}
+          </p>
         </Card>
       )}
     </div>

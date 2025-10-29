@@ -1,0 +1,225 @@
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  GRID_COLS,
+  GRID_ROWS,
+  GridPosition,
+  getGridLabel,
+  getPresetPosition,
+} from "@/hooks/useGridPositioning";
+import { cn } from "@/lib/utils";
+
+interface BoothGridSelectorProps {
+  selectedPosition: GridPosition | null;
+  occupiedPositions: GridPosition[];
+  onSelectPosition: (position: GridPosition) => void;
+  backgroundImageUrl?: string;
+}
+
+export const BoothGridSelector = ({
+  selectedPosition,
+  occupiedPositions,
+  onSelectPosition,
+  backgroundImageUrl,
+}: BoothGridSelectorProps) => {
+  const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
+
+  const isCellOccupied = (row: number, col: number) => {
+    return occupiedPositions.some((pos) => pos.row === row && pos.col === col);
+  };
+
+  const isCellSelected = (row: number, col: number) => {
+    return selectedPosition?.row === row && selectedPosition?.col === col;
+  };
+
+  const handleCellClick = (row: number, col: number) => {
+    if (!isCellOccupied(row, col)) {
+      onSelectPosition({ row, col });
+    }
+  };
+
+  const handlePresetClick = (preset: string) => {
+    const position = getPresetPosition(preset);
+    if (!isCellOccupied(position.row, position.col)) {
+      onSelectPosition(position);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4">
+        <h3 className="text-sm font-semibold mb-3">Quick Position Presets</h3>
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("top-left")}
+            className="text-xs"
+          >
+            ⬉ Top-Left
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("top-center")}
+            className="text-xs"
+          >
+            ⬆ Top-Center
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("top-right")}
+            className="text-xs"
+          >
+            ⬈ Top-Right
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("middle-left")}
+            className="text-xs"
+          >
+            ⬅ Middle-Left
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("center")}
+            className="text-xs"
+          >
+            ● Center
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("middle-right")}
+            className="text-xs"
+          >
+            ➡ Middle-Right
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("bottom-left")}
+            className="text-xs"
+          >
+            ⬋ Bottom-Left
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("bottom-center")}
+            className="text-xs"
+          >
+            ⬇ Bottom-Center
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePresetClick("bottom-right")}
+            className="text-xs"
+          >
+            ⬊ Bottom-Right
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-sm font-semibold">Grid Position Selector</h3>
+          {selectedPosition && (
+            <Badge variant="secondary">
+              {getGridLabel(selectedPosition)}
+            </Badge>
+          )}
+        </div>
+
+        <div className="relative w-full overflow-x-auto">
+          <div
+            className="relative mx-auto"
+            style={{
+              width: `${GRID_COLS * 50}px`,
+              height: `${GRID_ROWS * 50}px`,
+              minWidth: "320px",
+            }}
+          >
+            {/* Background image if available */}
+            {backgroundImageUrl && (
+              <img
+                src={backgroundImageUrl}
+                alt="Floor plan background"
+                className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
+              />
+            )}
+
+            {/* Grid cells */}
+            <div className="relative grid" style={{ gridTemplateColumns: `repeat(${GRID_COLS}, 50px)` }}>
+              {Array.from({ length: GRID_ROWS }).map((_, row) =>
+                Array.from({ length: GRID_COLS }).map((_, col) => {
+                  const occupied = isCellOccupied(row, col);
+                  const selected = isCellSelected(row, col);
+                  const hovered = hoveredCell?.row === row && hoveredCell?.col === col;
+
+                  return (
+                    <button
+                      key={`${row}-${col}`}
+                      onClick={() => handleCellClick(row, col)}
+                      onMouseEnter={() => setHoveredCell({ row, col })}
+                      onMouseLeave={() => setHoveredCell(null)}
+                      disabled={occupied}
+                      className={cn(
+                        "w-[50px] h-[50px] border transition-all touch-manipulation",
+                        "hover:scale-105 active:scale-95",
+                        occupied && "bg-destructive/20 border-destructive cursor-not-allowed",
+                        !occupied && "bg-background border-border hover:bg-accent",
+                        selected && "bg-primary border-primary ring-2 ring-primary",
+                        hovered && !occupied && !selected && "bg-secondary border-secondary"
+                      )}
+                      style={{
+                        minWidth: "44px",
+                        minHeight: "44px",
+                      }}
+                    >
+                      {selected && <span className="text-xs font-bold">✓</span>}
+                      {occupied && !selected && <span className="text-xs">✕</span>}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Grid labels */}
+            <div className="absolute -left-6 top-0 h-full flex flex-col justify-around text-xs text-muted-foreground">
+              {Array.from({ length: GRID_ROWS }).map((_, i) => (
+                <div key={i}>{String.fromCharCode(65 + i)}</div>
+              ))}
+            </div>
+            <div className="absolute -top-6 left-0 w-full flex justify-around text-xs text-muted-foreground">
+              {Array.from({ length: GRID_COLS }).map((_, i) => (
+                <div key={i}>{i + 1}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-4 mt-4 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-background border border-border rounded" />
+            <span className="text-muted-foreground">Available</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-destructive/20 border border-destructive rounded" />
+            <span className="text-muted-foreground">Occupied</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-primary border border-primary rounded" />
+            <span className="text-muted-foreground">Selected</span>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};

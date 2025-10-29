@@ -28,11 +28,23 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
           if (payload.eventType === "UPDATE") {
             const updatedBooth = payload.new as any;
             const tableNo = updatedBooth?.table_no || "Unknown";
+            const gridRow = updatedBooth?.grid_row;
+            const gridCol = updatedBooth?.grid_col;
             
-            toast.info(`📍 Booth ${tableNo} repositioned`, {
-              description: "Floor plan updated by admin",
-              duration: 2500,
-            });
+            if (gridRow !== null && gridCol !== null) {
+              const rowLabel = String.fromCharCode(65 + gridRow); // A-H
+              const colLabel = (gridCol + 1).toString(); // 1-12
+              
+              toast.success(`📍 Booth ${tableNo} moved`, {
+                description: `New position: Row ${rowLabel}, Column ${colLabel}`,
+                duration: 3000,
+              });
+            } else {
+              toast.info(`📍 Booth ${tableNo} updated`, {
+                description: "Floor plan updated by admin",
+                duration: 2000,
+              });
+            }
           } else if (payload.eventType === "INSERT") {
             toast.info("🆕 New booth added to floor plan", {
               duration: 2000,
