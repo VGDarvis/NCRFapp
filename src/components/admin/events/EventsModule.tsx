@@ -1,9 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Users, BarChart, Loader2 } from "lucide-react";
+import { Calendar, MapPin, Users, BarChart, Loader2, QrCode } from "lucide-react";
 import { FloorPlanUploader } from "./FloorPlanUploader";
 import { BoothCSVImporter } from "./BoothCSVImporter";
 import { SeminarCSVImporter } from "./SeminarCSVImporter";
+import { EventQRCodeGenerator } from "./EventQRCodeGenerator";
+import { GuestAnalyticsDashboard } from "./GuestAnalyticsDashboard";
 import { useEvents } from "@/hooks/useEvents";
 import { useVenues } from "@/hooks/useVenues";
 
@@ -31,7 +33,7 @@ export const EventsModule = () => {
       </div>
 
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="grid w-full max-w-2xl grid-cols-4">
+        <TabsList className="grid w-full max-w-3xl grid-cols-5">
           <TabsTrigger value="events" className="gap-2">
             <Calendar className="w-4 h-4" />
             Events
@@ -43,6 +45,10 @@ export const EventsModule = () => {
           <TabsTrigger value="booths" className="gap-2">
             <Users className="w-4 h-4" />
             Booths
+          </TabsTrigger>
+          <TabsTrigger value="qr-codes" className="gap-2">
+            <QrCode className="w-4 h-4" />
+            QR Codes
           </TabsTrigger>
           <TabsTrigger value="analytics" className="gap-2">
             <BarChart className="w-4 h-4" />
@@ -116,14 +122,12 @@ export const EventsModule = () => {
           )}
         </TabsContent>
 
+        <TabsContent value="qr-codes" className="mt-6">
+          <EventQRCodeGenerator eventId={firstEvent?.id} />
+        </TabsContent>
+
         <TabsContent value="analytics" className="mt-6">
-          <Card className="p-8 text-center">
-            <BarChart className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Event Analytics</h3>
-            <p className="text-muted-foreground">
-              Booth traffic heatmaps, registration metrics, and attendance tracking
-            </p>
-          </Card>
+          <GuestAnalyticsDashboard eventId={firstEvent?.id || null} />
         </TabsContent>
       </Tabs>
     </div>

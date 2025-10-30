@@ -1997,30 +1997,39 @@ export type Database = {
       guest_analytics: {
         Row: {
           created_at: string
+          device_type: string | null
+          entry_source: string | null
           event_id: string | null
           id: string
           page_view: string
           referrer: string | null
+          session_duration: number | null
           session_id: string
           timestamp: string
           user_agent: string | null
         }
         Insert: {
           created_at?: string
+          device_type?: string | null
+          entry_source?: string | null
           event_id?: string | null
           id?: string
           page_view: string
           referrer?: string | null
+          session_duration?: number | null
           session_id: string
           timestamp?: string
           user_agent?: string | null
         }
         Update: {
           created_at?: string
+          device_type?: string | null
+          entry_source?: string | null
           event_id?: string | null
           id?: string
           page_view?: string
           referrer?: string | null
+          session_duration?: number | null
           session_id?: string
           timestamp?: string
           user_agent?: string | null
@@ -2028,6 +2037,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "guest_analytics_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_sessions: {
+        Row: {
+          created_at: string | null
+          device_type: string | null
+          ended_at: string | null
+          entry_source: string | null
+          event_id: string | null
+          id: string
+          interactions: Json | null
+          last_active_at: string | null
+          page_views: Json | null
+          referrer: string | null
+          session_id: string
+          started_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          device_type?: string | null
+          ended_at?: string | null
+          entry_source?: string | null
+          event_id?: string | null
+          id?: string
+          interactions?: Json | null
+          last_active_at?: string | null
+          page_views?: Json | null
+          referrer?: string | null
+          session_id: string
+          started_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          device_type?: string | null
+          ended_at?: string | null
+          entry_source?: string | null
+          event_id?: string | null
+          id?: string
+          interactions?: Json | null
+          last_active_at?: string | null
+          page_views?: Json | null
+          referrer?: string | null
+          session_id?: string
+          started_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_sessions_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { Home, Calendar, MapPin, GraduationCap, Heart } from 'lucide-react';
-import { useGuestAnalytics } from '@/hooks/useGuestAnalytics';
+import { useGuestSession } from '@/hooks/useGuestSession';
 import { WelcomeTab } from './dashboard/college-expo/WelcomeTab';
 import { ExploreTab } from './dashboard/college-expo/ExploreTab';
 import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
@@ -41,8 +41,13 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
     fetchCurrentEvent();
   }, []);
 
-  // Track guest analytics
-  useGuestAnalytics(eventId, `college-expo-${activeTab}`);
+  // Track guest session with detailed analytics
+  const { trackPageView } = useGuestSession(eventId, `college-expo-${activeTab}`);
+
+  // Track tab changes
+  useEffect(() => {
+    trackPageView(`college-expo-${activeTab}`);
+  }, [activeTab, trackPageView]);
 
   const tabs = [
     {

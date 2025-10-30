@@ -22,6 +22,18 @@ export const Dashboard = () => {
   
   // Check if this is a guest user (accessing via /guest/:program)
   const isGuest = location.pathname.startsWith('/guest/');
+  
+  // Validate guest can only access college-expo
+  useEffect(() => {
+    if (isGuest && !location.pathname.startsWith('/guest/college-expo')) {
+      toast({
+        title: "Access Restricted",
+        description: "This QR code is for College Expo access only",
+        variant: "destructive",
+      });
+      navigate('/guest/college-expo', { replace: true });
+    }
+  }, [isGuest, location.pathname, navigate, toast]);
 
   useEffect(() => {
     const getUser = async () => {
