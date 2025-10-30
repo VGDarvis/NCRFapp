@@ -96,12 +96,12 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       />
       
       {/* Main Content */}
-      <div className="flex-1 pb-20 md:pb-8">
+      <div className="flex-1 pb-20">
         <ActiveComponent user={user} isGuest={isGuest} />
       </div>
       
-      {/* Bottom Navigation for Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border md:hidden z-50">
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border z-50">
         <div className="grid grid-cols-5 h-16">
           {tabs.map((tab) => (
             <button

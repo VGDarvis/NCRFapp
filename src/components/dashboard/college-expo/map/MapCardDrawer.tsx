@@ -69,7 +69,7 @@ export const MapCardDrawer = ({
         <SheetHeader>
           <div className="flex items-center justify-between">
             <SheetTitle>
-              {content.type === "event" ? content.title : content.sponsor.name}
+              {content.type === "event" ? content.title : content.sponsor?.name || "Organization"}
             </SheetTitle>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="w-4 h-4" />
