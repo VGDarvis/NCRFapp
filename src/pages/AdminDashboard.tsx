@@ -6,10 +6,10 @@ import { useSessionManager } from '@/hooks/useSessionManager';
 import { SessionWarningDialog } from '@/components/SessionWarningDialog';
 import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import { AdminMobileNav } from '@/components/admin/layout/AdminMobileNav';
+import { EventQRCodeGenerator } from '@/components/admin/events/EventQRCodeGenerator';
 import { AppSidebar } from '@/components/admin/layout/AppSidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { MetricsGrid } from '@/components/admin/dashboard/MetricsGrid';
-import { QuickActionsPanel } from '@/components/admin/dashboard/QuickActionsPanel';
 import { RecentActivityFeed } from '@/components/admin/dashboard/RecentActivityFeed';
 import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksWidget';
 import { Shield } from 'lucide-react';
@@ -112,11 +112,10 @@ export default function AdminDashboard() {
               {activeTab === 'dashboard' && (
                 <>
                   <MetricsGrid />
-                  <div className="grid gap-6 xl:grid-cols-2">
-                    <QuickActionsPanel onAction={handleQuickAction} />
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <RecentActivityFeed />
                     <UpcomingTasksWidget />
                   </div>
-                  <RecentActivityFeed />
                 </>
               )}
               
@@ -127,9 +126,21 @@ export default function AdminDashboard() {
               {activeTab === 'exhibitors' && <ExhibitorsModule />}
               
               {activeTab === 'settings' && (
-                <div className="glass-premium rounded-lg p-8 text-center">
-                  <h2 className="text-2xl font-bold text-primary mb-2">Settings</h2>
-                  <p className="text-muted-foreground">Configuration options coming soon</p>
+                <div className="space-y-6">
+                  <div>
+                    <h2 className="text-3xl font-bold tracking-tight mb-2">Settings</h2>
+                    <p className="text-muted-foreground">
+                      Configure your admin panel and generate QR codes
+                    </p>
+                  </div>
+                  
+                  <div className="glass-premium rounded-lg p-6">
+                    <h3 className="text-xl font-semibold mb-4 text-primary">Event QR Code Generator</h3>
+                    <p className="text-muted-foreground mb-6">
+                      Generate QR codes for expo entrances, booths, and promotions
+                    </p>
+                    <EventQRCodeGenerator />
+                  </div>
                 </div>
               )}
             </main>

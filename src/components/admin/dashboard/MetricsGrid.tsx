@@ -1,88 +1,85 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "../shared/StatsCard";
-import { Users, MessageSquare, Briefcase, Target, TrendingUp, Activity } from "lucide-react";
+import { QrCode, Users, Activity, Mail, Clock, Star } from "lucide-react";
+import { useExpoStats } from "@/hooks/useExpoStats";
 
 export function MetricsGrid() {
-  const [metrics, setMetrics] = useState({
-    totalStaff: 0,
-    activeCrmContacts: 0,
-    messagesSentWeek: 0,
-    activeCampaigns: 0,
-    pendingHrTasks: 0,
-    outreachSuccessRate: 0,
-  });
+  const [eventId, setEventId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchMetrics();
-  }, []);
-
-  const fetchMetrics = async () => {
-    try {
-      // Fetch from analytics_summary table for aggregated data
-      const { data: summaryData } = await supabase
-        .from('analytics_summary')
-        .select('*')
-        .order('summary_date', { ascending: false })
+    const fetchEvent = async () => {
+      const { data } = await supabase
+        .from('events')
+        .select('id')
+        .order('created_at', { ascending: false })
         .limit(1)
         .single();
+      
+      if (data) setEventId(data.id);
+    };
+    fetchEvent();
+  }, []);
 
-      if (summaryData) {
-        setMetrics({
-          totalStaff: summaryData.total_employees || 0,
-          activeCrmContacts: summaryData.active_crm_contacts || 0,
-          messagesSentWeek: summaryData.messages_sent_week || 0,
-          activeCampaigns: summaryData.active_campaigns || 0,
-          pendingHrTasks: summaryData.pending_hr_tasks || 0,
-          outreachSuccessRate: Number(summaryData.outreach_success_rate) || 0,
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching metrics:', error);
-    }
+  const { data: stats, isLoading } = useExpoStats(eventId);
+
+  if (isLoading || !stats) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="h-32 glass-premium animate-pulse rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    return `${hours}h ${remainingMins}m`;
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <StatsCard
-        title="Total Staff"
-        value={metrics.totalStaff}
-        description="Active employees"
+        title="QR Code Scans Today"
+        value={stats.qrScansToday}
+        description="Attendees who joined today"
+        icon={QrCode}
+        className="border-primary/20"
+      />
+      <StatsCard
+        title="Total App Users"
+        value={stats.totalAppUsers}
+        description="All-time expo visitors"
         icon={Users}
       />
       <StatsCard
-        title="Active CRM Contacts"
-        value={metrics.activeCrmContacts}
-        description="Organizations & individuals"
-        icon={Target}
-      />
-      <StatsCard
-        title="Messages This Week"
-        value={metrics.messagesSentWeek}
-        description="Outreach communications"
-        icon={MessageSquare}
-      />
-      <StatsCard
-        title="Active Campaigns"
-        value={metrics.activeCampaigns}
-        description="Ongoing outreach efforts"
-        icon={TrendingUp}
-      />
-      <StatsCard
-        title="Pending HR Tasks"
-        value={metrics.pendingHrTasks}
-        description="Onboarding & reviews"
-        icon={Briefcase}
-      />
-      <StatsCard
-        title="Outreach Success Rate"
-        value={`${metrics.outreachSuccessRate.toFixed(1)}%`}
-        description="Response rate"
+        title="Active Now"
+        value={stats.activeNow}
+        description="Live in the last 5 minutes"
         icon={Activity}
-        trend={{
-          value: 12.5,
-          isPositive: true,
-        }}
+        className="border-accent/20"
+      />
+      <StatsCard
+        title="Beta Interest Sign-Ups"
+        value={stats.betaSignUps}
+        description="Want to test new features"
+        icon={Mail}
+      />
+      <StatsCard
+        title="Avg. Session Duration"
+        value={formatDuration(stats.avgSessionDuration)}
+        description="Time spent in app"
+        icon={Clock}
+      />
+      <StatsCard
+        title="Popular Booths"
+        value={stats.popularBoothsCount}
+        description="Favorited by visitors"
+        icon={Star}
       />
     </div>
   );

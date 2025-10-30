@@ -377,6 +377,50 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_interest: {
+        Row: {
+          created_at: string | null
+          email: string
+          event_id: string | null
+          id: string
+          interest_level: string | null
+          name: string | null
+          notes: string | null
+          phone: string | null
+          session_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          event_id?: string | null
+          id?: string
+          interest_level?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          event_id?: string | null
+          id?: string
+          interest_level?: string | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beta_interest_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booklet_downloads: {
         Row: {
           booklet_id: string

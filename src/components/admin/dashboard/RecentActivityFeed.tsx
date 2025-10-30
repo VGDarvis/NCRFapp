@@ -41,6 +41,7 @@ export function RecentActivityFeed() {
       const { data, error } = await supabase
         .from('activity_logs')
         .select('*')
+        .or('activity_category.eq.booth,action.ilike.%booth%,action.ilike.%floor plan%')
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -54,18 +55,20 @@ export function RecentActivityFeed() {
     }
   };
 
-  const getActivityIcon = (category: string | null) => {
-    return "🔔";
+  const getActivityIcon = (action: string) => {
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes('added') || actionLower.includes('created')) return "🟢";
+    if (actionLower.includes('updated') || actionLower.includes('moved') || actionLower.includes('edited') || actionLower.includes('uploaded')) return "🔵";
+    if (actionLower.includes('deleted') || actionLower.includes('removed')) return "🔴";
+    return "🟣";
   };
 
-  const getActivityColor = (category: string | null) => {
-    const colors: Record<string, string> = {
-      hr: "text-blue-500",
-      crm: "text-green-500",
-      system: "text-purple-500",
-      user: "text-amber-500",
-    };
-    return colors[category || "system"] || "text-muted-foreground";
+  const getActivityColor = (action: string) => {
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes('added') || actionLower.includes('created')) return "text-green-500";
+    if (actionLower.includes('updated') || actionLower.includes('moved') || actionLower.includes('edited') || actionLower.includes('uploaded')) return "text-blue-500";
+    if (actionLower.includes('deleted') || actionLower.includes('removed')) return "text-red-500";
+    return "text-purple-500";
   };
 
   return (
@@ -73,9 +76,9 @@ export function RecentActivityFeed() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-primary" />
-          Recent Activity
+          Booth Activity Feed
         </CardTitle>
-        <CardDescription>Latest system events and actions</CardDescription>
+        <CardDescription>Recent booth and floor plan changes</CardDescription>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[400px] pr-4">
@@ -84,8 +87,8 @@ export function RecentActivityFeed() {
           ) : activities.length === 0 ? (
             <EmptyState
               icon={Activity}
-              title="No recent activity"
-              description="System activity will appear here"
+              title="No booth activity yet"
+              description="Booth changes will appear here"
             />
           ) : (
             <div className="space-y-3">
@@ -94,13 +97,13 @@ export function RecentActivityFeed() {
                   key={activity.id}
                   className="flex gap-3 p-3 rounded-lg glass-medium border border-primary/10 hover:border-primary/30 transition-colors"
                 >
-                  <div className="text-xl">{getActivityIcon(activity.activity_category)}</div>
+                  <div className="text-xl">{getActivityIcon(activity.action)}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="text-sm font-medium text-foreground">
                       {activity.action}
                     </p>
-                    <p className={`text-xs ${getActivityColor(activity.activity_category)}`}>
-                      {activity.activity_category || 'System'}
+                    <p className={`text-xs font-medium ${getActivityColor(activity.action)}`}>
+                      Booth Management
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
