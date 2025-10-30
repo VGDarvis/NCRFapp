@@ -58,31 +58,67 @@ export function useBooths(eventId: string | null, filters?: BoothFilters) {
     queryFn: async () => {
       if (!eventId) return [];
 
-      let query = supabase
-        .from("booths")
-        .select(`
-          *,
-          sponsor:sponsors(*)
-        `)
-        .eq("event_id", eventId);
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Authenticated users get full booth data including contact info (if they have permissions)
+        let query = supabase
+          .from("booths")
+          .select(`
+            *,
+            sponsor:sponsors(*)
+          `)
+          .eq("event_id", eventId);
 
-      // Apply filters
-      if (filters?.search) {
-        query = query.ilike("sponsor.name", `%${filters.search}%`);
+        // Apply filters
+        if (filters?.search) {
+          query = query.ilike("org_name", `%${filters.search}%`);
+        }
+
+        if (filters?.org_type && filters.org_type.length > 0) {
+          query = query.in("org_type", filters.org_type);
+        }
+
+        if (filters?.tier && filters.tier.length > 0) {
+          query = query.in("sponsor_tier", filters.tier);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        return data as any as Booth[];
+      } else {
+        // Guest users use secure function (no contact info)
+        const { data, error } = await supabase.rpc('get_public_booths', {
+          p_event_id: eventId
+        });
+
+        if (error) throw error;
+        
+        // Apply client-side filters for guest users
+        let filteredData = data || [];
+        
+        if (filters?.search) {
+          const searchLower = filters.search.toLowerCase();
+          filteredData = filteredData.filter((booth: any) => 
+            booth.org_name?.toLowerCase().includes(searchLower)
+          );
+        }
+
+        if (filters?.org_type && filters.org_type.length > 0) {
+          filteredData = filteredData.filter((booth: any) => 
+            filters.org_type!.includes(booth.org_type)
+          );
+        }
+
+        if (filters?.tier && filters.tier.length > 0) {
+          filteredData = filteredData.filter((booth: any) => 
+            filters.tier!.includes(booth.sponsor_tier)
+          );
+        }
+
+        return filteredData as any as Booth[];
       }
-
-      if (filters?.org_type && filters.org_type.length > 0) {
-        query = query.in("sponsor.org_type", filters.org_type);
-      }
-
-      if (filters?.tier && filters.tier.length > 0) {
-        query = query.in("sponsor.tier", filters.tier);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data as any as Booth[];
     },
     enabled: !!eventId,
   });

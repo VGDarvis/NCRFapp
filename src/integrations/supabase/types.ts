@@ -4945,6 +4945,41 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_public_booths: {
+        Args: { p_event_id?: string }
+        Returns: {
+          booth_depth: number
+          booth_width: number
+          created_at: string
+          description: string
+          display_order: number
+          event_id: string
+          floor_number: number
+          floor_plan_id: string
+          grid_col: number
+          grid_row: number
+          id: string
+          is_featured: boolean
+          latitude: number
+          logo_url: string
+          longitude: number
+          offers_on_spot_admission: boolean
+          org_name: string
+          org_type: string
+          scholarship_info: string
+          sponsor_id: string
+          sponsor_tier: string
+          stage_description: string
+          table_no: string
+          updated_at: string
+          venue_id: string
+          waives_application_fee: boolean
+          website_url: string
+          x_position: number
+          y_position: number
+          zone: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

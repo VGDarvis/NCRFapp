@@ -22,54 +22,63 @@ export function useExhibitors(eventId: string | null, filters?: ExhibitorFilters
     queryFn: async () => {
       if (!eventId) return [];
 
-      let query = supabase
-        .from("booths")
-        .select("*")
-        .eq("event_id", eventId);
-
-      // Apply filters
-      if (filters?.search) {
-        query = query.ilike("org_name", `%${filters.search}%`);
-      }
-
-      if (filters?.orgType) {
-        query = query.eq("org_type", filters.orgType);
-      }
-
-      if (filters?.sponsorTier) {
-        query = query.eq("sponsor_tier", filters.sponsorTier);
-      }
-
-      if (filters?.hasOnSpotAdmission) {
-        query = query.eq("offers_on_spot_admission", true);
-      }
-
-      if (filters?.hasFeeWaiver) {
-        query = query.eq("waives_application_fee", true);
-      }
-
-      if (filters?.hasScholarships) {
-        query = query.not("scholarship_info", "is", null);
-      }
-
-      if (filters?.assignedOnly) {
-        query = query.not("x_position", "is", null);
-      }
-
-      if (filters?.unassignedOnly) {
-        query = query.is("x_position", null);
-      }
-
-      const { data, error } = await query.order("org_name");
-
-      if (error) throw error;
+      // Check if user is authenticated (admins need full access to contact info)
+      const { data: { user } } = await supabase.auth.getUser();
       
-      // Map data to match Booth interface
-      return (data || []).map(booth => ({
-        ...booth,
-        booth_number: booth.table_no,
-        qr_code_url: null,
-      }));
+      if (user) {
+        // Authenticated admins get full booth data including contact info
+        let query = supabase
+          .from("booths")
+          .select("*")
+          .eq("event_id", eventId);
+
+        // Apply filters
+        if (filters?.search) {
+          query = query.ilike("org_name", `%${filters.search}%`);
+        }
+
+        if (filters?.orgType) {
+          query = query.eq("org_type", filters.orgType);
+        }
+
+        if (filters?.sponsorTier) {
+          query = query.eq("sponsor_tier", filters.sponsorTier);
+        }
+
+        if (filters?.hasOnSpotAdmission) {
+          query = query.eq("offers_on_spot_admission", true);
+        }
+
+        if (filters?.hasFeeWaiver) {
+          query = query.eq("waives_application_fee", true);
+        }
+
+        if (filters?.hasScholarships) {
+          query = query.not("scholarship_info", "is", null);
+        }
+
+        if (filters?.assignedOnly) {
+          query = query.not("x_position", "is", null);
+        }
+
+        if (filters?.unassignedOnly) {
+          query = query.is("x_position", null);
+        }
+
+        const { data, error } = await query.order("org_name");
+
+        if (error) throw error;
+        
+        // Map data to match Booth interface
+        return (data || []).map(booth => ({
+          ...booth,
+          booth_number: booth.table_no,
+          qr_code_url: null,
+        }));
+      } else {
+        // This shouldn't happen for exhibitors module (admin only), but handle gracefully
+        return [];
+      }
     },
     enabled: !!eventId,
   });
