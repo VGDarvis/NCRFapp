@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, Copy, Printer, QrCode } from "lucide-react";
 import { generateQRCode, downloadQRCode } from "@/lib/qr-utils";
+import { generateGuestAccessUrl } from "@/lib/domain-config";
 import { toast } from "sonner";
 
 interface EventQRCodeGeneratorProps {
@@ -19,10 +20,7 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const baseUrl = window.location.origin;
-  const guestUrl = eventId
-    ? `${baseUrl}/guest/college-expo?event=${eventId}&source=${entrySource}`
-    : `${baseUrl}/guest/college-expo?source=${entrySource}`;
+  const guestUrl = generateGuestAccessUrl(eventId, entrySource);
 
   const handleGenerateQR = async () => {
     setIsGenerating(true);

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Share2, Mail, MessageSquare, Copy, Download, Check } from 'lucide-react';
 import { generateEventQRCode, downloadQRCode } from '@/lib/qr-utils';
+import { generateEventRegistrationUrl } from '@/lib/domain-config';
 import { toast } from 'sonner';
 
 interface ShareEventDialogProps {
@@ -21,7 +22,7 @@ interface ShareEventDialogProps {
 export const ShareEventDialog = ({ isOpen, onClose, event }: ShareEventDialogProps) => {
   const [qrCode, setQrCode] = useState<string>('');
   const [copied, setCopied] = useState(false);
-  const eventUrl = `${window.location.origin}/join-college-expo?event=${event.id}`;
+  const eventUrl = generateEventRegistrationUrl(event.id);
 
   useEffect(() => {
     if (isOpen) {

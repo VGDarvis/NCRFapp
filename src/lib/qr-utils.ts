@@ -1,5 +1,6 @@
 // QR code generation utilities
 import QRCode from 'qrcode';
+import { generateEventRegistrationUrl } from './domain-config';
 
 export interface QRCodeOptions {
   width?: number;
@@ -31,7 +32,7 @@ export const generateQRCode = async (
 };
 
 export const generateEventQRCode = (eventId: string): Promise<string> => {
-  const eventUrl = `${window.location.origin}/join-college-expo?event=${eventId}`;
+  const eventUrl = generateEventRegistrationUrl(eventId);
   return generateQRCode(eventUrl);
 };
 

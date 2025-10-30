@@ -57,7 +57,8 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // Generate QR code as data URL
-    const qrCodeUrl = `${Deno.env.get("SUPABASE_URL").replace('.supabase.co', '')}/check-in/${registration.qr_code}`;
+    const customDomain = Deno.env.get("CUSTOM_DOMAIN") || "https://expo.collegeexpoapp.org";
+    const qrCodeUrl = `${customDomain}/check-in/${registration.qr_code}`;
     const qrCodeDataUrl = await QRCode.toDataURL(qrCodeUrl, {
       width: 512,
       margin: 2,
@@ -183,7 +184,7 @@ serve(async (req: Request): Promise<Response> => {
                 
                 <div style="text-align: center;">
                   <a href="${qrCodeImageUrl}" class="button" download>Download QR Code</a>
-                  <a href="${Deno.env.get("SUPABASE_URL").replace('.supabase.co', '')}/guest/college-expo" class="button">View Event Details</a>
+                  <a href="${customDomain}/guest/college-expo" class="button">View Event Details</a>
                 </div>
                 
                 <div class="footer">
