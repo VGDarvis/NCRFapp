@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +46,8 @@ interface BoothAddDialogProps {
 
 export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAddDialogProps) {
   const [saving, setSaving] = useState(false);
+  const [isCreatingNewOrg, setIsCreatingNewOrg] = useState(false);
+  const [newOrgName, setNewOrgName] = useState("");
   const [formData, setFormData] = useState({
     table_no: "",
     org_name: "",
@@ -73,6 +76,8 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
         description: "",
         sponsor_tier: "standard",
       });
+      setIsCreatingNewOrg(false);
+      setNewOrgName("");
     }
   }, [open]);
 
@@ -211,16 +216,50 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Loading organizations...
               </div>
+            ) : isCreatingNewOrg ? (
+              <div className="space-y-2">
+                <Input
+                  id="new_org_name"
+                  value={newOrgName}
+                  onChange={(e) => {
+                    setNewOrgName(e.target.value);
+                    setFormData({ ...formData, org_name: e.target.value });
+                  }}
+                  placeholder="Enter new organization name"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setIsCreatingNewOrg(false);
+                    setNewOrgName("");
+                    setFormData({ ...formData, org_name: "" });
+                  }}
+                >
+                  ← Back to organization list
+                </Button>
+              </div>
             ) : (
               <Select
                 value={formData.org_name}
-                onValueChange={(value) => setFormData({ ...formData, org_name: value })}
+                onValueChange={(value) => {
+                  if (value === "CREATE_NEW") {
+                    setIsCreatingNewOrg(true);
+                  } else {
+                    setFormData({ ...formData, org_name: value });
+                  }
+                }}
                 required
               >
                 <SelectTrigger id="org_name">
                   <SelectValue placeholder="Select organization" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
+                  <SelectItem value="CREATE_NEW" className="font-semibold text-primary">
+                    ➕ Create New Organization...
+                  </SelectItem>
                   {organizations.map((org) => (
                     <SelectItem key={org} value={org}>
                       {org}
@@ -229,9 +268,11 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
                 </SelectContent>
               </Select>
             )}
-            <p className="text-xs text-muted-foreground">
-              {organizations.length} organizations available
-            </p>
+            {!isCreatingNewOrg && (
+              <p className="text-xs text-muted-foreground">
+                {organizations.length} organizations available
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -119,8 +119,8 @@ export const MapTab = () => {
 
     markersRef.current.push(marker);
 
-    // Fly to venue
-    flyToLocation(map, longitude, latitude, 15);
+    // Fly to venue with higher zoom for precise location visibility
+    flyToLocation(map, longitude, latitude, 17);
   }, [map, isLoaded, selectedEventId, eventsWithVenues]);
 
   // Handle booth layer

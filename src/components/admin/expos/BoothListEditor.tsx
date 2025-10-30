@@ -47,6 +47,7 @@ interface BoothListEditorProps {
 export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState<string>("booth-low-high");
   const [editingBoothId, setEditingBoothId] = useState<string | null>(null);
   const [selectedGridPosition, setSelectedGridPosition] = useState<GridPosition | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,12 +73,51 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
 
   const filteredBooths = useMemo(() => {
     if (!booths) return [];
-    return booths.filter(
+    
+    // Filter by search query
+    let filtered = booths.filter(
       (booth) =>
         booth.table_no?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         booth.org_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [booths, searchQuery]);
+    
+    // Sort based on selected option
+    switch (sortOption) {
+      case "booth-low-high":
+        filtered.sort((a, b) => {
+          const numA = parseInt(a.table_no || "0");
+          const numB = parseInt(b.table_no || "0");
+          return numA - numB;
+        });
+        break;
+      case "booth-high-low":
+        filtered.sort((a, b) => {
+          const numA = parseInt(a.table_no || "0");
+          const numB = parseInt(b.table_no || "0");
+          return numB - numA;
+        });
+        break;
+      case "org-a-z":
+        filtered.sort((a, b) => 
+          (a.org_name || "").localeCompare(b.org_name || "")
+        );
+        break;
+      case "org-z-a":
+        filtered.sort((a, b) => 
+          (b.org_name || "").localeCompare(a.org_name || "")
+        );
+        break;
+      case "unpositioned-first":
+        filtered.sort((a, b) => {
+          const aPositioned = a.grid_row !== null && a.grid_col !== null ? 1 : 0;
+          const bPositioned = b.grid_row !== null && b.grid_col !== null ? 1 : 0;
+          return aPositioned - bPositioned;
+        });
+        break;
+    }
+    
+    return filtered;
+  }, [booths, searchQuery, sortOption]);
 
   const occupiedGridPositions = useMemo((): GridPosition[] => {
     if (!booths) return [];
@@ -293,6 +333,24 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
             </div>
           </div>
         </div>
+
+        {selectedEvent && booths && booths.length > 0 && (
+          <div className="mb-4">
+            <label className="text-sm font-medium mb-2 block">Sort By</label>
+            <Select value={sortOption} onValueChange={setSortOption}>
+              <SelectTrigger className="w-full md:w-[300px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="booth-low-high">Booth Number (Low to High)</SelectItem>
+                <SelectItem value="booth-high-low">Booth Number (High to Low)</SelectItem>
+                <SelectItem value="org-a-z">Organization (A-Z)</SelectItem>
+                <SelectItem value="org-z-a">Organization (Z-A)</SelectItem>
+                <SelectItem value="unpositioned-first">Position Status (Unpositioned First)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         {selectedEvent && booths && booths.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
