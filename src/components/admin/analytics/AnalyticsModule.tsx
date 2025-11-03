@@ -21,34 +21,34 @@ export function AnalyticsModule() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-none">
-          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+        <TabsList className="inline-flex w-full lg:w-auto overflow-x-auto gap-2 px-1 scrollbar-hide">
+          <TabsTrigger value="dashboard" className="flex items-center gap-2 whitespace-nowrap">
             <BarChart3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Dashboard</span>
+            <span>Dashboard</span>
           </TabsTrigger>
-          <TabsTrigger value="engagement" className="flex items-center gap-2">
+          <TabsTrigger value="engagement" className="flex items-center gap-2 whitespace-nowrap">
             <Activity className="h-4 w-4" />
-            <span className="hidden sm:inline">Event Engagement</span>
+            <span>Event Engagement</span>
           </TabsTrigger>
-          <TabsTrigger value="programs" className="flex items-center gap-2">
+          <TabsTrigger value="programs" className="flex items-center gap-2 whitespace-nowrap">
             <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Programs</span>
+            <span>Programs</span>
           </TabsTrigger>
-          <TabsTrigger value="crm" className="flex items-center gap-2">
+          <TabsTrigger value="crm" className="flex items-center gap-2 whitespace-nowrap">
             <Building2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Partnerships</span>
+            <span>Partnerships</span>
           </TabsTrigger>
-          <TabsTrigger value="hr" className="flex items-center gap-2">
+          <TabsTrigger value="hr" className="flex items-center gap-2 whitespace-nowrap">
             <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">HR</span>
+            <span>HR</span>
           </TabsTrigger>
-          <TabsTrigger value="search" className="flex items-center gap-2">
+          <TabsTrigger value="search" className="flex items-center gap-2 whitespace-nowrap">
             <Sparkles className="h-4 w-4" />
-            <span className="hidden sm:inline">AI Search</span>
+            <span>AI Search</span>
           </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-2">
+          <TabsTrigger value="reports" className="flex items-center gap-2 whitespace-nowrap">
             <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Reports</span>
+            <span>Reports</span>
           </TabsTrigger>
         </TabsList>
 
