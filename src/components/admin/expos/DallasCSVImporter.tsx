@@ -163,9 +163,9 @@ export const DallasCSVImporter = () => {
           await supabase
             .from("floor_plans")
             .update({
-              background_image_url: "/floor-plans/dallas-fort-worth-gym.jpg",
-              canvas_width: 1200,
-              canvas_height: 800,
+              background_image_url: "/floor-plans/dallas-fort-worth-floor-plan.png",
+              canvas_width: 1920,
+              canvas_height: 1080,
             })
             .eq("id", floorPlanId);
 
