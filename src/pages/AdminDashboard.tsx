@@ -17,6 +17,7 @@ import { ThemeProvider } from "next-themes";
 import { CRMModule } from '@/components/admin/crm/CRMModule';
 import { ExposModule } from '@/components/admin/expos/ExposModule';
 import { ExhibitorsModule } from '@/components/admin/expos/ExhibitorsModule';
+import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -118,6 +119,8 @@ export default function AdminDashboard() {
                   </div>
                 </>
               )}
+              
+              {activeTab === 'analytics' && <AnalyticsModule />}
               
               {activeTab === 'expos' && <ExposModule />}
               

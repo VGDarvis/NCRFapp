@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Calendar, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, BarChart3, Settings, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminMobileNavProps {
@@ -8,8 +8,8 @@ interface AdminMobileNavProps {
 
 const tabs = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "analytics", label: "Analytics", icon: TrendingUp },
   { id: "expos", label: "Expos", icon: Calendar },
-  { id: "crm", label: "CRM", icon: Users },
   { id: "exhibitors", label: "Exhibitors", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
 ];

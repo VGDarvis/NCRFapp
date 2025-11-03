@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Calendar, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, BarChart3, Settings, TrendingUp } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -24,6 +24,12 @@ const navigationItems = [
     label: "Dashboard", 
     icon: LayoutDashboard,
     description: "Overview & metrics"
+  },
+  { 
+    id: "analytics", 
+    label: "Analytics", 
+    icon: TrendingUp,
+    description: "Reports & insights"
   },
   { 
     id: "expos", 
