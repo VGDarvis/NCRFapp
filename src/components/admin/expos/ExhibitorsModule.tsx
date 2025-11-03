@@ -4,6 +4,7 @@ import { ExhibitorCSVImporter } from "./ExhibitorCSVImporter";
 import { ExhibitorDirectory } from "./ExhibitorDirectory";
 import { BoothAssignmentWizard } from "./BoothAssignmentWizard";
 import { WebsiteMapIntegration } from "./WebsiteMapIntegration";
+import { DallasCSVImporter } from "./DallasCSVImporter";
 
 export const ExhibitorsModule = () => {
   return (
@@ -40,7 +41,10 @@ export const ExhibitorsModule = () => {
         </TabsContent>
 
         <TabsContent value="import">
-          <ExhibitorCSVImporter />
+          <div className="space-y-6">
+            <DallasCSVImporter />
+            <ExhibitorCSVImporter />
+          </div>
         </TabsContent>
 
         <TabsContent value="assign">
