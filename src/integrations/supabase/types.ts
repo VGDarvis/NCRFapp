@@ -595,12 +595,15 @@ export type Database = {
           description: string | null
           display_order: number | null
           event_id: string
+          exhibitor_id: string | null
           floor_number: number | null
           floor_plan_id: string | null
           grid_col: number | null
           grid_row: number | null
           id: string
           is_featured: boolean | null
+          is_verified: boolean | null
+          last_verified_at: string | null
           latitude: number | null
           logo_url: string | null
           longitude: number | null
@@ -614,6 +617,7 @@ export type Database = {
           table_no: string | null
           updated_at: string | null
           venue_id: string | null
+          verification_notes: string | null
           waives_application_fee: boolean | null
           website_url: string | null
           x_position: number | null
@@ -630,12 +634,15 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           event_id: string
+          exhibitor_id?: string | null
           floor_number?: number | null
           floor_plan_id?: string | null
           grid_col?: number | null
           grid_row?: number | null
           id?: string
           is_featured?: boolean | null
+          is_verified?: boolean | null
+          last_verified_at?: string | null
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -649,6 +656,7 @@ export type Database = {
           table_no?: string | null
           updated_at?: string | null
           venue_id?: string | null
+          verification_notes?: string | null
           waives_application_fee?: boolean | null
           website_url?: string | null
           x_position?: number | null
@@ -665,12 +673,15 @@ export type Database = {
           description?: string | null
           display_order?: number | null
           event_id?: string
+          exhibitor_id?: string | null
           floor_number?: number | null
           floor_plan_id?: string | null
           grid_col?: number | null
           grid_row?: number | null
           id?: string
           is_featured?: boolean | null
+          is_verified?: boolean | null
+          last_verified_at?: string | null
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -684,6 +695,7 @@ export type Database = {
           table_no?: string | null
           updated_at?: string | null
           venue_id?: string | null
+          verification_notes?: string | null
           waives_application_fee?: boolean | null
           website_url?: string | null
           x_position?: number | null
@@ -696,6 +708,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booths_exhibitor_id_fkey"
+            columns: ["exhibitor_id"]
+            isOneToOne: false
+            referencedRelation: "exhibitors"
             referencedColumns: ["id"]
           },
           {
@@ -1846,6 +1865,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      exhibitors: {
+        Row: {
+          campus_address: string | null
+          campus_city: string | null
+          campus_state: string | null
+          campus_zip: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_verified: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          metadata: Json | null
+          offers_on_spot_admission: boolean | null
+          org_name: string
+          org_type: string | null
+          scholarship_info: string | null
+          updated_at: string | null
+          waives_application_fee: boolean | null
+          website_url: string | null
+        }
+        Insert: {
+          campus_address?: string | null
+          campus_city?: string | null
+          campus_state?: string | null
+          campus_zip?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          metadata?: Json | null
+          offers_on_spot_admission?: boolean | null
+          org_name: string
+          org_type?: string | null
+          scholarship_info?: string | null
+          updated_at?: string | null
+          waives_application_fee?: boolean | null
+          website_url?: string | null
+        }
+        Update: {
+          campus_address?: string | null
+          campus_city?: string | null
+          campus_state?: string | null
+          campus_zip?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          metadata?: Json | null
+          offers_on_spot_admission?: boolean | null
+          org_name?: string
+          org_type?: string | null
+          scholarship_info?: string | null
+          updated_at?: string | null
+          waives_application_fee?: boolean | null
+          website_url?: string | null
+        }
+        Relationships: []
       }
       expo_events: {
         Row: {
@@ -3603,6 +3697,8 @@ export type Database = {
           end_time: string
           event_id: string
           id: string
+          is_verified: boolean | null
+          last_verified_at: string | null
           max_capacity: number | null
           presenter_name: string | null
           presenter_organization: string | null
@@ -3613,6 +3709,7 @@ export type Database = {
           target_audience: string[] | null
           title: string
           updated_at: string
+          verification_notes: string | null
         }
         Insert: {
           category?: string | null
@@ -3621,6 +3718,8 @@ export type Database = {
           end_time: string
           event_id: string
           id?: string
+          is_verified?: boolean | null
+          last_verified_at?: string | null
           max_capacity?: number | null
           presenter_name?: string | null
           presenter_organization?: string | null
@@ -3631,6 +3730,7 @@ export type Database = {
           target_audience?: string[] | null
           title: string
           updated_at?: string
+          verification_notes?: string | null
         }
         Update: {
           category?: string | null
@@ -3639,6 +3739,8 @@ export type Database = {
           end_time?: string
           event_id?: string
           id?: string
+          is_verified?: boolean | null
+          last_verified_at?: string | null
           max_capacity?: number | null
           presenter_name?: string | null
           presenter_organization?: string | null
@@ -3649,6 +3751,7 @@ export type Database = {
           target_audience?: string[] | null
           title?: string
           updated_at?: string
+          verification_notes?: string | null
         }
         Relationships: [
           {

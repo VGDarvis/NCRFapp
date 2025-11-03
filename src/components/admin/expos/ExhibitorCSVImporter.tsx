@@ -1,217 +1,243 @@
 import { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Upload, FileText, CheckCircle, AlertCircle, Download } from 'lucide-react';
-import { useCSVParser } from '@/hooks/useCSVParser';
-import { parseExhibitorCSV, detectOrgType, getSponsorTier, validateExhibitorRow, type ExhibitorCSVRow } from '@/lib/exhibitor-validation';
-import { generateWebsiteURL } from '@/lib/website-finder-utils';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useEvents } from '@/hooks/useEvents';
+import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import { Upload, Download, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import Papa from 'papaparse';
+
+interface ExhibitorRow {
+  org_name: string;
+  org_type?: string;
+  website_url?: string;
+  description?: string;
+  contact_name?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  offers_on_spot_admission?: boolean | string;
+  waives_application_fee?: boolean | string;
+  scholarship_info?: string;
+}
 
 export const ExhibitorCSVImporter = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<ExhibitorCSVRow[]>([]);
+  const [parsedData, setParsedData] = useState<ExhibitorRow[]>([]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [isImporting, setIsImporting] = useState(false);
-  const [importProgress, setImportProgress] = useState(0);
-  const { parseCSV, isLoading: isParsing } = useCSVParser<any>();
-  const { events } = useEvents();
+  const [importing, setImporting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [importResults, setImportResults] = useState<{ created: number; updated: number; skipped: number } | null>(null);
 
-  const houstonEvent = events?.find(e => 
-    e.event_type === 'college_fair' && 
-    e.start_at && new Date(e.start_at) > new Date()
-  );
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const uploadedFile = e.target.files?.[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadedFile = event.target.files?.[0];
     if (!uploadedFile) return;
 
     setFile(uploadedFile);
-    const result = await parseCSV(uploadedFile);
+    setImportResults(null);
 
-    const exhibitors: ExhibitorCSVRow[] = [];
-    const errors: string[] = [];
+    Papa.parse(uploadedFile, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const errors: string[] = [];
+        const data = results.data as ExhibitorRow[];
 
-    result.data.forEach((row: any, index: number) => {
-      const exhibitor = parseExhibitorCSV(row);
-      if (exhibitor) {
-        const validation = validateExhibitorRow(exhibitor);
-        if (validation.isValid) {
-          exhibitors.push(exhibitor);
+        data.forEach((row, index) => {
+          if (!row.org_name || row.org_name.trim() === '') {
+            errors.push(`Row ${index + 2}: Missing organization name`);
+          }
+        });
+
+        setParsedData(data);
+        setValidationErrors(errors);
+
+        if (errors.length === 0) {
+          toast.success(`Parsed ${data.length} exhibitors successfully`);
         } else {
-          errors.push(`Row ${index + 2}: ${validation.errors.join(', ')}`);
+          toast.error(`Found ${errors.length} validation errors`);
         }
-      }
+      },
+      error: (error) => {
+        toast.error('Failed to parse CSV', { description: error.message });
+      },
     });
-
-    setParsedData(exhibitors);
-    setValidationErrors(errors);
   };
 
   const handleImport = async () => {
-    if (!houstonEvent) {
-      toast.error('No active event found for import');
+    if (parsedData.length === 0) {
+      toast.error('No data to import');
       return;
     }
 
-    setIsImporting(true);
-    setImportProgress(0);
+    setImporting(true);
+    setProgress(0);
+
+    let created = 0;
+    let updated = 0;
+    let skipped = 0;
 
     try {
-      const venueId = houstonEvent.venue?.id;
-      const floorPlanId = venueId ? await getFloorPlanId(venueId) : null;
-
       for (let i = 0; i < parsedData.length; i++) {
-        const exhibitor = parsedData[i];
-        const orgType = detectOrgType(exhibitor.organizationName);
-        const sponsorTier = getSponsorTier(exhibitor.paymentStatus, exhibitor.paid);
-        const websiteUrl = generateWebsiteURL(exhibitor.organizationName);
+        const row = parsedData[i];
+        
+        // Check if exhibitor already exists
+        const { data: existing } = await supabase
+          .from('exhibitors')
+          .select('id')
+          .eq('org_name', row.org_name)
+          .single();
 
-        await supabase.from('booths').insert({
-          event_id: houstonEvent.id,
-          venue_id: venueId,
-          floor_plan_id: floorPlanId,
-          org_name: exhibitor.organizationName,
-          org_type: orgType,
-          sponsor_tier: sponsorTier,
-          table_no: exhibitor.boothNumber || null,
-          contact_name: exhibitor.contactName,
-          contact_email: exhibitor.email,
-          contact_phone: exhibitor.phone,
-          website_url: websiteUrl,
-          offers_on_spot_admission: exhibitor.acceptingOnSpot,
-          waives_application_fee: exhibitor.applicationFeesWaived,
-          scholarship_info: exhibitor.scholarshipsOnSpot ? 'Available on-spot' : null,
-          booth_width: 40,
-          booth_depth: 40,
-          latitude: 29.6847,
-          longitude: -95.4107,
-          x_position: null,
-          y_position: null,
-        });
+        const exhibitorData = {
+          org_name: row.org_name.trim(),
+          org_type: row.org_type || 'college',
+          website_url: row.website_url?.trim() || null,
+          description: row.description?.trim() || null,
+          contact_name: row.contact_name?.trim() || null,
+          contact_email: row.contact_email?.trim() || null,
+          contact_phone: row.contact_phone?.trim() || null,
+          offers_on_spot_admission: row.offers_on_spot_admission === true || row.offers_on_spot_admission === 'true' || row.offers_on_spot_admission === 'yes',
+          waives_application_fee: row.waives_application_fee === true || row.waives_application_fee === 'true' || row.waives_application_fee === 'yes',
+          scholarship_info: row.scholarship_info?.trim() || null,
+        };
 
-        setImportProgress(((i + 1) / parsedData.length) * 100);
+        if (existing) {
+          // Update existing exhibitor
+          const { error } = await supabase
+            .from('exhibitors')
+            .update(exhibitorData)
+            .eq('id', existing.id);
+
+          if (error) {
+            console.error(`Error updating ${row.org_name}:`, error);
+            skipped++;
+          } else {
+            updated++;
+          }
+        } else {
+          // Create new exhibitor
+          const { error } = await supabase
+            .from('exhibitors')
+            .insert([exhibitorData]);
+
+          if (error) {
+            console.error(`Error creating ${row.org_name}:`, error);
+            skipped++;
+          } else {
+            created++;
+          }
+        }
+
+        setProgress(Math.round(((i + 1) / parsedData.length) * 100));
       }
 
-      toast.success(`Successfully imported ${parsedData.length} exhibitors`);
-      setParsedData([]);
-      setFile(null);
+      setImportResults({ created, updated, skipped });
+      toast.success('Import completed', {
+        description: `Created: ${created}, Updated: ${updated}, Skipped: ${skipped}`,
+      });
     } catch (error: any) {
       toast.error('Import failed', { description: error.message });
     } finally {
-      setIsImporting(false);
-      setImportProgress(0);
+      setImporting(false);
     }
   };
 
-  const getFloorPlanId = async (venueId: string) => {
-    const { data } = await supabase
-      .from('floor_plans')
-      .select('id')
-      .eq('venue_id', venueId)
-      .limit(1)
-      .single();
-    return data?.id || null;
+  const downloadTemplate = () => {
+    const template = `org_name,org_type,website_url,description,contact_name,contact_email,contact_phone,offers_on_spot_admission,waives_application_fee,scholarship_info
+"Example University","college","https://example.edu","A great university","John Doe","john@example.edu","555-1234","yes","yes","Full scholarships available"`;
+
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'exhibitor_import_template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <Upload className="w-6 h-6 text-primary" />
-            <div>
-              <h3 className="font-semibold">Import Exhibitors from CSV</h3>
-              <p className="text-sm text-muted-foreground">
-                Upload your exhibitor list to automatically create booth entries
-              </p>
-            </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Import Exhibitors from CSV</CardTitle>
+        <CardDescription>
+          Bulk import exhibitors into the master directory
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <Input
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              disabled={importing}
+            />
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            <label className="flex-1">
-              <input
-                type="file"
-                accept=".csv"
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={isParsing || isImporting}
-              />
-              <Button
-                variant="outline"
-                className="w-full"
-                disabled={isParsing || isImporting}
-                asChild
-              >
-                <span>
-                  <FileText className="w-4 h-4 mr-2" />
-                  {file ? file.name : 'Choose CSV File'}
-                </span>
-              </Button>
-            </label>
-
-            <Button
-              variant="outline"
-              onClick={() => window.open('/datasets/houston_booths.csv', '_blank')}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Template
-            </Button>
-          </div>
-
-          {isParsing && (
-            <Alert>
-              <AlertCircle className="w-4 h-4" />
-              <AlertDescription>Parsing CSV file...</AlertDescription>
-            </Alert>
-          )}
-
-          {parsedData.length > 0 && (
-            <Alert>
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              <AlertDescription>
-                <strong>{parsedData.length}</strong> valid exhibitors found
-                {validationErrors.length > 0 && (
-                  <span className="text-destructive ml-2">
-                    ({validationErrors.length} errors)
-                  </span>
-                )}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {validationErrors.length > 0 && (
-            <div className="max-h-40 overflow-y-auto space-y-1">
-              {validationErrors.map((error, i) => (
-                <p key={i} className="text-sm text-destructive">{error}</p>
-              ))}
-            </div>
-          )}
-
-          {isImporting && (
-            <div className="space-y-2">
-              <Progress value={importProgress} />
-              <p className="text-sm text-muted-foreground text-center">
-                Importing... {Math.round(importProgress)}%
-              </p>
-            </div>
-          )}
-
-          {parsedData.length > 0 && !isImporting && (
-            <Button 
-              onClick={handleImport} 
-              className="w-full"
-              size="lg"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Import {parsedData.length} Exhibitors
-            </Button>
-          )}
+          <Button variant="outline" onClick={downloadTemplate}>
+            <Download className="w-4 h-4 mr-2" />
+            Download Template
+          </Button>
         </div>
-      </Card>
-    </div>
+
+        {validationErrors.length > 0 && (
+          <Alert variant="destructive">
+            <AlertCircle className="w-4 h-4" />
+            <AlertDescription>
+              <div className="font-semibold">Validation Errors:</div>
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                {validationErrors.slice(0, 10).map((error, i) => (
+                  <li key={i} className="text-sm">{error}</li>
+                ))}
+                {validationErrors.length > 10 && (
+                  <li className="text-sm">... and {validationErrors.length - 10} more errors</li>
+                )}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {parsedData.length > 0 && validationErrors.length === 0 && (
+          <Alert>
+            <CheckCircle2 className="w-4 h-4" />
+            <AlertDescription>
+              Ready to import {parsedData.length} exhibitors
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {importing && (
+          <div className="space-y-2">
+            <Progress value={progress} />
+            <p className="text-sm text-muted-foreground text-center">
+              Importing... {progress}%
+            </p>
+          </div>
+        )}
+
+        {importResults && (
+          <Alert>
+            <CheckCircle2 className="w-4 h-4" />
+            <AlertDescription>
+              <div className="font-semibold">Import Complete:</div>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                <li>Created: {importResults.created}</li>
+                <li>Updated: {importResults.updated}</li>
+                <li>Skipped: {importResults.skipped}</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Button
+          onClick={handleImport}
+          disabled={parsedData.length === 0 || validationErrors.length > 0 || importing}
+          className="w-full"
+        >
+          <Upload className="w-4 h-4 mr-2" />
+          Import Exhibitors
+        </Button>
+      </CardContent>
+    </Card>
   );
 };

@@ -1,103 +1,119 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import type { Booth } from "./useBooths";
+
+export interface Exhibitor {
+  id: string;
+  org_name: string;
+  org_type: string;
+  website_url: string | null;
+  logo_url: string | null;
+  description: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  campus_address: string | null;
+  campus_city: string | null;
+  campus_state: string | null;
+  campus_zip: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  offers_on_spot_admission: boolean;
+  waives_application_fee: boolean;
+  scholarship_info: string | null;
+  is_verified: boolean;
+  metadata: any;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface ExhibitorFilters {
   search?: string;
   orgType?: string;
-  sponsorTier?: string;
   hasOnSpotAdmission?: boolean;
   hasFeeWaiver?: boolean;
   hasScholarships?: boolean;
-  assignedOnly?: boolean;
-  unassignedOnly?: boolean;
+  isVerified?: boolean;
 }
 
-export function useExhibitors(eventId: string | null, filters?: ExhibitorFilters) {
+export function useExhibitors(filters?: ExhibitorFilters) {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ["exhibitors", eventId, filters],
+    queryKey: ["exhibitors", filters],
     queryFn: async () => {
-      if (!eventId) return [];
+      let query = supabase
+        .from("exhibitors")
+        .select("*");
 
-      // Check if user is authenticated (admins need full access to contact info)
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // Authenticated admins get full booth data including contact info
-        let query = supabase
-          .from("booths")
-          .select("*")
-          .eq("event_id", eventId);
-
-        // Apply filters
-        if (filters?.search) {
-          query = query.ilike("org_name", `%${filters.search}%`);
-        }
-
-        if (filters?.orgType) {
-          query = query.eq("org_type", filters.orgType);
-        }
-
-        if (filters?.sponsorTier) {
-          query = query.eq("sponsor_tier", filters.sponsorTier);
-        }
-
-        if (filters?.hasOnSpotAdmission) {
-          query = query.eq("offers_on_spot_admission", true);
-        }
-
-        if (filters?.hasFeeWaiver) {
-          query = query.eq("waives_application_fee", true);
-        }
-
-        if (filters?.hasScholarships) {
-          query = query.not("scholarship_info", "is", null);
-        }
-
-        if (filters?.assignedOnly) {
-          query = query.not("x_position", "is", null);
-        }
-
-        if (filters?.unassignedOnly) {
-          query = query.is("x_position", null);
-        }
-
-        const { data, error } = await query.order("org_name");
-
-        if (error) throw error;
-        
-        // Map data to match Booth interface
-        return (data || []).map(booth => ({
-          ...booth,
-          booth_number: booth.table_no,
-          qr_code_url: null,
-        }));
-      } else {
-        // This shouldn't happen for exhibitors module (admin only), but handle gracefully
-        return [];
+      // Apply filters
+      if (filters?.search) {
+        query = query.ilike("org_name", `%${filters.search}%`);
       }
+
+      if (filters?.orgType) {
+        query = query.eq("org_type", filters.orgType);
+      }
+
+      if (filters?.hasOnSpotAdmission) {
+        query = query.eq("offers_on_spot_admission", true);
+      }
+
+      if (filters?.hasFeeWaiver) {
+        query = query.eq("waives_application_fee", true);
+      }
+
+      if (filters?.hasScholarships) {
+        query = query.not("scholarship_info", "is", null);
+      }
+
+      if (filters?.isVerified !== undefined) {
+        query = query.eq("is_verified", filters.isVerified);
+      }
+
+      const { data, error } = await query.order("org_name");
+
+      if (error) throw error;
+      return (data || []) as Exhibitor[];
     },
-    enabled: !!eventId,
+  });
+
+  const createExhibitor = useMutation({
+    mutationFn: async (exhibitor: Partial<Exhibitor>) => {
+      const { data, error } = await supabase
+        .from("exhibitors")
+        .insert([exhibitor as any])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["exhibitors"] });
+      toast.success("Exhibitor created successfully");
+    },
+    onError: (error: any) => {
+      toast.error("Failed to create exhibitor", {
+        description: error.message,
+      });
+    },
   });
 
   const updateExhibitor = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Booth> }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Exhibitor> }) => {
       const { error } = await supabase
-        .from("booths")
+        .from("exhibitors")
         .update(updates)
         .eq("id", id);
 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["exhibitors", eventId] });
-      queryClient.invalidateQueries({ queryKey: ["booths", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["exhibitors"] });
       toast.success("Exhibitor updated successfully");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("Failed to update exhibitor", {
         description: error.message,
       });
@@ -106,15 +122,14 @@ export function useExhibitors(eventId: string | null, filters?: ExhibitorFilters
 
   const deleteExhibitor = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("booths").delete().eq("id", id);
+      const { error } = await supabase.from("exhibitors").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["exhibitors", eventId] });
-      queryClient.invalidateQueries({ queryKey: ["booths", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["exhibitors"] });
       toast.success("Exhibitor deleted successfully");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("Failed to delete exhibitor", {
         description: error.message,
       });
@@ -125,8 +140,10 @@ export function useExhibitors(eventId: string | null, filters?: ExhibitorFilters
     exhibitors: query.data || [],
     isLoading: query.isLoading,
     error: query.error,
+    createExhibitor: createExhibitor.mutate,
     updateExhibitor: updateExhibitor.mutate,
     deleteExhibitor: deleteExhibitor.mutate,
+    isCreating: createExhibitor.isPending,
     isUpdating: updateExhibitor.isPending,
     isDeleting: deleteExhibitor.isPending,
   };
