@@ -159,11 +159,13 @@ export const DallasCSVImporter = () => {
             }
           }
 
-          // Update floor plan with background image
+          // Update floor plan with background image and dimensions
           await supabase
             .from("floor_plans")
             .update({
               background_image_url: "/floor-plans/dallas-fort-worth-gym.jpg",
+              canvas_width: 1200,
+              canvas_height: 800,
             })
             .eq("id", floorPlanId);
 
