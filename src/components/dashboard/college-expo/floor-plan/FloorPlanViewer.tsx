@@ -63,7 +63,9 @@ export const FloorPlanViewer = ({
               style={{ 
                 width: "100%",
                 maxWidth: "1200px",
-                aspectRatio: "3/2",
+                aspectRatio: floorPlan.canvas_width && floorPlan.canvas_height 
+                  ? `${floorPlan.canvas_width}/${floorPlan.canvas_height}` 
+                  : "16/9",
               }}
             >
               <TransformComponent
@@ -75,7 +77,7 @@ export const FloorPlanViewer = ({
                   <img
                     src={floorPlan.background_image_url}
                     alt="Floor plan"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-contain"
                     style={{ pointerEvents: "none" }}
                   />
                 )}
