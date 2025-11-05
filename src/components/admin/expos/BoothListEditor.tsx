@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Grid, MapPin, Save, Repeat, Move, ChevronDown, Settings, FolderTree, Sparkles } from "lucide-react";
+import { Search, Grid, MapPin, Save, Repeat, Move, ChevronDown, Settings, FolderTree, Sparkles, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BoothGridSelector } from "./BoothGridSelector";
@@ -60,6 +61,7 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   const [zoneManagerOpen, setZoneManagerOpen] = useState(false);
   const [featuresDrawerBooth, setFeaturesDrawerBooth] = useState<any>(null);
   const [isFeaturesDrawerOpen, setIsFeaturesDrawerOpen] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
   
   const { isMobile } = useMobileDetection();
 
@@ -298,6 +300,45 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
     }
   };
 
+  const handleClearPositions = async () => {
+    if (selectedBooths.size === 0) {
+      toast.error("No booths selected");
+      return;
+    }
+
+    const boothIds = Array.from(selectedBooths);
+    setIsSaving(true);
+    toast.loading(`Clearing positions for ${boothIds.length} booth(s)...`, { id: "clear-positions" });
+
+    try {
+      for (const boothId of boothIds) {
+        const { error } = await supabase
+          .from("booths")
+          .update({
+            grid_row: null,
+            grid_col: null,
+            x_position: null,
+            y_position: null,
+          })
+          .eq("id", boothId);
+
+        if (error) throw error;
+      }
+
+      toast.success(`Cleared positions for ${boothIds.length} booth(s)`, {
+        id: "clear-positions",
+        description: "These booths can now be repositioned anywhere",
+      });
+      setSelectedBooths(new Set());
+      refetchBooths();
+    } catch (error: any) {
+      console.error("Error clearing booth positions:", error);
+      toast.error("Failed to clear booth positions", { id: "clear-positions" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-4">
       <Card className="p-4">
@@ -386,6 +427,16 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
                 >
                   <Move className="w-4 h-4 mr-2" />
                   Move {selectedBooths.size} Selected
+                </Button>
+                <Button
+                  variant="destructive"
+                  size={isMobile ? "lg" : "sm"}
+                  onClick={() => setShowClearDialog(true)}
+                  disabled={isSaving}
+                  className={cn(isMobile && "min-h-[48px]")}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Clear Positions
                 </Button>
                 <Button
                   variant="ghost"
@@ -823,6 +874,31 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
           onUpdate={() => refetchBooths()}
         />
       )}
+
+      <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear Booth Positions?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove the grid positions for {selectedBooths.size} selected booth(s). 
+              They will appear as "Not positioned" and can be placed anywhere afterwards.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowClearDialog(false);
+                handleClearPositions();
+              }}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Clear Positions
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
