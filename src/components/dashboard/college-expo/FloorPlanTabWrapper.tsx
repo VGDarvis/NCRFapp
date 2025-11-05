@@ -1,42 +1,39 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { FloorPlanTab } from "./FloorPlanTab";
+import { EventSwitcher } from "./map/EventSwitcher";
+import { useEvents } from "@/hooks/useEvents";
 
 export const FloorPlanTabWrapper = () => {
-  const [eventId, setEventId] = useState<string | null>(null);
-  const [venueId, setVenueId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const { eventsWithVenues, isLoadingEventsWithVenues } = useEvents();
 
+  // Smart auto-selection: Select most upcoming event or most recent past event
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("events")
-          .select("id, venue_id")
-          .eq("status", "upcoming")
-          .order("start_at", { ascending: true })
-          .limit(1)
-          .maybeSingle();
+    if (!eventsWithVenues || eventsWithVenues.length === 0 || selectedEventId) return;
 
-        if (error) throw error;
-        
-        if (data) {
-          setEventId(data.id);
-          setVenueId(data.venue_id);
-        }
-      } catch (error) {
-        console.error("Error fetching event:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Sort events by start date
+    const sortedEvents = [...eventsWithVenues].sort(
+      (a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+    );
 
-    fetchEvent();
-  }, []);
+    // Find the next upcoming event
+    const now = new Date();
+    const upcomingEvent = sortedEvents.find(e => new Date(e.start_at) >= now);
 
-  if (loading) {
+    // Auto-select upcoming event, or fall back to most recent past event
+    const eventToSelect = upcomingEvent || sortedEvents[sortedEvents.length - 1];
+    
+    if (eventToSelect) {
+      setSelectedEventId(eventToSelect.id);
+    }
+  }, [eventsWithVenues, selectedEventId]);
+
+  const selectedEvent = eventsWithVenues?.find(e => e.id === selectedEventId);
+  const venueId = selectedEvent?.venue_id || null;
+
+  if (isLoadingEventsWithVenues) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="p-12 text-center">
@@ -47,7 +44,7 @@ export const FloorPlanTabWrapper = () => {
     );
   }
 
-  if (!eventId) {
+  if (!eventsWithVenues || eventsWithVenues.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="p-12 text-center">
@@ -60,5 +57,31 @@ export const FloorPlanTabWrapper = () => {
     );
   }
 
-  return <FloorPlanTab eventId={eventId} venueId={venueId} />;
+  if (!selectedEventId) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card className="p-12 text-center">
+          <h3 className="text-xl font-semibold mb-2">Select an Event</h3>
+          <p className="text-muted-foreground mb-4">
+            Choose an event to view the BCE Map
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Event Switcher */}
+      <Card className="p-4 mb-6">
+        <EventSwitcher
+          events={eventsWithVenues}
+          selectedEventId={selectedEventId}
+          onEventSelect={setSelectedEventId}
+        />
+      </Card>
+
+      <FloorPlanTab eventId={selectedEventId} venueId={venueId} />
+    </div>
+  );
 };
