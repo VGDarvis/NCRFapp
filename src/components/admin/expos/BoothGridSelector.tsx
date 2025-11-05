@@ -14,6 +14,8 @@ import {
 import { Zone } from "@/hooks/useZones";
 import { useMobileDetection } from "@/hooks/useMobileDetection";
 import { cn } from "@/lib/utils";
+import { GridZoomControls } from "./GridZoomControls";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface BoothGridSelectorProps {
   selectedPosition: GridPosition | null;
@@ -38,9 +40,10 @@ export const BoothGridSelector = ({
 }: BoothGridSelectorProps) => {
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
   const { isMobile } = useMobileDetection();
+  const [zoom, setZoom] = useState(1);
   
-  // Responsive cell size
-  const cellSize = isMobile ? 40 : 50;
+  // Responsive cell size - larger on mobile for better touch targets
+  const cellSize = isMobile ? 56 : 50;
   const gridWidth = GRID_COLS * cellSize;
   const gridHeight = GRID_ROWS * cellSize;
 
@@ -170,14 +173,37 @@ export const BoothGridSelector = ({
         </div>
 
         <div className="relative w-full overflow-x-auto pb-6">
-          <div
-            className="relative mx-auto"
-            style={{
-              width: `${gridWidth}px`,
-              height: `${gridHeight}px`,
-              minWidth: "320px",
-            }}
+          <TransformWrapper
+            initialScale={1}
+            minScale={0.5}
+            maxScale={3}
+            centerOnInit
+            wheel={{ disabled: !isMobile }}
+            onZoom={(ref) => setZoom(ref.state.scale)}
           >
+            {({ zoomIn, zoomOut, resetTransform }) => (
+              <>
+                {isMobile && (
+                  <GridZoomControls
+                    onZoomIn={() => zoomIn()}
+                    onZoomOut={() => zoomOut()}
+                    onResetZoom={() => resetTransform()}
+                  />
+                )}
+                <TransformComponent
+                  wrapperStyle={{
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <div
+                    className="relative mx-auto"
+                    style={{
+                      width: `${gridWidth}px`,
+                      height: `${gridHeight}px`,
+                      minWidth: "320px",
+                    }}
+                  >
             {/* Background image if available */}
             {backgroundImageUrl && (
               <img
@@ -198,11 +224,15 @@ export const BoothGridSelector = ({
                   width: `${zone.cols * cellSize}px`,
                   height: `${zone.rows * cellSize}px`,
                   borderColor: zone.color,
-                  backgroundColor: `${zone.color}15`,
+                  backgroundColor: `${zone.color}25`,
+                  borderWidth: isMobile ? "3px" : "2px",
                 }}
               >
                 <span
-                  className="absolute top-1 left-1 text-xs font-semibold px-1 rounded"
+                  className={cn(
+                    "absolute top-1 left-1 font-semibold px-1 rounded shadow-sm",
+                    isMobile ? "text-sm" : "text-xs"
+                  )}
                   style={{
                     backgroundColor: zone.color,
                     color: 'white',
@@ -282,13 +312,12 @@ export const BoothGridSelector = ({
               {Array.from({ length: GRID_ROWS }).map((_, i) => (
                 <div key={i}>{String.fromCharCode(65 + i)}</div>
               ))}
-            </div>
-            <div className="absolute -top-6 left-0 w-full flex justify-around text-xs text-muted-foreground">
-              {Array.from({ length: GRID_COLS }).map((_, i) => (
-                <div key={i}>{i + 1}</div>
-              ))}
-            </div>
-          </div>
+             </div>
+                  </div>
+                </TransformComponent>
+              </>
+            )}
+          </TransformWrapper>
         </div>
 
         <div className="flex gap-4 mt-4 text-xs">

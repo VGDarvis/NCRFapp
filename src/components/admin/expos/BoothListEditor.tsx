@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Grid, MapPin, Save, Repeat, Move, ChevronDown, Settings, FolderTree } from "lucide-react";
+import { Search, Grid, MapPin, Save, Repeat, Move, ChevronDown, Settings, FolderTree, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BoothGridSelector } from "./BoothGridSelector";
@@ -23,6 +23,7 @@ import { BulkMoveDialog } from "./BulkMoveDialog";
 import { LayoutCopier } from "./LayoutCopier";
 import { ZoneManager } from "./ZoneManager";
 import { FloorPlanImageUpload } from "./FloorPlanImageUpload";
+import { BoothFeaturesDrawer } from "./BoothFeaturesDrawer";
 import { useFloorPlans } from "@/hooks/useFloorPlans";
 import { useMobileDetection } from "@/hooks/useMobileDetection";
 import { cn } from "@/lib/utils";
@@ -57,6 +58,8 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   const [showBulkMove, setShowBulkMove] = useState(false);
   const [floorPlanSettingsOpen, setFloorPlanSettingsOpen] = useState(false);
   const [zoneManagerOpen, setZoneManagerOpen] = useState(false);
+  const [featuresDrawerBooth, setFeaturesDrawerBooth] = useState<any>(null);
+  const [isFeaturesDrawerOpen, setIsFeaturesDrawerOpen] = useState(false);
   
   const { isMobile } = useMobileDetection();
 
@@ -740,27 +743,41 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
                 )}
 
                 {editingBoothId !== booth.id && !swapMode && (
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      variant="outline"
-                      size={isMobile ? "lg" : "sm"}
-                      onClick={() => {
-                        setEditingBoothId(booth.id);
-                        setSelectedGridPosition(currentGridPos);
-                      }}
-                      className={cn("flex-1", isMobile && "min-h-[48px]")}
-                    >
-                      <MapPin className="w-4 h-4 mr-1" />
-                      Edit Position
-                    </Button>
+                  <div className="flex flex-col gap-2 mt-2">
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size={isMobile ? "lg" : "sm"}
+                        onClick={() => {
+                          setFeaturesDrawerBooth(booth);
+                          setIsFeaturesDrawerOpen(true);
+                        }}
+                        className={cn("flex-1", isMobile && "min-h-[48px]")}
+                      >
+                        <Sparkles className="w-4 h-4 mr-1" />
+                        Edit Features
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size={isMobile ? "lg" : "sm"}
+                        onClick={() => {
+                          setEditingBoothId(booth.id);
+                          setSelectedGridPosition(currentGridPos);
+                        }}
+                        className={cn("flex-1", isMobile && "min-h-[48px]")}
+                      >
+                        <MapPin className="w-4 h-4 mr-1" />
+                        Move Booth
+                      </Button>
+                    </div>
                     <Button
                       variant="secondary"
                       size={isMobile ? "lg" : "sm"}
                       onClick={() => handleAutoAssign(booth.id)}
                       disabled={isSaving}
-                      className={cn(isMobile && "min-h-[48px]")}
+                      className={cn("w-full", isMobile && "min-h-[48px]")}
                     >
-                      Auto-Assign
+                      Auto-Assign Position
                     </Button>
                   </div>
                 )}
@@ -790,6 +807,22 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
           refetchBooths();
         }}
       />
+
+      {featuresDrawerBooth && (
+        <BoothFeaturesDrawer
+          open={isFeaturesDrawerOpen}
+          onOpenChange={setIsFeaturesDrawerOpen}
+          boothId={featuresDrawerBooth.id}
+          boothNumber={featuresDrawerBooth.table_no}
+          organizationName={featuresDrawerBooth.org_name || "Unknown"}
+          initialFeatures={{
+            offers_on_spot_admission: featuresDrawerBooth.offers_on_spot_admission || false,
+            scholarship_info: featuresDrawerBooth.scholarship_info,
+            waives_application_fee: featuresDrawerBooth.waives_application_fee || false,
+          }}
+          onUpdate={() => refetchBooths()}
+        />
+      )}
     </div>
   );
 };
