@@ -105,7 +105,6 @@ export function BoothEditorTab() {
                     <tr className="border-b bg-muted/50">
                       <th className="p-3 text-left text-sm font-medium">Booth #</th>
                       <th className="p-3 text-left text-sm font-medium">Organization</th>
-                      <th className="p-3 text-left text-sm font-medium">Sponsorship</th>
                       <th className="p-3 text-right text-sm font-medium">Actions</th>
                       <th className="p-3 text-center text-sm font-medium w-20">Delete</th>
                     </tr>
@@ -115,16 +114,6 @@ export function BoothEditorTab() {
                       <tr key={booth.id} className="border-b hover:bg-muted/30 transition-colors">
                         <td className="p-3 text-sm font-mono">{booth.table_no || "—"}</td>
                         <td className="p-3 text-sm">{booth.org_name || "No organization"}</td>
-                        <td className="p-3 text-sm">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            booth.sponsor_tier === "gold" ? "bg-yellow-100 text-yellow-800" :
-                            booth.sponsor_tier === "silver" ? "bg-gray-100 text-gray-800" :
-                            booth.sponsor_tier === "bronze" ? "bg-orange-100 text-orange-800" :
-                            "bg-blue-100 text-blue-800"
-                          }`}>
-                            {booth.sponsor_tier || "Standard"}
-                          </span>
-                        </td>
                         <td className="p-3 text-right">
                           <Button
                             variant="ghost"
