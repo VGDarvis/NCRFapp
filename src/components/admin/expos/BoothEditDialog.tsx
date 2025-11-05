@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Booth } from "@/hooks/useBooths";
 import { useAvailableBoothNumbers, useOrganizationOptions } from "@/hooks/useBoothPresets";
 import { useBooths } from "@/hooks/useBooths";
@@ -24,11 +25,14 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAllBooths, setShowAllBooths] = useState(false);
   const [formData, setFormData] = useState({
     table_no: booth.table_no || "",
     org_name: booth.org_name || "",
     description: booth.description || "",
-    sponsor_tier: booth.sponsor_tier || "standard",
+    offers_on_spot_admission: booth.offers_on_spot_admission || false,
+    scholarship_info: !!booth.scholarship_info,
+    waives_application_fee: booth.waives_application_fee || false,
     x_position: booth.x_position?.toString() || "",
     y_position: booth.y_position?.toString() || "",
     booth_width: booth.booth_width?.toString() || "60",
@@ -50,7 +54,9 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       table_no: booth.table_no || "",
       org_name: booth.org_name || "",
       description: booth.description || "",
-      sponsor_tier: booth.sponsor_tier || "standard",
+      offers_on_spot_admission: booth.offers_on_spot_admission || false,
+      scholarship_info: !!booth.scholarship_info,
+      waives_application_fee: booth.waives_application_fee || false,
       x_position: booth.x_position?.toString() || "",
       y_position: booth.y_position?.toString() || "",
       booth_width: booth.booth_width?.toString() || "60",
@@ -69,7 +75,9 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
           table_no: formData.table_no,
           org_name: formData.org_name,
           description: formData.description,
-          sponsor_tier: formData.sponsor_tier,
+          offers_on_spot_admission: formData.offers_on_spot_admission,
+          scholarship_info: formData.scholarship_info ? "Available" : null,
+          waives_application_fee: formData.waives_application_fee,
           x_position: formData.x_position ? parseFloat(formData.x_position) : null,
           y_position: formData.y_position ? parseFloat(formData.y_position) : null,
           booth_width: formData.booth_width ? parseFloat(formData.booth_width) : 60,
@@ -151,30 +159,49 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                 Loading booth numbers...
               </div>
             ) : (
-              <Select
-                value={formData.table_no}
-                onValueChange={(value) => setFormData({ ...formData, table_no: value })}
-                required
-              >
-                <SelectTrigger id="table_no">
-                  <SelectValue placeholder="Select booth number" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  {boothNumbers.map((boothNum) => {
-                    const isAssigned = assignedBoothNumbers.has(boothNum);
-                    const isCurrent = boothNum === booth.table_no;
-                    return (
-                      <SelectItem 
-                        key={boothNum} 
-                        value={boothNum}
-                        disabled={isAssigned && !isCurrent}
-                      >
-                        {boothNum} {isAssigned && !isCurrent && "• Already Assigned"}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+              <>
+                <Select
+                  value={formData.table_no}
+                  onValueChange={(value) => setFormData({ ...formData, table_no: value })}
+                  required
+                >
+                  <SelectTrigger id="table_no" className="min-h-[48px]">
+                    <SelectValue placeholder="Select booth number" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px] z-50 bg-background">
+                    {boothNumbers
+                      .filter(boothNum => {
+                        if (showAllBooths) return true;
+                        const isAssigned = assignedBoothNumbers.has(boothNum);
+                        const isCurrent = boothNum === booth.table_no;
+                        return !isAssigned || isCurrent;
+                      })
+                      .map((boothNum) => {
+                        const isAssigned = assignedBoothNumbers.has(boothNum);
+                        const isCurrent = boothNum === booth.table_no;
+                        return (
+                          <SelectItem 
+                            key={boothNum} 
+                            value={boothNum}
+                            disabled={isAssigned && !isCurrent}
+                            className="min-h-[44px]"
+                          >
+                            {boothNum} {isAssigned && !isCurrent && "• Already Assigned"}
+                          </SelectItem>
+                        );
+                      })}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAllBooths(!showAllBooths)}
+                  className="text-xs h-auto py-1"
+                >
+                  {showAllBooths ? "Show Available Only" : "Show All Booths"}
+                </Button>
+              </>
             )}
           </div>
 
@@ -216,22 +243,66 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="sponsor_tier">Sponsorship Level</Label>
-            <Select
-              value={formData.sponsor_tier}
-              onValueChange={(value) => setFormData({ ...formData, sponsor_tier: value })}
-            >
-              <SelectTrigger id="sponsor_tier">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="standard">Standard</SelectItem>
-                <SelectItem value="bronze">Bronze</SelectItem>
-                <SelectItem value="silver">Silver</SelectItem>
-                <SelectItem value="gold">Gold</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Special Features</Label>
+            <div className="space-y-3 p-4 border rounded-lg bg-muted/20">
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="on_spot_admission"
+                  checked={formData.offers_on_spot_admission}
+                  onCheckedChange={(checked) => 
+                    setFormData({ ...formData, offers_on_spot_admission: checked as boolean })
+                  }
+                  className="mt-1"
+                />
+                <div className="space-y-1 flex-1">
+                  <label htmlFor="on_spot_admission" className="text-sm font-medium cursor-pointer">
+                    🎓 Acceptance on the Spot
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Offers immediate admission decisions to qualified students
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="scholarships"
+                  checked={formData.scholarship_info}
+                  onCheckedChange={(checked) => 
+                    setFormData({ ...formData, scholarship_info: checked as boolean })
+                  }
+                  className="mt-1"
+                />
+                <div className="space-y-1 flex-1">
+                  <label htmlFor="scholarships" className="text-sm font-medium cursor-pointer">
+                    💰 Scholarships on the Spot
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Provides scholarship opportunities during the event
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="fee_waivers"
+                  checked={formData.waives_application_fee}
+                  onCheckedChange={(checked) => 
+                    setFormData({ ...formData, waives_application_fee: checked as boolean })
+                  }
+                  className="mt-1"
+                />
+                <div className="space-y-1 flex-1">
+                  <label htmlFor="fee_waivers" className="text-sm font-medium cursor-pointer">
+                    💳 Application Fee Waivers
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Waives application fees for students who apply today
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm">
@@ -244,16 +315,16 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
               variant="destructive" 
               onClick={() => setShowDeleteConfirm(true)} 
               disabled={saving || deleting}
-              className="sm:mr-auto"
+              className="sm:mr-auto min-h-[48px]"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Delete Booth
             </Button>
             <div className="flex gap-2 sm:ml-auto">
-              <Button type="button" variant="outline" onClick={onClose} disabled={saving || deleting}>
+              <Button type="button" variant="outline" onClick={onClose} disabled={saving || deleting} className="min-h-[48px]">
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving || deleting}>
+              <Button type="submit" disabled={saving || deleting} className="min-h-[48px]">
                 {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Save Changes
               </Button>

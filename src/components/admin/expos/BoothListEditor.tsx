@@ -423,9 +423,20 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
               Auto-Arrange All
             </Button>
             
-            <Badge variant="secondary" className="flex items-center">
-              {filteredBooths.length} booth{filteredBooths.length !== 1 ? "s" : ""}
-            </Badge>
+            <div className="flex flex-wrap gap-2 ml-auto">
+              <Badge variant="secondary" className="flex items-center">
+                {filteredBooths.length} booth{filteredBooths.length !== 1 ? "s" : ""}
+              </Badge>
+              <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20">
+                🎓 {booths.filter((b: any) => b.offers_on_spot_admission).length}
+              </Badge>
+              <Badge variant="secondary" className="bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20">
+                💰 {booths.filter((b: any) => b.scholarship_info).length}
+              </Badge>
+              <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20">
+                💳 {booths.filter((b: any) => b.waives_application_fee).length}
+              </Badge>
+            </div>
           </div>
         )}
       </Card>
@@ -602,6 +613,26 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
                       <p className="text-sm text-muted-foreground">
                         {booth.org_name}
                       </p>
+                      {/* Special Features Badges */}
+                      {(booth.offers_on_spot_admission || booth.scholarship_info || booth.waives_application_fee) && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {booth.offers_on_spot_admission && (
+                            <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-300 border-green-500/20">
+                              🎓 On-Spot Admission
+                            </Badge>
+                          )}
+                          {booth.scholarship_info && (
+                            <Badge variant="secondary" className="bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20">
+                              💰 Scholarships
+                            </Badge>
+                          )}
+                          {booth.waives_application_fee && (
+                            <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20">
+                              💳 Fee Waiver
+                            </Badge>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="text-sm">
