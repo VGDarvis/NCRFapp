@@ -5120,6 +5120,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_event_statuses: { Args: never; Returns: undefined }
       update_user_roles: {
         Args: { _role_type: string; _user_id: string }
         Returns: undefined

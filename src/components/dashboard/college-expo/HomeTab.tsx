@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Calendar, GraduationCap, MapPin, TrendingUp } from 'lucide-react';
+import { Calendar, GraduationCap, MapPin, TrendingUp, LogOut } from 'lucide-react';
 import { CollegeExpoVideo } from './CollegeExpoVideo';
 import { ExpoFlyersGallery } from './ExpoFlyersGallery';
+import { FeaturedEventHero } from './FeaturedEventHero';
 import { calculateBookletScholarshipTotals, formatCurrency } from '@/lib/scholarship-utils';
 
 interface CollegeExpoHomeTabProps {
@@ -58,28 +59,40 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="font-display text-4xl font-bold text-foreground mb-2">
-            Welcome to <span className="text-primary">College Expo</span>
-          </h1>
-          <p className="text-muted-foreground">
-            Your pathway to college success and scholarship opportunities
-          </p>
+    <div className="space-y-8">
+      {/* Welcome Banner - Only if user is logged in */}
+      {!isGuest && user && (
+        <div className="container mx-auto px-4 pt-8">
+          <Card className="p-6 bg-gradient-to-r from-primary/10 to-accent/10">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">
+                  Welcome, {user.email?.split('@')[0]}! 👋
+                </h1>
+                <p className="text-muted-foreground">
+                  Your gateway to college opportunities and success
+                </p>
+              </div>
+              <Button variant="outline" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
+          </Card>
         </div>
-        {!isGuest && (
-          <Button onClick={handleSignOut} variant="outline">
-            Sign Out
-          </Button>
-        )}
-      </div>
+      )}
+
+      {/* Featured Event Hero - Dynamic based on event status */}
+      <FeaturedEventHero />
 
       {/* Video Section */}
-      <CollegeExpoVideo />
+      <div className="container mx-auto px-4">
+        <CollegeExpoVideo />
+      </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6 glass-premium border-primary/20">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-full bg-primary/20">
@@ -115,13 +128,17 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
             </div>
           </div>
         </Card>
+        </div>
       </div>
 
       {/* Expo Flyers Gallery */}
-      <ExpoFlyersGallery />
+      <div className="container mx-auto px-4">
+        <ExpoFlyersGallery />
+      </div>
 
       {/* Upcoming Events */}
-      <div className="mb-8">
+      <div className="container mx-auto px-4">
+        <div className="mb-8">
         <h2 className="text-2xl font-bold text-foreground mb-4">Upcoming College Expo Events</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {upcomingEvents.length > 0 ? (
@@ -151,10 +168,12 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
             </Card>
           )}
         </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 glass-premium border-primary/20">
           <h3 className="text-xl font-bold text-foreground mb-3">Find Scholarships</h3>
           <p className="text-muted-foreground mb-4">
@@ -170,6 +189,7 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
           </p>
           <Button variant="outline" className="w-full">Explore Resources</Button>
         </Card>
+        </div>
       </div>
     </div>
   );
