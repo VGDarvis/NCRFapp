@@ -30,15 +30,24 @@ export const EventSwitcher = ({
   selectedEventId,
   onEventSelect,
 }: EventSwitcherProps) => {
+  const selectedEvent = events.find(e => e.id === selectedEventId);
+  
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium">Select Event</label>
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">Select Event</label>
+        {selectedEvent && (
+          <Badge variant="secondary" className="text-xs">
+            Selected
+          </Badge>
+        )}
+      </div>
       <Select
         value={selectedEventId || "all"}
         onValueChange={(value) => onEventSelect(value === "all" ? null : value)}
       >
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Choose an event..." />
+        <SelectTrigger className="w-full border-2">
+          <SelectValue placeholder="Choose an event to view..." />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">

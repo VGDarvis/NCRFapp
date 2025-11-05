@@ -168,7 +168,7 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                   <SelectTrigger id="table_no" className="min-h-[48px]">
                     <SelectValue placeholder="Select booth number" />
                   </SelectTrigger>
-                  <SelectContent className="max-h-[300px] z-50 bg-background">
+                  <SelectContent className="max-h-[300px] z-[100] bg-background">
                     {boothNumbers
                       .filter(boothNum => {
                         if (showAllBooths) return true;
@@ -221,7 +221,7 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                 <SelectTrigger id="org_name">
                   <SelectValue placeholder="Select organization" />
                 </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
+                <SelectContent className="max-h-[300px] z-[100]">
                   {organizations.map((org) => (
                     <SelectItem key={org} value={org}>
                       {org}

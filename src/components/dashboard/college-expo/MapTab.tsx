@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Loader2, Search, Eye, EyeOff } from "lucide-react";
+import { Loader2, Search, Eye, EyeOff, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { EventSwitcher } from "./map/EventSwitcher";
 import { MapFilterSidebar, MapFilters } from "./map/MapFilterSidebar";
@@ -81,10 +81,24 @@ export const MapTab = () => {
       });
   }, []);
 
-  // Auto-select Houston event if it's the only one
+  // Smart auto-selection: Select most upcoming event or most recent past event
   useEffect(() => {
-    if (eventsWithVenues && eventsWithVenues.length === 1 && !selectedEventId) {
-      setSelectedEventId(eventsWithVenues[0].id);
+    if (!eventsWithVenues || eventsWithVenues.length === 0 || selectedEventId) return;
+
+    // Sort events by start date
+    const sortedEvents = [...eventsWithVenues].sort(
+      (a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+    );
+
+    // Find the next upcoming event
+    const now = new Date();
+    const upcomingEvent = sortedEvents.find(e => new Date(e.start_at) >= now);
+
+    // Auto-select upcoming event, or fall back to most recent past event
+    const eventToSelect = upcomingEvent || sortedEvents[sortedEvents.length - 1];
+    
+    if (eventToSelect) {
+      setSelectedEventId(eventToSelect.id);
     }
   }, [eventsWithVenues, selectedEventId]);
 
@@ -334,6 +348,22 @@ export const MapTab = () => {
           {!isLoaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-background/80">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          )}
+          {/* Empty State when no event selected */}
+          {isLoaded && !selectedEventId && eventsWithVenues && eventsWithVenues.length > 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/95 z-10">
+              <Card className="max-w-md p-8 text-center shadow-lg">
+                <div className="text-6xl mb-4">📍</div>
+                <h3 className="text-xl font-semibold mb-2">Select an Event Above</h3>
+                <p className="text-muted-foreground mb-4">
+                  Choose an event from the dropdown to view expo locations and booths on the map
+                </p>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
+                  <span>{eventsWithVenues.length} event{eventsWithVenues.length !== 1 ? 's' : ''} available</span>
+                </div>
+              </Card>
             </div>
           )}
         </Card>
