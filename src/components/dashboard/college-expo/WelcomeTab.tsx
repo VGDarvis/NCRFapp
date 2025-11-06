@@ -112,36 +112,6 @@ export const WelcomeTab = () => {
         </div>
       </Card>
 
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
-            <MapPinned className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold mb-1">Explore Map</h3>
-            <p className="text-sm text-muted-foreground">Find event locations and directions</p>
-          </Card>
-          
-          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
-            <Grid3x3 className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold mb-1">View Floor Plan</h3>
-            <p className="text-sm text-muted-foreground">Navigate booth layouts and exhibitors</p>
-          </Card>
-          
-          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
-            <Building2 className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold mb-1">Browse Colleges</h3>
-            <p className="text-sm text-muted-foreground">Discover schools and programs</p>
-          </Card>
-          
-          <Card className="p-6 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer group">
-            <Heart className="w-10 h-10 text-emerald-600 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold mb-1">Support Us</h3>
-            <p className="text-sm text-muted-foreground">View donors and contribute</p>
-          </Card>
-        </div>
-      </div>
-
       {/* Highlights */}
       {event.highlights && event.highlights.length > 0 && (
         <div>
