@@ -140,8 +140,8 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
         grid_col: nextCell.col,
         x_position: coords.x,
         y_position: coords.y,
-        booth_width: 100,
-        booth_depth: 100,
+        booth_width: 80,
+        booth_depth: 80,
       };
 
       console.log("📤 Inserting booth data:", boothData);
