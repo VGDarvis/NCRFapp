@@ -171,26 +171,6 @@ export const CollegeExpoHomeTab = ({ user, isGuest }: CollegeExpoHomeTabProps) =
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 glass-premium border-primary/20">
-          <h3 className="text-xl font-bold text-foreground mb-3">Find Scholarships</h3>
-          <p className="text-muted-foreground mb-4">
-            Discover scholarship opportunities that match your profile and interests.
-          </p>
-          <Button className="w-full">Browse Scholarships</Button>
-        </Card>
-
-        <Card className="p-6 glass-premium border-primary/20">
-          <h3 className="text-xl font-bold text-foreground mb-3">College Prep Resources</h3>
-          <p className="text-muted-foreground mb-4">
-            Access guides, tools, and resources to help you prepare for college applications.
-          </p>
-          <Button variant="outline" className="w-full">Explore Resources</Button>
-        </Card>
-        </div>
-      </div>
     </div>
   );
 };
