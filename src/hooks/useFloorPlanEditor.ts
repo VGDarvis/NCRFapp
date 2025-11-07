@@ -33,14 +33,10 @@ export function useFloorPlanEditor(
 
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    // Make canvas fill its container
-    const container = canvasRef.current.parentElement;
-    const canvasWidth = container?.clientWidth || 1200;
-    const canvasHeight = container?.clientHeight || 800;
-    
+    // Fixed canvas size to match attendee viewer SVG viewBox="0 0 1200 800"
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: canvasWidth,
-      height: canvasHeight,
+      width: 1200,
+      height: 800,
       backgroundColor: "#f8f9fa",
       selection: true,
       enablePointerEvents: true,
@@ -49,7 +45,7 @@ export function useFloorPlanEditor(
       perPixelTargetFind: !isMobile,
     });
     
-    console.log("✅ Fabric.js canvas initialized", { width: canvasWidth, height: canvasHeight });
+    console.log("✅ Fabric.js canvas initialized with FIXED dimensions", { width: 1200, height: 800 });
 
     // Enable touch gestures
     canvas.allowTouchScrolling = true;
@@ -107,21 +103,8 @@ export function useFloorPlanEditor(
     }
 
     setFabricCanvas(canvas);
-    
-    // Handle window resize to keep canvas responsive
-    const handleResize = () => {
-      if (!container) return;
-      const newWidth = container.clientWidth;
-      const newHeight = container.clientHeight;
-      canvas.setDimensions({ width: newWidth, height: newHeight });
-      canvas.renderAll();
-      console.log("📐 Canvas resized", { width: newWidth, height: newHeight });
-    };
-    
-    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
       if (canvasRef.current) {
         canvasRef.current.removeEventListener('touchstart', handleTouchStart);
         canvasRef.current.removeEventListener('touchmove', handleTouchMove);
@@ -155,17 +138,15 @@ export function useFloorPlanEditor(
         height: img.height,
       });
       
-      // Scale image to fit canvas
-      const canvasWidth = fabricCanvas.width || 1200;
-      const canvasHeight = fabricCanvas.height || 800;
-      const scaleX = canvasWidth / (img.width || 1);
-      const scaleY = canvasHeight / (img.height || 1);
+      // Scale image to fit canvas (1200x800)
+      const scaleX = 1200 / (img.width || 1);
+      const scaleY = 800 / (img.height || 1);
       const scale = Math.min(scaleX, scaleY) * 0.95; // 95% to add small margin
       
       img.scale(scale);
       img.set({
-        left: (canvasWidth - (img.width || 0) * scale) / 2,
-        top: (canvasHeight - (img.height || 0) * scale) / 2,
+        left: (1200 - (img.width || 0) * scale) / 2,
+        top: (800 - (img.height || 0) * scale) / 2,
         selectable: false,
         evented: false,
       });
@@ -184,18 +165,29 @@ export function useFloorPlanEditor(
 
   // Fit all booths to screen
   const fitAllBoothsToScreen = useCallback(() => {
-    if (!fabricCanvas || booths.length === 0) return;
+    if (!fabricCanvas) {
+      console.log("⚠️ No canvas available for fitting booths");
+      return;
+    }
 
-    // Get bounding box of all booth objects
+    // If no booths, just reset to show full canvas
+    if (booths.length === 0) {
+      console.log("📐 No booths to fit, showing full canvas");
+      fabricCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+      fabricCanvas.renderAll();
+      toast.info("No booths positioned yet");
+      return;
+    }
+
+    // Calculate bounding box of all booths
     let minX = Infinity, minY = Infinity;
     let maxX = -Infinity, maxY = -Infinity;
 
-    booths.forEach(booth => {
-      const rect = booth.rect;
+    booths.forEach(({ rect }) => {
       const left = rect.left || 0;
       const top = rect.top || 0;
-      const width = (rect.width || 0) * (rect.scaleX || 1);
-      const height = (rect.height || 0) * (rect.scaleY || 1);
+      const width = rect.getScaledWidth();
+      const height = rect.getScaledHeight();
 
       minX = Math.min(minX, left);
       minY = Math.min(minY, top);
@@ -203,47 +195,53 @@ export function useFloorPlanEditor(
       maxY = Math.max(maxY, top + height);
     });
 
-    // Add padding around booths (10% margin)
-    const padding = 50;
+    // Add padding around all booths
+    const padding = 80;
     minX -= padding;
     minY -= padding;
     maxX += padding;
     maxY += padding;
 
-    // Calculate content dimensions
-    const contentWidth = maxX - minX;
-    const contentHeight = maxY - minY;
+    // Calculate dimensions of booth area
+    const boothAreaWidth = maxX - minX;
+    const boothAreaHeight = maxY - minY;
 
-    // Get canvas viewport dimensions
-    const canvasElement = fabricCanvas.getElement();
-    const viewportWidth = canvasElement.clientWidth;
-    const viewportHeight = canvasElement.clientHeight;
+    // Canvas is always 1200x800
+    const canvasWidth = 1200;
+    const canvasHeight = 800;
 
-    // Calculate zoom to fit all content
-    const zoomX = viewportWidth / contentWidth;
-    const zoomY = viewportHeight / contentHeight;
-    const optimalZoom = Math.min(zoomX, zoomY, 1); // Don't zoom in more than 1x
+    // Calculate zoom level to fit all booths
+    const zoomX = canvasWidth / boothAreaWidth;
+    const zoomY = canvasHeight / boothAreaHeight;
+    const optimalZoom = Math.min(zoomX, zoomY, 2); // Cap at 2x zoom
 
-    // Calculate center point of all booths
+    // Calculate center point of booth area
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
-    // Set zoom
-    fabricCanvas.setZoom(optimalZoom);
+    // Calculate viewport offset to center booths
+    const viewportCenterX = canvasWidth / 2;
+    const viewportCenterY = canvasHeight / 2;
 
-    // Center viewport on booth content
-    const vpt = fabricCanvas.viewportTransform!;
-    vpt[4] = viewportWidth / 2 - centerX * optimalZoom;
-    vpt[5] = viewportHeight / 2 - centerY * optimalZoom;
+    // Set zoom and pan to show all booths
+    const vpt: [number, number, number, number, number, number] = [
+      optimalZoom, 0, 0, 
+      optimalZoom,
+      viewportCenterX - centerX * optimalZoom,
+      viewportCenterY - centerY * optimalZoom
+    ];
 
-    fabricCanvas.requestRenderAll();
-    
-    console.log('✅ Fit all booths to screen:', {
-      booths: booths.length,
-      zoom: optimalZoom,
-      center: { x: centerX, y: centerY }
+    fabricCanvas.setViewportTransform(vpt);
+    fabricCanvas.renderAll();
+
+    console.log("✅ Fitted all booths to screen", {
+      boothCount: booths.length,
+      bounds: { minX, minY, maxX, maxY },
+      zoom: optimalZoom.toFixed(2),
+      center: { x: centerX.toFixed(0), y: centerY.toFixed(0) },
     });
 
+    toast.success(`Fitted ${booths.length} booths to screen`);
     return optimalZoom;
   }, [fabricCanvas, booths]);
 
@@ -280,8 +278,8 @@ export function useFloorPlanEditor(
           const rect = new Rect({
             left: Number(booth.x_position),
             top: Number(booth.y_position),
-            width: Number(booth.booth_width || 120),
-            height: Number(booth.booth_depth || 120),
+            width: Number(booth.booth_width || 80),
+            height: Number(booth.booth_depth || 80),
             fill: tierColor,
             stroke: "#1e40af",
             strokeWidth: isMobile ? 2 : 3,
@@ -487,16 +485,15 @@ export function useFloorPlanEditor(
 
   // Auto-fit to screen after booths are loaded
   useEffect(() => {
-    if (!fabricCanvas || booths.length === 0) return;
-    
-    // Wait a brief moment for canvas to be fully rendered
+    if (!fabricCanvas || !eventId) return;
+
     const timer = setTimeout(() => {
-      console.log('🎯 Auto-fitting', booths.length, 'booths to screen');
+      console.log("🎯 Auto-fitting booths to screen after load...");
       fitAllBoothsToScreen();
-    }, 500);
-    
+    }, 1000); // Increased timeout to ensure floor plan loads first
+
     return () => clearTimeout(timer);
-  }, [booths.length, fabricCanvas, fitAllBoothsToScreen]);
+  }, [fabricCanvas, eventId, fitAllBoothsToScreen]);
 
   // Handle pan mode
   useEffect(() => {

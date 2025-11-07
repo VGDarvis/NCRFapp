@@ -222,17 +222,50 @@ export const FloorPlanEditorTab = () => {
         </div>
 
         <div 
-          className="border rounded-lg bg-muted/20 relative" 
+          className="border rounded-lg bg-muted/20 relative flex items-center justify-center" 
           style={{ 
-            height: "calc(100vh - 400px)",
-            minHeight: "500px",
+            height: "calc(100vh - 300px)",
+            minHeight: "600px",
             width: "100%",
             overflow: "hidden",
-            position: "relative",
           }}
         >
-          <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+          <canvas 
+            ref={canvasRef} 
+            style={{ 
+              maxWidth: '100%', 
+              maxHeight: '100%', 
+              width: '1200px',
+              height: '800px',
+              objectFit: 'contain',
+              display: 'block'
+            }} 
+          />
         </div>
+        
+        {/* Debug Info Panel */}
+        {fabricCanvas && (
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Canvas:</span>
+                <span className="ml-2 font-mono">1200 × 800</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Zoom:</span>
+                <span className="ml-2 font-mono">{Math.round(zoom)}%</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Positioned:</span>
+                <span className="ml-2 font-mono">{booths.length} booths</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Mode:</span>
+                <span className="ml-2 font-mono">{isPanMode ? "Pan" : "Select"}</span>
+              </div>
+            </div>
+          </div>
+        )}
         
         <MobileCanvasControls 
           canvas={fabricCanvas} 

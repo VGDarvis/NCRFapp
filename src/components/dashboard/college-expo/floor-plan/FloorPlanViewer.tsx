@@ -94,8 +94,8 @@ export const FloorPlanViewer = ({
                     const isHighlighted = highlightedBoothIds.includes(booth.id);
                     const x = Number(booth.x_position || 0);
                     const y = Number(booth.y_position || 0);
-                    const width = Number(booth.booth_width || 60);
-                    const height = Number(booth.booth_depth || 60);
+                    const width = Number(booth.booth_width || 80);
+                    const height = Number(booth.booth_depth || 80);
 
                     // Color based on sponsor tier
                     const fillColor = booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.6)" :
