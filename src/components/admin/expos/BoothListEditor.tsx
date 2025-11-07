@@ -150,8 +150,8 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
           grid_col: selectedGridPosition.col,
           x_position: coords.x,
           y_position: coords.y,
-          booth_width: 80,
-          booth_depth: 80,
+          booth_width: 30,
+          booth_depth: 30,
         })
         .eq("id", boothId);
 

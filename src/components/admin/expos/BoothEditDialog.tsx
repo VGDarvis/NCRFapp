@@ -39,8 +39,8 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
     waives_application_fee: booth.waives_application_fee || false,
     x_position: booth.x_position?.toString() || "",
     y_position: booth.y_position?.toString() || "",
-    booth_width: booth.booth_width?.toString() || "60",
-    booth_depth: booth.booth_depth?.toString() || "60",
+    booth_width: booth.booth_width?.toString() || "30",
+    booth_depth: booth.booth_depth?.toString() || "30",
   });
 
   const { boothNumbers, isLoading: boothNumbersLoading } = useAvailableBoothNumbers(booth.event_id);
@@ -63,8 +63,8 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       waives_application_fee: booth.waives_application_fee || false,
       x_position: booth.x_position?.toString() || "",
       y_position: booth.y_position?.toString() || "",
-      booth_width: booth.booth_width?.toString() || "60",
-      booth_depth: booth.booth_depth?.toString() || "60",
+      booth_width: booth.booth_width?.toString() || "30",
+      booth_depth: booth.booth_depth?.toString() || "30",
     });
   }, [booth]);
 
@@ -95,8 +95,8 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       // Validate numeric inputs
       const xPos = formData.x_position?.trim() ? parseFloat(formData.x_position) : null;
       const yPos = formData.y_position?.trim() ? parseFloat(formData.y_position) : null;
-      const width = formData.booth_width?.trim() ? parseFloat(formData.booth_width) : 60;
-      const depth = formData.booth_depth?.trim() ? parseFloat(formData.booth_depth) : 60;
+      const width = formData.booth_width?.trim() ? parseFloat(formData.booth_width) : 30;
+      const depth = formData.booth_depth?.trim() ? parseFloat(formData.booth_depth) : 30;
 
       if ((xPos !== null && isNaN(xPos)) || (yPos !== null && isNaN(yPos))) {
         toast.error("Invalid position values. Please enter valid numbers.");
