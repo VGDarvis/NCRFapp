@@ -53,7 +53,6 @@ export function useSeminarSessions(eventId: string | null) {
       return data as any as SeminarSession[];
     },
     enabled: !!eventId,
-    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -73,6 +72,5 @@ export function useSeminarRooms(venueId: string | null) {
       return data as SeminarRoom[];
     },
     enabled: !!venueId,
-    staleTime: 5 * 60 * 1000,
   });
 }
