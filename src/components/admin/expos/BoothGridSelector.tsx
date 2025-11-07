@@ -134,11 +134,11 @@ export const BoothGridSelector = ({
           <div className="w-full h-full relative flex items-center justify-center">
             <TransformWrapper
               initialScale={getInitialScale()}
-              minScale={0.15}
+              minScale={0.25}
               maxScale={4}
               centerOnInit={true}
-              centerZoomedOut={true}
-              limitToBounds={false}
+              centerZoomedOut={false}
+              limitToBounds={true}
               wheel={{ disabled: false, step: 0.1 }}
               pinch={{ step: 5 }}
               doubleClick={{ disabled: false, mode: "zoomIn", step: 0.5 }}
@@ -147,7 +147,7 @@ export const BoothGridSelector = ({
                 velocityDisabled: false,
               }}
               onZoom={(ref) => setZoom(ref.state.scale)}
-              alignmentAnimation={{ disabled: false, sizeX: 0, sizeY: 0 }}
+              alignmentAnimation={{ disabled: true }}
             >
               {({ zoomIn, zoomOut, resetTransform }) => (
                 <>
