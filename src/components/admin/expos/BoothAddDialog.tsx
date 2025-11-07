@@ -15,30 +15,6 @@ import { useBooths } from "@/hooks/useBooths";
 import { findNextAvailableCell, gridToCoordinates, getGridLabel, GridPosition } from "@/hooks/useGridPositioning";
 import { useQueryClient } from "@tanstack/react-query";
 
-// Auto-calculate booth positions based on booth number
-const calculateBoothPosition = (boothNumber: string) => {
-  const num = parseInt(boothNumber);
-  
-  // Grid layout: 10 booths per row, 60x60 size, 20px spacing
-  const boothsPerRow = 10;
-  const boothWidth = 60;
-  const boothDepth = 60;
-  const spacing = 20;
-  const startX = 100;
-  const startY = 100;
-  
-  // Calculate index (0-based) from booth number
-  const index = Math.floor((num - 100) / 2);
-  const row = Math.floor(index / boothsPerRow);
-  const col = index % boothsPerRow;
-  
-  return {
-    x_position: startX + (col * (boothWidth + spacing)),
-    y_position: startY + (row * (boothDepth + spacing)),
-    booth_width: boothWidth,
-    booth_depth: boothDepth,
-  };
-};
 
 interface BoothAddDialogProps {
   eventId: string;

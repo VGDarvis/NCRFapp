@@ -323,14 +323,16 @@ export function useFloorPlanEditor(
             cornerSize: isMobile ? 20 : 12,
             transparentCorners: false,
             padding: isMobile ? 20 : 10,
-            hasControls: true,
+            hasControls: false,
             hasBorders: true,
+            lockScalingX: true,
+            lockScalingY: true,
             shadow: isMobile ? undefined : new Shadow({ blur: 4, color: 'rgba(0,0,0,0.2)', offsetX: 2, offsetY: 2 }),
           });
 
           const label = new Text(booth.table_no || "---", {
-            left: Number(booth.x_position) + Number(booth.booth_width || 100) / 2,
-            top: Number(booth.y_position) + Number(booth.booth_depth || 100) / 2,
+            left: Number(booth.x_position) + Number(booth.booth_width || 30) / 2,
+            top: Number(booth.y_position) + Number(booth.booth_depth || 30) / 2,
             fontSize: 20,
             fill: "#1e40af",
             fontWeight: "bold",
@@ -602,6 +604,9 @@ export function useFloorPlanEditor(
       cornerSize: 12,
       transparentCorners: false,
       padding: 10,
+      hasControls: false,
+      lockScalingX: true,
+      lockScalingY: true,
     });
 
     const label = new Text("New", {
@@ -667,12 +672,10 @@ export function useFloorPlanEditor(
         .filter(booth => booth.boothData?.id)
         .map((booth) => {
           const rect = booth.rect;
-          const width = rect.width! * rect.scaleX!;
-          const height = rect.height! * rect.scaleY!;
           
           // Validate and constrain coordinates within canvas bounds (1200x800)
-          const x = Math.max(0, Math.min(1200 - width, rect.left || 0));
-          const y = Math.max(0, Math.min(800 - height, rect.top || 0));
+          const x = Math.max(0, Math.min(1200 - 30, rect.left || 0));
+          const y = Math.max(0, Math.min(800 - 30, rect.top || 0));
           
           return {
             id: booth.boothData.id,
@@ -680,8 +683,8 @@ export function useFloorPlanEditor(
             org_name: booth.boothData.org_name,
             x_position: Math.round(x),
             y_position: Math.round(y),
-            booth_width: Math.round(width),
-            booth_depth: Math.round(height),
+            booth_width: 30,
+            booth_depth: 30,
           };
         });
 
