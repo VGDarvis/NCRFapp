@@ -1,17 +1,17 @@
 // Grid-based positioning system for booth placement
-// Grid: 12 columns x 8 rows = 96 cells
-// Cell size: 100x100 pixels
+// Grid: 15 columns x 10 rows = 150 cells
+// Cell size: 80x80 pixels
 // Canvas: 1200x800 pixels
 
-export const GRID_COLS = 12;
-export const GRID_ROWS = 8;
-export const CELL_SIZE = 100;
+export const GRID_COLS = 15;
+export const GRID_ROWS = 10;
+export const CELL_SIZE = 80;
 export const CANVAS_WIDTH = 1200;
 export const CANVAS_HEIGHT = 800;
 
 export interface GridPosition {
-  row: number; // 0-7
-  col: number; // 0-11
+  row: number; // 0-9
+  col: number; // 0-14
 }
 
 export interface CoordinatePosition {
@@ -43,8 +43,8 @@ export const coordinatesToGrid = (coords: CoordinatePosition): GridPosition => {
  * Get a human-readable label for a grid position
  */
 export const getGridLabel = (gridPos: GridPosition): string => {
-  const rowLabel = String.fromCharCode(65 + gridPos.row); // A-H
-  const colLabel = (gridPos.col + 1).toString(); // 1-12
+  const rowLabel = String.fromCharCode(65 + gridPos.row); // A-J
+  const colLabel = (gridPos.col + 1).toString(); // 1-15
   return `Row ${rowLabel}, Column ${colLabel}`;
 };
 
@@ -129,14 +129,14 @@ export const isValidZone = (zone: {
 export const getPresetPosition = (preset: string): GridPosition => {
   const presets: Record<string, GridPosition> = {
     "top-left": { row: 0, col: 0 },
-    "top-center": { row: 0, col: 5 },
-    "top-right": { row: 0, col: 11 },
-    "middle-left": { row: 3, col: 0 },
-    center: { row: 3, col: 5 },
-    "middle-right": { row: 3, col: 11 },
-    "bottom-left": { row: 7, col: 0 },
-    "bottom-center": { row: 7, col: 5 },
-    "bottom-right": { row: 7, col: 11 },
+    "top-center": { row: 0, col: 7 },
+    "top-right": { row: 0, col: 14 },
+    "middle-left": { row: 4, col: 0 },
+    center: { row: 4, col: 7 },
+    "middle-right": { row: 4, col: 14 },
+    "bottom-left": { row: 9, col: 0 },
+    "bottom-center": { row: 9, col: 7 },
+    "bottom-right": { row: 9, col: 14 },
   };
   return presets[preset] || { row: 0, col: 0 };
 };
