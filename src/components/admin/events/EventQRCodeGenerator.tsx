@@ -16,11 +16,10 @@ interface EventQRCodeGeneratorProps {
 
 export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => {
   const [qrSize, setQrSize] = useState<number>(512);
-  const [entrySource, setEntrySource] = useState<string>("entrance");
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const guestUrl = generateGuestAccessUrl(eventId, entrySource);
+  const guestUrl = generateGuestAccessUrl(eventId);
 
   const handleGenerateQR = async () => {
     setIsGenerating(true);
@@ -45,7 +44,7 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
 
   const handleDownload = () => {
     if (!qrCodeUrl) return;
-    const filename = `college-expo-qr-${entrySource}-${qrSize}px.png`;
+    const filename = `college-expo-qr-${qrSize}px.png`;
     downloadQRCode(qrCodeUrl, filename);
     toast.success("QR Code downloaded!");
   };
@@ -64,7 +63,7 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
       <!DOCTYPE html>
       <html>
         <head>
-          <title>College Expo QR Code - ${entrySource}</title>
+          <title>College Expo QR Code</title>
           <style>
             body {
               margin: 0;
@@ -91,12 +90,6 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
               color: #6b7280;
               margin: 20px 0;
             }
-            .location {
-              font-size: 16px;
-              font-weight: bold;
-              color: #374151;
-              margin-top: 30px;
-            }
             .footer {
               margin-top: 40px;
               font-size: 14px;
@@ -112,7 +105,6 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
             Point your camera at this code to access<br/>
             the Houston College Expo Digital Guide
           </div>
-          <div class="location">Location: ${entrySource.toUpperCase()}</div>
           <div class="footer">National College Resources Foundation</div>
         </body>
       </html>
@@ -143,24 +135,6 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-
-          {/* Entry Source */}
-          <div className="space-y-2">
-            <Label>Entry Point / Location</Label>
-            <Select value={entrySource} onValueChange={setEntrySource}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="entrance">Main Entrance</SelectItem>
-                <SelectItem value="registration">Registration Table</SelectItem>
-                <SelectItem value="booth">Information Booth</SelectItem>
-                <SelectItem value="poster">Wall Poster</SelectItem>
-                <SelectItem value="restroom">Restroom Area</SelectItem>
-                <SelectItem value="food">Food Court</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* QR Code Size */}

@@ -198,7 +198,7 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
                   <SelectTrigger id="table_no" className="min-h-[48px]">
                     <SelectValue placeholder="Select booth number" />
                   </SelectTrigger>
-                  <SelectContent className="max-h-[300px] z-[100] bg-background">
+                  <SelectContent className="max-h-[300px] z-[9999] bg-background" position="popper" sideOffset={5}>
                     {boothNumbers
                       .filter(boothNum => showAllBooths || !assignedBoothNumbers.has(boothNum))
                       .map((boothNum) => {
@@ -281,7 +281,7 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
                 <SelectTrigger id="org_name">
                   <SelectValue placeholder="Select organization" />
                 </SelectTrigger>
-                <SelectContent className="max-h-[300px] z-[100]">
+                <SelectContent className="max-h-[300px] z-[9999] bg-background" position="popper" sideOffset={5}>
                   <SelectItem value="CREATE_NEW" className="font-semibold text-primary">
                     ➕ Create New Organization...
                   </SelectItem>
