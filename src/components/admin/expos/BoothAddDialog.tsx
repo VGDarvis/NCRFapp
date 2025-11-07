@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAvailableBoothNumbers, useOrganizationOptions } from "@/hooks/useBoothPresets";
 import { useBooths } from "@/hooks/useBooths";
 import { findNextAvailableCell, gridToCoordinates, getGridLabel, GridPosition } from "@/hooks/useGridPositioning";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Auto-calculate booth positions based on booth number
 const calculateBoothPosition = (boothNumber: string) => {
@@ -47,6 +48,7 @@ interface BoothAddDialogProps {
 }
 
 export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAddDialogProps) {
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [isCreatingNewOrg, setIsCreatingNewOrg] = useState(false);
   const [newOrgName, setNewOrgName] = useState("");
@@ -160,6 +162,9 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
       }
 
       console.log("✅ Booth inserted successfully:", data);
+
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
 
       toast.success(`Booth #${formData.table_no} added successfully`, {
         description: `${formData.org_name} has been assigned to booth #${formData.table_no}`,

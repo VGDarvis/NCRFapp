@@ -34,6 +34,7 @@ import {
   getGridLabel,
   findNextAvailableCell,
 } from "@/hooks/useGridPositioning";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Haptic feedback helper
 const triggerHaptic = () => {
@@ -47,6 +48,7 @@ interface BoothListEditorProps {
 }
 
 export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
+  const queryClient = useQueryClient();
   const [selectedEvent, setSelectedEvent] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState<string>("booth-low-high");
@@ -66,7 +68,7 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   const { isMobile } = useMobileDetection();
 
   const { events } = useEvents();
-  const { data: booths, refetch: refetchBooths } = useBooths(selectedEvent || null);
+  const { data: booths } = useBooths(selectedEvent || null);
   
   // Get venue_id from selected event
   const selectedEventData = events?.find((e) => e.id === selectedEvent);
@@ -160,9 +162,11 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
         description: "All attendees will see this change immediately",
       });
       
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
+      
       setEditingBoothId(null);
       setSelectedGridPosition(null);
-      refetchBooths();
     } catch (error: any) {
       console.error("Error updating booth position:", error);
       toast.error("Failed to update booth position", { id: "save-position" });
@@ -208,9 +212,12 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
       if (error1 || error2) throw error1 || error2;
 
       toast.success(`Swapped Booth #${firstBooth.table_no} ↔ Booth #${secondBooth.table_no}`);
+      
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
+      
       setSwapMode(false);
       setFirstBoothId(null);
-      refetchBooths();
     } catch (error: any) {
       console.error("Error swapping booths:", error);
       toast.error("Failed to swap booths");
@@ -243,7 +250,9 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
       if (error) throw error;
 
       toast.success(`Booth auto-assigned to ${getGridLabel(nextCell)}`);
-      refetchBooths();
+      
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
     } catch (error: any) {
       console.error("Error auto-assigning booth:", error);
       toast.error("Failed to auto-assign booth");
@@ -293,7 +302,9 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
       }
 
       toast.success(`Auto-arranged ${updates.length} booths in grid layout`);
-      refetchBooths();
+      
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
     } catch (error: any) {
       console.error("Error auto-arranging booths:", error);
       toast.error("Failed to auto-arrange booths");
@@ -332,7 +343,9 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
         description: "These booths can now be repositioned anywhere",
       });
       setSelectedBooths(new Set());
-      refetchBooths();
+      
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
     } catch (error: any) {
       console.error("Error clearing booth positions:", error);
       toast.error("Failed to clear booth positions", { id: "clear-positions" });
@@ -777,10 +790,11 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
         boothIds={Array.from(selectedBooths)}
         occupiedPositions={occupiedGridPositions}
         booths={booths || []}
-        onSuccess={() => {
+        onSuccess={async () => {
           setSelectedBooths(new Set());
           setShowBulkMove(false);
-          refetchBooths();
+          // Invalidate all booth queries to sync across all components
+          await queryClient.invalidateQueries({ queryKey: ["booths"] });
         }}
       />
 
@@ -796,7 +810,10 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
             scholarship_info: featuresDrawerBooth.scholarship_info,
             waives_application_fee: featuresDrawerBooth.waives_application_fee || false,
           }}
-          onUpdate={() => refetchBooths()}
+          onUpdate={async () => {
+            // Invalidate all booth queries to sync across all components
+            await queryClient.invalidateQueries({ queryKey: ["booths"] });
+          }}
         />
       )}
 

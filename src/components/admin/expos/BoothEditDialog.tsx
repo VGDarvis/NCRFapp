@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { Booth } from "@/hooks/useBooths";
 import { useAvailableBoothNumbers, useOrganizationOptions } from "@/hooks/useBoothPresets";
 import { useBooths } from "@/hooks/useBooths";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface BoothEditDialogProps {
   booth: Booth;
@@ -23,6 +24,7 @@ interface BoothEditDialogProps {
 }
 
 export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothEditDialogProps) {
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -89,6 +91,9 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
 
       if (error) throw error;
 
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
+
       toast.success(`Booth #${booth.table_no} updated successfully`);
       onBoothUpdated();
     } catch (error) {
@@ -108,6 +113,9 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
         .eq("id", booth.id);
 
       if (error) throw error;
+
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
 
       toast.success(`Booth #${booth.table_no} deleted successfully`);
       setShowDeleteConfirm(false);

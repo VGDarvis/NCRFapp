@@ -12,8 +12,10 @@ import { BoothAddDialog } from "./BoothAddDialog";
 import { DallasBoothUpdater } from "./DallasBoothUpdater";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function BoothEditorTab() {
+  const queryClient = useQueryClient();
   const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [editingBooth, setEditingBooth] = useState<Booth | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -24,7 +26,7 @@ export function BoothEditorTab() {
   const [sortOption, setSortOption] = useState<string>("org-a-z");
   
   const { events, isLoading: eventsLoading } = useEvents();
-  const { data: booths, isLoading: boothsLoading, refetch } = useBooths(selectedEventId);
+  const { data: booths, isLoading: boothsLoading } = useBooths(selectedEventId);
 
   const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
 
@@ -78,7 +80,7 @@ export function BoothEditorTab() {
   }, [collegeExpos, selectedEventId]);
 
   const handleBoothUpdated = () => {
-    refetch();
+    // Cache will be automatically invalidated by child components
     setEditingBooth(null);
   };
 
@@ -92,9 +94,11 @@ export function BoothEditorTab() {
 
       if (error) throw error;
 
+      // Invalidate all booth queries to sync across all components
+      await queryClient.invalidateQueries({ queryKey: ["booths"] });
+
       toast.success(`Booth #${booth.table_no} deleted successfully`);
       setDeletingBoothId(null);
-      refetch();
     } catch (error) {
       console.error("Error deleting booth:", error);
       toast.error("Failed to delete booth");

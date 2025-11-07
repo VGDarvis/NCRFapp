@@ -7,6 +7,7 @@ import { useCSVParser } from "@/hooks/useCSVParser";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, AlertCircle, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DALLAS_EVENT_ID = "df8a7c6b-5e4d-3c2b-1a0f-9e8d7c6b5a4f";
 
@@ -31,6 +32,7 @@ export function DallasBoothUpdater({ open, onClose, onComplete }: {
   onClose: () => void;
   onComplete: () => void;
 }) {
+  const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<CSVRow[]>([]);
   const [updating, setUpdating] = useState(false);
@@ -152,6 +154,9 @@ export function DallasBoothUpdater({ open, onClose, onComplete }: {
     setResult(results);
     setUpdating(false);
     setProgress(100);
+    
+    // Invalidate all booth queries to sync across all components
+    await queryClient.invalidateQueries({ queryKey: ["booths"] });
     
     if (results.success > 0) {
       toast.success(`Updated ${results.success} booths successfully`);
