@@ -1,17 +1,17 @@
 // Grid-based positioning system for booth placement
-// Grid: 15 columns x 10 rows = 150 cells
-// Cell size: 80x80 pixels
+// Grid: 120 columns x 80 rows = 9,600 cells
+// Cell size: 10x10 pixels
 // Canvas: 1200x800 pixels
 
-export const GRID_COLS = 15;
-export const GRID_ROWS = 10;
-export const CELL_SIZE = 80;
+export const GRID_COLS = 120;
+export const GRID_ROWS = 80;
+export const CELL_SIZE = 10;
 export const CANVAS_WIDTH = 1200;
 export const CANVAS_HEIGHT = 800;
 
 export interface GridPosition {
-  row: number; // 0-9
-  col: number; // 0-14
+  row: number; // 0-79
+  col: number; // 0-119
 }
 
 export interface CoordinatePosition {
@@ -43,8 +43,14 @@ export const coordinatesToGrid = (coords: CoordinatePosition): GridPosition => {
  * Get a human-readable label for a grid position
  */
 export const getGridLabel = (gridPos: GridPosition): string => {
-  const rowLabel = String.fromCharCode(65 + gridPos.row); // A-J
-  const colLabel = (gridPos.col + 1).toString(); // 1-15
+  // For rows beyond Z (26), use AA, AB, AC pattern like Excel
+  let rowLabel = '';
+  let row = gridPos.row;
+  while (row >= 0) {
+    rowLabel = String.fromCharCode(65 + (row % 26)) + rowLabel;
+    row = Math.floor(row / 26) - 1;
+  }
+  const colLabel = (gridPos.col + 1).toString(); // 1-120
   return `Row ${rowLabel}, Column ${colLabel}`;
 };
 
@@ -129,14 +135,14 @@ export const isValidZone = (zone: {
 export const getPresetPosition = (preset: string): GridPosition => {
   const presets: Record<string, GridPosition> = {
     "top-left": { row: 0, col: 0 },
-    "top-center": { row: 0, col: 7 },
-    "top-right": { row: 0, col: 14 },
-    "middle-left": { row: 4, col: 0 },
-    center: { row: 4, col: 7 },
-    "middle-right": { row: 4, col: 14 },
-    "bottom-left": { row: 9, col: 0 },
-    "bottom-center": { row: 9, col: 7 },
-    "bottom-right": { row: 9, col: 14 },
+    "top-center": { row: 0, col: 59 },
+    "top-right": { row: 0, col: 119 },
+    "middle-left": { row: 39, col: 0 },
+    center: { row: 39, col: 59 },
+    "middle-right": { row: 39, col: 119 },
+    "bottom-left": { row: 79, col: 0 },
+    "bottom-center": { row: 79, col: 59 },
+    "bottom-right": { row: 79, col: 119 },
   };
   return presets[preset] || { row: 0, col: 0 };
 };
