@@ -16,6 +16,7 @@ export const FloorPlanEditorTab = () => {
   const [floorPlanId, setFloorPlanId] = useState<string | null>(null);
   const [isPanMode, setIsPanMode] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [canvasScale, setCanvasScale] = useState(0.8); // CSS scale for visual zoom
   const { events } = useEvents();
 
   const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
@@ -143,24 +144,19 @@ export const FloorPlanEditorTab = () => {
             </Button>
 
             <div className="flex gap-1">
-              <Button variant="outline" size="sm" onClick={() => handleZoom("out")} title="Zoom Out">
+              <Button variant="outline" size="sm" onClick={() => setCanvasScale(Math.max(0.25, canvasScale - 0.25))} title="Zoom Out">
                 <ZoomOut className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleZoom("reset")} title="Show Full Floor Plan (1:1)">
-                <Maximize2 className="w-4 h-4" />
-                <span className="ml-1 text-xs hidden xl:inline">Full</span>
+              <Button variant="outline" size="sm" onClick={() => setCanvasScale(1)} title="Reset to 100%">
+                <span className="text-xs font-mono">100%</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleZoom("fitBooths")} title="Zoom to Positioned Booths">
-                <Maximize2 className="w-4 h-4" />
-                <span className="ml-1 text-xs hidden xl:inline">Booths</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handleZoom("in")} title="Zoom In">
+              <Button variant="outline" size="sm" onClick={() => setCanvasScale(Math.min(2, canvasScale + 0.25))} title="Zoom In">
                 <ZoomIn className="w-4 h-4" />
               </Button>
             </div>
             
             <Badge variant="outline" className="hidden lg:inline-flex">
-              Zoom: {Math.round(zoom * 100)}%
+              Scale: {Math.round(canvasScale * 100)}%
             </Badge>
 
             <Button onClick={handleSave} disabled={isLoading} size="sm">
@@ -232,21 +228,67 @@ export const FloorPlanEditorTab = () => {
           </div>
         </div>
 
-        <div className="w-full px-2 md:px-4">
+        <div 
+          className="border rounded-lg bg-muted/20 relative overflow-auto"
+          style={{
+            width: "100%",
+            maxHeight: "calc(100vh - 400px)",
+            minHeight: "500px",
+          }}
+        >
           <div 
-            className="border rounded-lg bg-muted/20 relative overflow-hidden mx-auto" 
-            style={{ 
-              width: "100%",
-              maxWidth: "1200px",
-              aspectRatio: "1200/800",
+            className="relative mx-auto transition-transform"
+            style={{
+              width: "1200px",
+              height: "800px",
+              transform: `scale(${canvasScale})`,
+              transformOrigin: "0 0",
             }}
           >
+            {/* Optional Grid Overlay */}
+            <svg
+              className="absolute top-0 left-0 pointer-events-none"
+              style={{
+                width: "1200px",
+                height: "800px",
+                opacity: 0.08,
+                zIndex: 1,
+              }}
+            >
+              {/* Vertical lines every 100px */}
+              {Array.from({ length: 13 }).map((_, i) => (
+                <line
+                  key={`v-${i}`}
+                  x1={i * 100}
+                  y1={0}
+                  x2={i * 100}
+                  y2={800}
+                  stroke="currentColor"
+                  strokeWidth="1"
+                />
+              ))}
+              {/* Horizontal lines every 100px */}
+              {Array.from({ length: 9 }).map((_, i) => (
+                <line
+                  key={`h-${i}`}
+                  x1={0}
+                  y1={i * 100}
+                  x2={1200}
+                  y2={i * 100}
+                  stroke="currentColor"
+                  strokeWidth="1"
+                />
+              ))}
+            </svg>
+            
             <canvas 
-              ref={canvasRef} 
-              className="w-full h-full"
+              ref={canvasRef}
               style={{ 
-                display: 'block',
-                objectFit: 'contain'
+                width: "1200px",
+                height: "800px",
+                display: "block",
+                position: "relative",
+                zIndex: 2,
               }} 
             />
           </div>
@@ -269,8 +311,8 @@ export const FloorPlanEditorTab = () => {
                 <span className="font-mono font-semibold">1200 × 800px</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-muted-foreground text-xs">Current Zoom</span>
-                <span className="font-mono font-semibold">{Math.round(zoom * 100)}%</span>
+                <span className="text-muted-foreground text-xs">View Scale</span>
+                <span className="font-mono font-semibold">{Math.round(canvasScale * 100)}%</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-muted-foreground text-xs">Total Booths</span>
@@ -292,10 +334,10 @@ export const FloorPlanEditorTab = () => {
           canvas={fabricCanvas} 
           isPanMode={isPanMode}
           onTogglePanMode={() => setIsPanMode(!isPanMode)}
-          zoom={zoom}
-          onZoomIn={() => handleZoom("in")}
-          onZoomOut={() => handleZoom("out")}
-          onResetZoom={() => handleZoom("reset")}
+          zoom={canvasScale}
+          onZoomIn={() => setCanvasScale(Math.min(2, canvasScale + 0.25))}
+          onZoomOut={() => setCanvasScale(Math.max(0.25, canvasScale - 0.25))}
+          onResetZoom={() => setCanvasScale(1)}
         />
         
         {/* Mobile Tips */}
@@ -312,12 +354,12 @@ export const FloorPlanEditorTab = () => {
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm hidden md:block">
           <p className="font-semibold mb-1">💡 How to use:</p>
           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Default view shows full 1200×800 floor plan (same as attendees see)</li>
+            <li>Canvas displays at exact 1200×800 pixels (1:1 coordinate mapping with attendee view)</li>
             <li>Click and drag booth numbers to reposition them</li>
             <li>Positions auto-save 2 seconds after you stop dragging</li>
-            <li>Use "Full" button to reset to complete floor plan view</li>
-            <li>Use "Booths" button to zoom into positioned booths only</li>
-            <li>Changes automatically broadcast to all attendees</li>
+            <li>Use +/- buttons to zoom view (doesn't affect coordinates)</li>
+            <li>Grid overlay shows 100px cells matching attendee booth grid</li>
+            <li>Changes automatically broadcast to all attendees in real-time</li>
           </ul>
         </div>
       </Card>
