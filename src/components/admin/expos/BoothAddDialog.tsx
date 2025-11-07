@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAvailableBoothNumbers, useOrganizationOptions } from "@/hooks/useBoothPresets";
 import { useBooths } from "@/hooks/useBooths";
 import { findNextAvailableCell, gridToCoordinates, getGridLabel, GridPosition } from "@/hooks/useGridPositioning";
@@ -49,6 +50,7 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
   const [saving, setSaving] = useState(false);
   const [isCreatingNewOrg, setIsCreatingNewOrg] = useState(false);
   const [newOrgName, setNewOrgName] = useState("");
+  const [boothInputMode, setBoothInputMode] = useState<"select" | "custom">("select");
   const [formData, setFormData] = useState({
     table_no: "",
     org_name: "",
@@ -85,6 +87,7 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
       setIsCreatingNewOrg(false);
       setNewOrgName("");
       setShowAllBooths(false);
+      setBoothInputMode("select");
     }
   }, [open]);
 
@@ -181,9 +184,40 @@ export function BoothAddDialog({ eventId, open, onClose, onBoothAdded }: BoothAd
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="table_no">Booth Number *</Label>
-            {boothNumbersLoading ? (
+            
+            <RadioGroup value={boothInputMode} onValueChange={(value: "select" | "custom") => setBoothInputMode(value)} className="flex gap-4">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="select" id="mode-select" />
+                <Label htmlFor="mode-select" className="font-normal cursor-pointer">Select from available booths</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="custom" id="mode-custom" />
+                <Label htmlFor="mode-custom" className="font-normal cursor-pointer">Enter custom booth number</Label>
+              </div>
+            </RadioGroup>
+
+            {boothInputMode === "custom" ? (
+              <>
+                <Input
+                  id="table_no"
+                  value={formData.table_no}
+                  onChange={(e) => setFormData({ ...formData, table_no: e.target.value })}
+                  placeholder="Enter booth number (e.g., 1, 38-39, A1)"
+                  required
+                  className="min-h-[48px]"
+                />
+                {formData.table_no && assignedBoothNumbers.has(formData.table_no) && (
+                  <p className="text-sm text-amber-600 dark:text-amber-500">
+                    ⚠️ Booth #{formData.table_no} is already assigned
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Enter any booth number (0-1000 or custom format like "38-39")
+                </p>
+              </>
+            ) : boothNumbersLoading ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Loading booth numbers...
