@@ -510,6 +510,56 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
         )}
       </Card>
 
+      {selectedEvent && booths && booths.length > 0 && (
+        <Card className="p-4 bg-gradient-to-r from-primary/5 to-accent/5">
+          <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            Positioning Overview
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Total Booths</span>
+              <span className="text-2xl font-bold">{booths.length}</span>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Positioned</span>
+              <span className="text-2xl font-bold text-green-600">
+                {booths.filter((b: any) => b.grid_row !== null && b.grid_col !== null).length}
+              </span>
+              <div className="w-full bg-muted rounded-full h-2 mt-1">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all" 
+                  style={{ 
+                    width: `${(booths.filter((b: any) => b.grid_row !== null && b.grid_col !== null).length / booths.length) * 100}%` 
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Unpositioned</span>
+              <span className="text-2xl font-bold text-orange-600">
+                {booths.filter((b: any) => b.grid_row === null || b.grid_col === null).length}
+              </span>
+              <div className="w-full bg-muted rounded-full h-2 mt-1">
+                <div 
+                  className="bg-orange-500 h-2 rounded-full transition-all" 
+                  style={{ 
+                    width: `${(booths.filter((b: any) => b.grid_row === null || b.grid_col === null).length / booths.length) * 100}%` 
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Grid Coverage</span>
+              <span className="text-2xl font-bold">
+                {Math.round((booths.filter((b: any) => b.grid_row !== null && b.grid_col !== null).length / 96) * 100)}%
+              </span>
+              <span className="text-[10px] text-muted-foreground">of 96 cells used</span>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {selectedEvent && floorPlanId && (
         <>
           <Collapsible open={floorPlanSettingsOpen} onOpenChange={setFloorPlanSettingsOpen}>
@@ -627,11 +677,16 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
                       )}
                     </div>
                   </div>
-                  <div className="text-sm">
+                  <div className="flex flex-col items-end gap-1">
                     {currentGridPos ? (
-                      <Badge variant="secondary">
-                        {getGridLabel(currentGridPos)}
-                      </Badge>
+                      <>
+                        <Badge variant="secondary" className="font-mono">
+                          {getGridLabel(currentGridPos)}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground font-mono">
+                          X:{booth.x_position || 0} Y:{booth.y_position || 0}
+                        </span>
+                      </>
                     ) : (
                       <Badge variant="destructive">Not positioned</Badge>
                     )}

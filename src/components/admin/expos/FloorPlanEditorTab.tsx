@@ -222,46 +222,58 @@ export const FloorPlanEditorTab = () => {
         </div>
 
         <div 
-          className="border rounded-lg bg-muted/20 relative flex items-center justify-center" 
+          className="border rounded-lg bg-muted/20 relative overflow-auto" 
           style={{ 
-            height: "calc(100vh - 300px)",
-            minHeight: "600px",
+            height: "calc(100vh - 280px)",
+            minHeight: "700px",
             width: "100%",
-            overflow: "hidden",
           }}
         >
-          <canvas 
-            ref={canvasRef} 
-            style={{ 
-              maxWidth: '100%', 
-              maxHeight: '100%', 
-              width: '1200px',
-              height: '800px',
-              objectFit: 'contain',
-              display: 'block'
-            }} 
-          />
+          <div className="w-full h-full flex items-center justify-center p-4">
+            <canvas 
+              ref={canvasRef} 
+              style={{ 
+                width: '1200px',
+                height: '800px',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                display: 'block'
+              }} 
+            />
+          </div>
         </div>
         
-        {/* Debug Info Panel */}
+        {/* Enhanced Stats Panel */}
         {fabricCanvas && (
-          <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">Canvas:</span>
-                <span className="ml-2 font-mono">1200 × 800</span>
+          <div className="mt-4 p-4 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg border border-border">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold">Floor Plan Status</h3>
+              {positionedBooths > 0 && (
+                <Badge variant="outline" className="text-xs">
+                  {Math.round((positionedBooths / (positionedBooths + unpositionedBooths)) * 100)}% Complete
+                </Badge>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+              <div className="flex flex-col">
+                <span className="text-muted-foreground text-xs">Canvas Size</span>
+                <span className="font-mono font-semibold">1200 × 800px</span>
               </div>
-              <div>
-                <span className="text-muted-foreground">Zoom:</span>
-                <span className="ml-2 font-mono">{Math.round(zoom)}%</span>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground text-xs">Current Zoom</span>
+                <span className="font-mono font-semibold">{Math.round(zoom * 100)}%</span>
               </div>
-              <div>
-                <span className="text-muted-foreground">Positioned:</span>
-                <span className="ml-2 font-mono">{booths.length} booths</span>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground text-xs">Total Booths</span>
+                <span className="font-mono font-semibold">{positionedBooths + unpositionedBooths}</span>
               </div>
-              <div>
-                <span className="text-muted-foreground">Mode:</span>
-                <span className="ml-2 font-mono">{isPanMode ? "Pan" : "Select"}</span>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground text-xs">Positioned</span>
+                <span className="font-mono font-semibold text-green-600">{positionedBooths}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground text-xs">Unpositioned</span>
+                <span className="font-mono font-semibold text-orange-600">{unpositionedBooths}</span>
               </div>
             </div>
           </div>

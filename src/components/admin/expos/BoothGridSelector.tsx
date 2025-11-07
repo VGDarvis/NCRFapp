@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   GRID_COLS,
   GRID_ROWS,
@@ -86,11 +87,11 @@ export const BoothGridSelector = ({
           )}
         </div>
 
-        <div 
-          className="relative w-full overflow-auto pb-6" 
+        <ScrollArea 
+          className="relative w-full pb-6 border rounded-lg" 
           style={{ 
-            height: `${Math.min(gridHeight + 100, 800)}px`,
-            maxHeight: "80vh",
+            height: `min(${gridHeight + 140}px, 80vh)`,
+            minHeight: "500px",
           }}
         >
           <TransformWrapper
@@ -117,6 +118,7 @@ export const BoothGridSelector = ({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    padding: "20px",
                   }}
                 >
                   <div
@@ -127,14 +129,19 @@ export const BoothGridSelector = ({
                       minWidth: "320px",
                     }}
                   >
-            {/* Background image if available */}
-            {backgroundImageUrl && (
-              <img
-                src={backgroundImageUrl}
-                alt="Floor plan background"
-                className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
-              />
-            )}
+                    {/* Background image with controlled opacity */}
+                    {backgroundImageUrl && (
+                      <div 
+                        className="absolute inset-0 pointer-events-none rounded"
+                        style={{
+                          backgroundImage: `url(${backgroundImageUrl})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                          opacity: 0.3,
+                        }}
+                      />
+                    )}
 
             {/* Zone overlays */}
             {zones.map((zone) => (
@@ -236,12 +243,12 @@ export const BoothGridSelector = ({
                 <div key={i}>{String.fromCharCode(65 + i)}</div>
               ))}
              </div>
-                  </div>
-                </TransformComponent>
-              </>
-            )}
-          </TransformWrapper>
-        </div>
+                   </div>
+                 </TransformComponent>
+               </>
+             )}
+           </TransformWrapper>
+         </ScrollArea>
 
         <div className="flex gap-4 mt-4 text-xs">
           <div className="flex items-center gap-2">
