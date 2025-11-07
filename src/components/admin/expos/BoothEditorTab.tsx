@@ -10,6 +10,7 @@ import { useBooths, type Booth } from "@/hooks/useBooths";
 import { BoothEditDialog } from "./BoothEditDialog";
 import { BoothAddDialog } from "./BoothAddDialog";
 import { DallasBoothUpdater } from "./DallasBoothUpdater";
+import { DallasExhibitorImporter } from "./DallasExhibitorImporter";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,6 +21,7 @@ export function BoothEditorTab() {
   const [editingBooth, setEditingBooth] = useState<Booth | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [updaterOpen, setUpdaterOpen] = useState(false);
+  const [importerOpen, setImporterOpen] = useState(false);
   const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -138,6 +140,10 @@ export function BoothEditorTab() {
               <h3 className="text-lg font-semibold">Booths</h3>
               <div className="flex items-center gap-2">
                 {boothsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                <Button onClick={() => setImporterOpen(true)} size="sm" variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import Dallas CSV
+                </Button>
                 <Button onClick={() => setUpdaterOpen(true)} size="sm" variant="outline">
                   <Upload className="w-4 h-4 mr-2" />
                   Update from CSV
@@ -261,6 +267,15 @@ export function BoothEditorTab() {
         onClose={() => setUpdaterOpen(false)}
         onComplete={handleBoothUpdated}
       />
+
+      {selectedEventId && (
+        <DallasExhibitorImporter
+          open={importerOpen}
+          onClose={() => setImporterOpen(false)}
+          eventId={selectedEventId}
+          eventTitle={collegeExpos.find(e => e.id === selectedEventId)?.title || ""}
+        />
+      )}
 
       <AlertDialog open={!!deletingBoothId} onOpenChange={(open) => !open && setDeletingBoothId(null)}>
         <AlertDialogContent>
