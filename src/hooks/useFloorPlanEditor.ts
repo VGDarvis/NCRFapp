@@ -472,9 +472,24 @@ export function useFloorPlanEditor(
                   }
                 });
                 
-                // Re-enable booth interaction
+                // Re-enable booth interaction AND normalize dimensions
                 loadedBooths.forEach(b => {
-                  b.rect.set({ selectable: true, evented: true });
+                  b.rect.set({ 
+                    selectable: true, 
+                    evented: true,
+                    width: 30,
+                    height: 30,
+                    scaleX: 1,
+                    scaleY: 1
+                  });
+                  
+                  // Also update the text label position
+                  if (b.label) {
+                    b.label.set({
+                      left: (b.rect.left || 0) + 15,
+                      top: (b.rect.top || 0) + 15
+                    });
+                  }
                 });
                 fabricCanvas.renderAll();
                 
