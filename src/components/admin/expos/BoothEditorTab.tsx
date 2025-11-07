@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Edit, Loader2, Trash2, Plus } from "lucide-react";
+import { Edit, Loader2, Trash2, Plus, Search } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths, type Booth } from "@/hooks/useBooths";
 import { BoothEditDialog } from "./BoothEditDialog";
@@ -17,11 +18,55 @@ export function BoothEditorTab() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState<string>("org-a-z");
   
   const { events, isLoading: eventsLoading } = useEvents();
   const { data: booths, isLoading: boothsLoading, refetch } = useBooths(selectedEventId);
 
   const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
+
+  // Filter and sort booths
+  const filteredBooths = useMemo(() => {
+    if (!booths) return [];
+    
+    // Filter by search query
+    let filtered = booths.filter(
+      (booth) =>
+        booth.table_no?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booth.org_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    // Sort based on selected option
+    switch (sortOption) {
+      case "booth-low-high":
+        filtered.sort((a, b) => {
+          const numA = parseInt(a.table_no || "0");
+          const numB = parseInt(b.table_no || "0");
+          return numA - numB;
+        });
+        break;
+      case "booth-high-low":
+        filtered.sort((a, b) => {
+          const numA = parseInt(a.table_no || "0");
+          const numB = parseInt(b.table_no || "0");
+          return numB - numA;
+        });
+        break;
+      case "org-a-z":
+        filtered.sort((a, b) => 
+          (a.org_name || "").localeCompare(b.org_name || "")
+        );
+        break;
+      case "org-z-a":
+        filtered.sort((a, b) => 
+          (b.org_name || "").localeCompare(a.org_name || "")
+        );
+        break;
+    }
+    
+    return filtered;
+  }, [booths, searchQuery, sortOption]);
 
   // Auto-select first event
   useEffect(() => {
@@ -94,11 +139,42 @@ export function BoothEditorTab() {
               </div>
             </div>
 
+            {/* Search and Sort Controls */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Search Booths</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Booth number or organization..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">Sort By</label>
+                <Select value={sortOption} onValueChange={setSortOption}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="org-a-z">Organization (A-Z)</SelectItem>
+                    <SelectItem value="org-z-a">Organization (Z-A)</SelectItem>
+                    <SelectItem value="booth-low-high">Booth Number (Low to High)</SelectItem>
+                    <SelectItem value="booth-high-low">Booth Number (High to Low)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             {boothsLoading ? (
               <div className="flex items-center justify-center p-8">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
-            ) : booths && booths.length > 0 ? (
+            ) : filteredBooths && filteredBooths.length > 0 ? (
               <div className="rounded-md border">
                 <table className="w-full">
                   <thead>
@@ -110,7 +186,7 @@ export function BoothEditorTab() {
                     </tr>
                   </thead>
                   <tbody>
-                    {booths.map((booth) => (
+                    {filteredBooths.map((booth) => (
                       <tr key={booth.id} className="border-b hover:bg-muted/30 transition-colors">
                         <td className="p-3 text-sm font-mono">{booth.table_no || "—"}</td>
                         <td className="p-3 text-sm">{booth.org_name || "No organization"}</td>
@@ -138,6 +214,10 @@ export function BoothEditorTab() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            ) : searchQuery ? (
+              <div className="text-center p-8 text-muted-foreground">
+                No booths found matching "{searchQuery}"
               </div>
             ) : (
               <div className="text-center p-8 text-muted-foreground">
