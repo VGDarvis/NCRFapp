@@ -314,8 +314,8 @@ export function useFloorPlanEditor(
           const rect = new Rect({
             left: xPos,
             top: yPos,
-            width: Number(booth.booth_width || 30),
-            height: Number(booth.booth_depth || 30),
+            width: 30,
+            height: 30,
             fill: tierColor,
             stroke: "#1e40af",
             strokeWidth: isMobile ? 2 : 3,
@@ -327,8 +327,14 @@ export function useFloorPlanEditor(
             hasBorders: true,
             lockScalingX: true,
             lockScalingY: true,
+            lockMovementX: false,
+            lockMovementY: false,
+            objectCaching: false,
             shadow: isMobile ? undefined : new Shadow({ blur: 4, color: 'rgba(0,0,0,0.2)', offsetX: 2, offsetY: 2 }),
           });
+          
+          // Force reset any scale factors
+          rect.set({ scaleX: 1, scaleY: 1 });
 
           const label = new Text(booth.table_no || "---", {
             left: Number(booth.x_position) + Number(booth.booth_width || 30) / 2,
@@ -426,8 +432,9 @@ export function useFloorPlanEditor(
                   .filter(b => b.boothData?.id)
                   .map((b) => {
                     const rect = b.rect;
-                    const width = rect.width! * (rect.scaleX || 1);
-                    const height = rect.height! * (rect.scaleY || 1);
+                    // Normalize to 30x30 for all booths
+                    const width = 30;
+                    const height = 30;
                     
                     // Validate and constrain coordinates within canvas bounds
                     const x = Math.max(0, Math.min(1200 - width, rect.left || 0));
