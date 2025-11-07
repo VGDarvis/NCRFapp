@@ -13,6 +13,7 @@ import { SeminarDialog } from "./SeminarDialog";
 import { SeminarCSVImporter } from "../events/SeminarCSVImporter";
 import { LoadingSpinner } from "../shared/LoadingSpinner";
 import { EmptyState } from "../shared/EmptyState";
+import { SeedDallasButton } from "./SeedDallasButton";
 import { format } from "date-fns";
 import {
   AlertDialog,
@@ -138,10 +139,13 @@ export function SeminarsModule() {
                       {filteredSeminars.length} session{filteredSeminars.length !== 1 ? "s" : ""}
                     </CardDescription>
                   </div>
-                  <Button onClick={() => setDialogOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Seminar
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <SeedDallasButton />
+                    <Button onClick={() => setDialogOpen(true)}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Seminar
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
