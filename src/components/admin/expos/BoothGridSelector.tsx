@@ -57,7 +57,7 @@ export const BoothGridSelector = ({
     
     // Calculate container dimensions
     const containerWidth = screenWidth - 32; // Account for padding
-    const containerHeight = isMobile ? screenHeight * 0.85 : 700; // 85vh on mobile, 700px on desktop
+    const containerHeight = isMobile ? screenHeight * 0.92 : 700; // 92vh on mobile, 700px on desktop
     
     // Calculate scale to fit BOTH width and height
     const scaleByWidth = containerWidth / gridWidth;
@@ -66,8 +66,8 @@ export const BoothGridSelector = ({
     // Use the smaller scale to ensure entire grid fits
     const fitScale = Math.min(scaleByWidth, scaleByHeight);
     
-    // Add 3% padding so grid doesn't touch edges
-    const finalScale = fitScale * 0.97;
+    // No padding - maximize visible area on mobile
+    const finalScale = fitScale * 1.0;
     
     console.log('📐 Grid scale calculation:', {
       containerWidth,
@@ -126,8 +126,8 @@ export const BoothGridSelector = ({
         <div 
           className="border rounded-lg bg-muted/20 relative overflow-hidden" 
           style={{ 
-            height: isMobile ? "85vh" : "700px",
-            minHeight: "400px",
+            height: isMobile ? "92vh" : "700px",
+            minHeight: "300px",
             width: "100%",
           }}
         >
