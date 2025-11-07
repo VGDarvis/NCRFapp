@@ -113,6 +113,8 @@ export function SeminarDialog({
       await createSeminar.mutateAsync(payload);
     }
 
+    // Small delay to ensure query refetch completes
+    await new Promise(resolve => setTimeout(resolve, 150));
     onOpenChange(false);
   };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,16 @@ export function SeminarsModule() {
   const { events, isLoading: eventsLoading } = useEvents();
   const { data: seminars, isLoading: seminarsLoading } = useSeminarSessions(selectedEventId);
   const { deleteSeminar } = useSeminarMutations();
+
+  // Sync editingSeminar with fresh data when seminars refetch
+  useEffect(() => {
+    if (editingSeminar && seminars) {
+      const freshSeminar = seminars.find(s => s.id === editingSeminar.id);
+      if (freshSeminar && JSON.stringify(freshSeminar) !== JSON.stringify(editingSeminar)) {
+        setEditingSeminar(freshSeminar);
+      }
+    }
+  }, [seminars]);
 
   const selectedEvent = events?.find((e) => e.id === selectedEventId);
 
