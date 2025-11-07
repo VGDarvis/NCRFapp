@@ -86,7 +86,13 @@ export const BoothGridSelector = ({
           )}
         </div>
 
-        <div className="relative w-full overflow-x-auto pb-6">
+        <div 
+          className="relative w-full overflow-auto pb-6" 
+          style={{ 
+            height: `${Math.min(gridHeight + 100, 800)}px`,
+            maxHeight: "80vh",
+          }}
+        >
           <TransformWrapper
             initialScale={1}
             minScale={0.5}
@@ -108,6 +114,9 @@ export const BoothGridSelector = ({
                   wrapperStyle={{
                     width: "100%",
                     height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   <div
