@@ -32,8 +32,8 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
             const gridCol = updatedBooth?.grid_col;
             
             if (gridRow !== null && gridCol !== null) {
-              const rowLabel = String.fromCharCode(65 + gridRow); // A-H
-              const colLabel = (gridCol + 1).toString(); // 1-12
+              const rowLabel = String.fromCharCode(65 + gridRow); // A-Z (26 rows)
+              const colLabel = (gridCol + 1).toString(); // 1-40 (40 columns)
               
               toast.success(`📍 Booth ${tableNo} moved`, {
                 description: `New position: Row ${rowLabel}, Column ${colLabel}`,

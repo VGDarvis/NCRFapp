@@ -314,8 +314,8 @@ export function useFloorPlanEditor(
           const rect = new Rect({
             left: xPos,
             top: yPos,
-            width: Number(booth.booth_width || 80),
-            height: Number(booth.booth_depth || 80),
+            width: Number(booth.booth_width || 30),
+            height: Number(booth.booth_depth || 30),
             fill: tierColor,
             stroke: "#1e40af",
             strokeWidth: isMobile ? 2 : 3,
@@ -593,8 +593,8 @@ export function useFloorPlanEditor(
     const rect = new Rect({
       left: x,
       top: y,
-      width: 80,
-      height: 80,
+      width: 30,
+      height: 30,
       fill: "rgba(59, 130, 246, 0.5)",
       stroke: "#1e40af",
       strokeWidth: 3,
@@ -605,8 +605,8 @@ export function useFloorPlanEditor(
     });
 
     const label = new Text("New", {
-      left: x + 40,
-      top: y + 40,
+      left: x + 15,
+      top: y + 15,
       fontSize: 16,
       fill: "#1e40af",
       fontWeight: "bold",
