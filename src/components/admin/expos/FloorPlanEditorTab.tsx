@@ -222,15 +222,16 @@ export const FloorPlanEditorTab = () => {
         </div>
 
         <div 
-          className="border rounded-lg bg-muted/20 relative flex items-center justify-center" 
+          className="border rounded-lg bg-muted/20 relative" 
           style={{ 
             height: "calc(100vh - 400px)",
             minHeight: "500px",
             width: "100%",
             overflow: "hidden",
+            position: "relative",
           }}
         >
-          <canvas ref={canvasRef} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+          <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
         </div>
         
         <MobileCanvasControls 

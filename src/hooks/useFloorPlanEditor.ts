@@ -32,9 +32,15 @@ export function useFloorPlanEditor(
     if (!canvasRef.current || fabricCanvas) return;
 
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // Make canvas fill its container
+    const container = canvasRef.current.parentElement;
+    const canvasWidth = container?.clientWidth || 1200;
+    const canvasHeight = container?.clientHeight || 800;
+    
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 1200,  // Fixed size to match attendee viewer SVG
-      height: 800,  // Fixed size to match attendee viewer SVG
+      width: canvasWidth,
+      height: canvasHeight,
       backgroundColor: "#f8f9fa",
       selection: true,
       enablePointerEvents: true,
@@ -42,6 +48,8 @@ export function useFloorPlanEditor(
       renderOnAddRemove: !isMobile,
       perPixelTargetFind: !isMobile,
     });
+    
+    console.log("✅ Fabric.js canvas initialized", { width: canvasWidth, height: canvasHeight });
 
     // Enable touch gestures
     canvas.allowTouchScrolling = true;
@@ -98,10 +106,22 @@ export function useFloorPlanEditor(
       canvasRef.current.addEventListener('touchend', handleTouchEnd);
     }
 
-    console.log("✅ Fabric.js canvas initialized", { width: 1200, height: 800 });
     setFabricCanvas(canvas);
+    
+    // Handle window resize to keep canvas responsive
+    const handleResize = () => {
+      if (!container) return;
+      const newWidth = container.clientWidth;
+      const newHeight = container.clientHeight;
+      canvas.setDimensions({ width: newWidth, height: newHeight });
+      canvas.renderAll();
+      console.log("📐 Canvas resized", { width: newWidth, height: newHeight });
+    };
+    
+    window.addEventListener('resize', handleResize);
 
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (canvasRef.current) {
         canvasRef.current.removeEventListener('touchstart', handleTouchStart);
         canvasRef.current.removeEventListener('touchmove', handleTouchMove);
@@ -136,14 +156,16 @@ export function useFloorPlanEditor(
       });
       
       // Scale image to fit canvas
-      const scaleX = (fabricCanvas.width || 1200) / (img.width || 1);
-      const scaleY = (fabricCanvas.height || 800) / (img.height || 1);
-      const scale = Math.min(scaleX, scaleY) * 0.9;
+      const canvasWidth = fabricCanvas.width || 1200;
+      const canvasHeight = fabricCanvas.height || 800;
+      const scaleX = canvasWidth / (img.width || 1);
+      const scaleY = canvasHeight / (img.height || 1);
+      const scale = Math.min(scaleX, scaleY) * 0.95; // 95% to add small margin
       
       img.scale(scale);
       img.set({
-        left: ((fabricCanvas.width || 1200) - (img.width || 0) * scale) / 2,
-        top: ((fabricCanvas.height || 800) - (img.height || 0) * scale) / 2,
+        left: (canvasWidth - (img.width || 0) * scale) / 2,
+        top: (canvasHeight - (img.height || 0) * scale) / 2,
         selectable: false,
         evented: false,
       });
