@@ -27,6 +27,7 @@ export const FloorPlanEditorTab = () => {
     isLoading,
     saveBooths,
     fitAllBoothsToScreen,
+    resetToFullView,
   } = useFloorPlanEditor(floorPlanId, canvasRef, isPanMode, selectedEventId || undefined);
 
   // Load floor plan for selected event
@@ -75,7 +76,7 @@ export const FloorPlanEditorTab = () => {
     await saveBooths(selectedEventId);
   };
 
-  const handleZoom = (direction: "in" | "out" | "reset") => {
+  const handleZoom = (direction: "in" | "out" | "reset" | "fitBooths") => {
     if (!fabricCanvas) return;
     
     let newZoom = zoom;
@@ -87,12 +88,17 @@ export const FloorPlanEditorTab = () => {
       newZoom = Math.max(zoom / 1.2, 0.5);
       fabricCanvas.setZoom(newZoom);
       setZoom(newZoom);
-    } else {
-      // Fit to screen - calculate optimal zoom for all booths
+    } else if (direction === "reset") {
+      // Reset to full floor plan view (matching attendee experience)
+      if (resetToFullView) {
+        resetToFullView();
+        setZoom(1);
+      }
+    } else if (direction === "fitBooths") {
+      // Fit to positioned booths only
       if (fitAllBoothsToScreen) {
         const optimalZoom = fitAllBoothsToScreen();
         setZoom(optimalZoom || 1);
-        toast.success('Showing all booths');
       }
     }
     
@@ -137,13 +143,18 @@ export const FloorPlanEditorTab = () => {
             </Button>
 
             <div className="flex gap-1">
-              <Button variant="outline" size="sm" onClick={() => handleZoom("out")}>
+              <Button variant="outline" size="sm" onClick={() => handleZoom("out")} title="Zoom Out">
                 <ZoomOut className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleZoom("reset")} title="Fit to Screen">
+              <Button variant="outline" size="sm" onClick={() => handleZoom("reset")} title="Show Full Floor Plan (1:1)">
                 <Maximize2 className="w-4 h-4" />
+                <span className="ml-1 text-xs hidden xl:inline">Full</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleZoom("in")}>
+              <Button variant="outline" size="sm" onClick={() => handleZoom("fitBooths")} title="Zoom to Positioned Booths">
+                <Maximize2 className="w-4 h-4" />
+                <span className="ml-1 text-xs hidden xl:inline">Booths</span>
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleZoom("in")} title="Zoom In">
                 <ZoomIn className="w-4 h-4" />
               </Button>
             </div>
@@ -303,10 +314,11 @@ export const FloorPlanEditorTab = () => {
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm hidden md:block">
           <p className="font-semibold mb-1">💡 How to use:</p>
           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Click and drag booth numbers to reposition</li>
+            <li>Default view shows full 1200×800 floor plan (same as attendees see)</li>
+            <li>Click and drag booth numbers to reposition them</li>
             <li>Positions auto-save 2 seconds after you stop dragging</li>
-            <li>Use Pan mode to navigate large floor plans</li>
-            <li>Zoom in/out for precise positioning</li>
+            <li>Use "Full" button to reset to complete floor plan view</li>
+            <li>Use "Booths" button to zoom into positioned booths only</li>
             <li>Changes automatically broadcast to all attendees</li>
           </ul>
         </div>

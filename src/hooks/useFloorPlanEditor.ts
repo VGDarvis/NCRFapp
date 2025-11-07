@@ -102,6 +102,9 @@ export function useFloorPlanEditor(
       canvasRef.current.addEventListener('touchend', handleTouchEnd);
     }
 
+    // Set initial viewport to show full canvas at 1:1 scale (matching attendee view)
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    
     setFabricCanvas(canvas);
 
     return () => {
@@ -153,17 +156,35 @@ export function useFloorPlanEditor(
 
       fabricCanvas.add(img);
       fabricCanvas.sendObjectToBack(img);
+      
+      // Reset to full view after loading background (matching attendee view)
+      fabricCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
       fabricCanvas.renderAll();
       
-      console.log('✅ Floor plan background set on canvas');
-      toast.success("Floor plan loaded");
+      console.log('✅ Floor plan background set on canvas at full scale');
+      toast.success("Floor plan loaded - showing full view");
     } catch (error) {
       console.error("❌ Error loading floor plan background:", error);
       toast.error("Failed to load floor plan image. Please refresh the page.");
     }
   }, [fabricCanvas]);
 
-  // Fit all booths to screen
+  // Reset to full view (matching attendee experience)
+  const resetToFullView = useCallback(() => {
+    if (!fabricCanvas) {
+      console.log("⚠️ No canvas available for resetting view");
+      return;
+    }
+
+    // Reset to identity matrix (1:1 scale, no zoom, no pan)
+    fabricCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    fabricCanvas.renderAll();
+    
+    console.log("✅ Reset to full floor plan view (1200×800)");
+    toast.success("Showing full floor plan");
+  }, [fabricCanvas]);
+
+  // Fit all booths to screen (optional tool for zooming to positioned booths)
   const fitAllBoothsToScreen = useCallback(() => {
     if (!fabricCanvas) {
       console.log("⚠️ No canvas available for fitting booths");
@@ -241,7 +262,7 @@ export function useFloorPlanEditor(
       center: { x: centerX.toFixed(0), y: centerY.toFixed(0) },
     });
 
-    toast.success(`Fitted ${booths.length} booths to screen`);
+    toast.success(`Zoomed to ${booths.length} positioned booth${booths.length === 1 ? '' : 's'}`);
     return optimalZoom;
   }, [fabricCanvas, booths]);
 
@@ -483,18 +504,6 @@ export function useFloorPlanEditor(
     autoLoadBooths();
   }, [fabricCanvas, eventId, loadBooths]);
 
-  // Auto-fit to screen after booths are loaded
-  useEffect(() => {
-    if (!fabricCanvas || !eventId) return;
-
-    const timer = setTimeout(() => {
-      console.log("🎯 Auto-fitting booths to screen after load...");
-      fitAllBoothsToScreen();
-    }, 1000); // Increased timeout to ensure floor plan loads first
-
-    return () => clearTimeout(timer);
-  }, [fabricCanvas, eventId, fitAllBoothsToScreen]);
-
   // Handle pan mode
   useEffect(() => {
     if (!fabricCanvas) return;
@@ -681,5 +690,6 @@ export function useFloorPlanEditor(
     saveBooths,
     setSelectedBooth,
     fitAllBoothsToScreen,
+    resetToFullView,
   };
 };
