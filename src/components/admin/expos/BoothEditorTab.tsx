@@ -4,13 +4,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Edit, Loader2, Trash2, Plus, Search, Upload } from "lucide-react";
+import { Edit, Loader2, Trash2, Plus, Search, Upload, Maximize2 } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths, type Booth } from "@/hooks/useBooths";
 import { BoothEditDialog } from "./BoothEditDialog";
 import { BoothAddDialog } from "./BoothAddDialog";
 import { DallasBoothUpdater } from "./DallasBoothUpdater";
 import { DallasExhibitorImporter } from "./DallasExhibitorImporter";
+import { BulkDimensionsDialog } from "./BulkDimensionsDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ export function BoothEditorTab() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [updaterOpen, setUpdaterOpen] = useState(false);
   const [importerOpen, setImporterOpen] = useState(false);
+  const [bulkDimensionsOpen, setBulkDimensionsOpen] = useState(false);
   const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -140,6 +142,10 @@ export function BoothEditorTab() {
               <h3 className="text-lg font-semibold">Booths</h3>
               <div className="flex items-center gap-2">
                 {boothsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                <Button onClick={() => setBulkDimensionsOpen(true)} size="sm" variant="outline">
+                  <Maximize2 className="w-4 h-4 mr-2" />
+                  Bulk Dimensions
+                </Button>
                 <Button onClick={() => setImporterOpen(true)} size="sm" variant="outline">
                   <Upload className="w-4 h-4 mr-2" />
                   Import Dallas CSV
@@ -274,6 +280,15 @@ export function BoothEditorTab() {
           onClose={() => setImporterOpen(false)}
           eventId={selectedEventId}
           eventTitle={collegeExpos.find(e => e.id === selectedEventId)?.title || ""}
+        />
+      )}
+
+      {selectedEventId && booths && (
+        <BulkDimensionsDialog
+          open={bulkDimensionsOpen}
+          onClose={() => setBulkDimensionsOpen(false)}
+          booths={booths}
+          onSuccess={handleBoothUpdated}
         />
       )}
 
