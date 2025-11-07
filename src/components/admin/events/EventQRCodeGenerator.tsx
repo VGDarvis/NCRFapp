@@ -19,7 +19,7 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const guestUrl = generateGuestAccessUrl(eventId);
+  const guestUrl = generateGuestAccessUrl(); // Dashboard only - no event parameter
 
   const handleGenerateQR = async () => {
     setIsGenerating(true);
