@@ -47,6 +47,16 @@ export const BoothGridSelector = ({
   const cellSize = CELL_SIZE;
   const gridWidth = GRID_COLS * cellSize; // 1200px
   const gridHeight = GRID_ROWS * cellSize; // 800px
+  
+  // Calculate initial scale for mobile to fit grid on screen
+  const getInitialScale = () => {
+    if (isMobile) {
+      const screenWidth = window.innerWidth;
+      const availableWidth = screenWidth - 32; // Account for padding
+      return Math.min(availableWidth / gridWidth, 0.4);
+    }
+    return 0.6;
+  };
 
   // Helper to get booth info for a grid position
   const getBoothInfo = (row: number, col: number) => {
@@ -88,34 +98,36 @@ export const BoothGridSelector = ({
           )}
         </div>
 
-        <div className="w-full px-2 md:px-4">
-          <div 
-            className="border rounded-lg bg-muted/20 relative overflow-hidden mx-auto" 
-            style={{ 
-              width: "100%",
-              maxWidth: "1200px",
-              aspectRatio: "1200/800",
-            }}
-          >
-            <div className="w-full h-full p-4">
+        <div 
+          className="border rounded-lg bg-muted/20 relative overflow-hidden" 
+          style={{ 
+            height: isMobile ? "70vh" : "600px",
+            minHeight: "400px",
+          }}
+        >
+          <div className="w-full h-full relative">
             <TransformWrapper
-              initialScale={1}
-              minScale={0.5}
-              maxScale={3}
+              initialScale={getInitialScale()}
+              minScale={0.2}
+              maxScale={4}
               centerOnInit={true}
               centerZoomedOut={true}
-              wheel={{ disabled: !isMobile }}
+              wheel={{ disabled: false }}
+              pinch={{ step: 5 }}
+              doubleClick={{ disabled: false, mode: "zoomIn" }}
+              panning={{ 
+                disabled: false,
+                velocityDisabled: false,
+              }}
               onZoom={(ref) => setZoom(ref.state.scale)}
             >
               {({ zoomIn, zoomOut, resetTransform }) => (
                 <>
-                  {isMobile && (
-                    <GridZoomControls
-                      onZoomIn={() => zoomIn()}
-                      onZoomOut={() => zoomOut()}
-                      onResetZoom={() => resetTransform()}
-                    />
-                  )}
+                  <GridZoomControls
+                    onZoomIn={() => zoomIn()}
+                    onZoomOut={() => zoomOut()}
+                    onResetZoom={() => resetTransform()}
+                  />
                   <TransformComponent
                     wrapperStyle={{
                       width: "100%",
@@ -213,15 +225,10 @@ export const BoothGridSelector = ({
                       style={{
                         width: `${cellSize}px`,
                         height: `${cellSize}px`,
-                        minWidth: "44px",
-                        minHeight: "44px",
                       }}
                     >
                       {boothNumber && (
-                        <span className={cn(
-                          "font-bold leading-none",
-                          isMobile ? "text-[8px]" : "text-[10px]"
-                        )}>
+                        <span className="font-bold leading-none text-xs">
                           {boothNumber.length > 4 ? `${boothNumber.slice(0, 3)}...` : boothNumber}
                         </span>
                       )}
@@ -255,9 +262,8 @@ export const BoothGridSelector = ({
              </TransformWrapper>
            </div>
          </div>
-        </div>
 
-        <div className="flex gap-4 mt-4 text-xs">
+         <div className="flex gap-4 mt-4 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-background border border-border rounded" />
             <span className="text-muted-foreground">Available</span>
