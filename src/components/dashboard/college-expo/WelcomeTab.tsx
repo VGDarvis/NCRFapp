@@ -104,7 +104,7 @@ export const WelcomeTab = () => {
 
           <div className="rounded-lg overflow-hidden shadow-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-green-500/10">
             <img 
-              src="/images/expo-houston-flyer.png" 
+              src="/images/dallas-fort-worth-flyer.png" 
               alt={event.title}
               className="w-full h-full object-cover"
             />
