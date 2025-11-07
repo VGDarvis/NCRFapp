@@ -43,9 +43,21 @@ export function SeminarDialog({
 
   useEffect(() => {
     if (seminar) {
-      // Parse ISO time to HH:MM format for input
-      const startTime = new Date(seminar.start_time).toTimeString().slice(0, 5);
-      const endTime = new Date(seminar.end_time).toTimeString().slice(0, 5);
+      // Parse UTC time to local HH:MM format for input
+      const startDate = new Date(seminar.start_time);
+      const endDate = new Date(seminar.end_time);
+      
+      // Format as HH:MM in local timezone
+      const startTime = startDate.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      const endTime = endDate.toLocaleTimeString('en-US', { 
+        hour12: false, 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
 
       setFormData({
         title: seminar.title || "",
@@ -86,10 +98,21 @@ export function SeminarDialog({
       return;
     }
 
-    // Extract date portion from ISO timestamp and combine with time
-    const dateOnly = eventDate.split('T')[0]; // Extract "2025-11-08" from "2025-11-08T00:00:00.000Z"
-    const startDateTime = `${dateOnly}T${formData.start_time}:00`;
-    const endDateTime = `${dateOnly}T${formData.end_time}:00`;
+    // Extract date and create proper Date objects in local timezone
+    const eventDateObj = new Date(eventDate);
+    const [startHour, startMinute] = formData.start_time.split(':').map(Number);
+    const [endHour, endMinute] = formData.end_time.split(':').map(Number);
+    
+    // Create dates in local timezone
+    const startDate = new Date(eventDateObj);
+    startDate.setHours(startHour, startMinute, 0, 0);
+    
+    const endDate = new Date(eventDateObj);
+    endDate.setHours(endHour, endMinute, 0, 0);
+    
+    // Convert to ISO strings (which will be in UTC)
+    const startDateTime = startDate.toISOString();
+    const endDateTime = endDate.toISOString();
 
     const payload = {
       event_id: eventId,
