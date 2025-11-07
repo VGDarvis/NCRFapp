@@ -48,14 +48,39 @@ export const BoothGridSelector = ({
   const gridWidth = GRID_COLS * cellSize; // 1200px
   const gridHeight = GRID_ROWS * cellSize; // 800px
   
-  // Calculate initial scale for mobile to fit grid on screen
+  // Calculate initial scale to fit ENTIRE grid on screen (both width and height)
   const getInitialScale = () => {
-    if (isMobile) {
-      const screenWidth = window.innerWidth;
-      const availableWidth = screenWidth - 32; // Account for padding
-      return Math.min(availableWidth / gridWidth, 0.4);
-    }
-    return 0.6;
+    if (typeof window === 'undefined') return 0.6;
+    
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    
+    // Calculate container dimensions
+    const containerWidth = screenWidth - 32; // Account for padding
+    const containerHeight = isMobile ? screenHeight * 0.7 : 600; // 70vh on mobile, 600px on desktop
+    
+    // Calculate scale to fit BOTH width and height
+    const scaleByWidth = containerWidth / gridWidth;
+    const scaleByHeight = containerHeight / gridHeight;
+    
+    // Use the smaller scale to ensure entire grid fits
+    const fitScale = Math.min(scaleByWidth, scaleByHeight);
+    
+    // Add 10% padding so grid doesn't touch edges
+    const finalScale = fitScale * 0.9;
+    
+    console.log('📐 Grid scale calculation:', {
+      containerWidth,
+      containerHeight,
+      gridWidth,
+      gridHeight,
+      scaleByWidth: scaleByWidth.toFixed(2),
+      scaleByHeight: scaleByHeight.toFixed(2),
+      finalScale: finalScale.toFixed(2),
+      isMobile
+    });
+    
+    return Math.max(0.2, Math.min(finalScale, 2)); // Clamp between 0.2 and 2
   };
 
   // Helper to get booth info for a grid position
@@ -103,31 +128,39 @@ export const BoothGridSelector = ({
           style={{ 
             height: isMobile ? "70vh" : "600px",
             minHeight: "400px",
+            width: "100%",
           }}
         >
-          <div className="w-full h-full relative">
+          <div className="w-full h-full relative flex items-center justify-center">
             <TransformWrapper
               initialScale={getInitialScale()}
-              minScale={0.2}
+              minScale={0.15}
               maxScale={4}
               centerOnInit={true}
               centerZoomedOut={true}
-              wheel={{ disabled: false }}
+              limitToBounds={false}
+              wheel={{ disabled: false, step: 0.1 }}
               pinch={{ step: 5 }}
-              doubleClick={{ disabled: false, mode: "zoomIn" }}
+              doubleClick={{ disabled: false, mode: "zoomIn", step: 0.5 }}
               panning={{ 
                 disabled: false,
                 velocityDisabled: false,
               }}
               onZoom={(ref) => setZoom(ref.state.scale)}
+              alignmentAnimation={{ disabled: false, sizeX: 0, sizeY: 0 }}
             >
               {({ zoomIn, zoomOut, resetTransform }) => (
                 <>
                   <GridZoomControls
-                    onZoomIn={() => zoomIn()}
-                    onZoomOut={() => zoomOut()}
+                    onZoomIn={() => zoomIn(0.3)}
+                    onZoomOut={() => zoomOut(0.3)}
                     onResetZoom={() => resetTransform()}
                   />
+                  <div className="fixed bottom-32 right-4 z-20 md:hidden">
+                    <Badge variant="secondary" className="text-xs px-2 py-1">
+                      {Math.round(zoom * 100)}%
+                    </Badge>
+                  </div>
                   <TransformComponent
                     wrapperStyle={{
                       width: "100%",
