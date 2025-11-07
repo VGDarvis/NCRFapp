@@ -73,6 +73,46 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
     setSaving(true);
 
     try {
+      // Debug: Log current user authentication state
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        toast.error(`Authentication error: ${sessionError.message}`);
+        setSaving(false);
+        return;
+      }
+
+      if (!session) {
+        console.error("No active session found");
+        toast.error("You must be logged in to update booths");
+        setSaving(false);
+        return;
+      }
+
+      console.log("Current user:", session.user.email, "User ID:", session.user.id);
+
+      // Validate numeric inputs
+      const xPos = formData.x_position?.trim() ? parseFloat(formData.x_position) : null;
+      const yPos = formData.y_position?.trim() ? parseFloat(formData.y_position) : null;
+      const width = formData.booth_width?.trim() ? parseFloat(formData.booth_width) : 60;
+      const depth = formData.booth_depth?.trim() ? parseFloat(formData.booth_depth) : 60;
+
+      if ((xPos !== null && isNaN(xPos)) || (yPos !== null && isNaN(yPos))) {
+        toast.error("Invalid position values. Please enter valid numbers.");
+        setSaving(false);
+        return;
+      }
+
+      console.log("Updating booth with data:", {
+        table_no: formData.table_no,
+        org_name: formData.org_name,
+        x_position: xPos,
+        y_position: yPos,
+        booth_width: width,
+        booth_depth: depth,
+      });
+
       const { error } = await supabase
         .from("booths")
         .update({
@@ -82,23 +122,32 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
           offers_on_spot_admission: formData.offers_on_spot_admission,
           scholarship_info: formData.scholarship_info ? "Available" : null,
           waives_application_fee: formData.waives_application_fee,
-          x_position: formData.x_position ? parseFloat(formData.x_position) : null,
-          y_position: formData.y_position ? parseFloat(formData.y_position) : null,
-          booth_width: formData.booth_width ? parseFloat(formData.booth_width) : 60,
-          booth_depth: formData.booth_depth ? parseFloat(formData.booth_depth) : 60,
+          x_position: xPos,
+          y_position: yPos,
+          booth_width: width,
+          booth_depth: depth,
         })
         .eq("id", booth.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw error;
+      }
 
       // Invalidate all booth queries to sync across all components
       await queryClient.invalidateQueries({ queryKey: ["booths"] });
 
       toast.success(`Booth #${booth.table_no} updated successfully`);
       onBoothUpdated();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating booth:", error);
-      toast.error("Failed to update booth");
+      const errorMessage = error?.message || error?.details || "Unknown error occurred";
+      toast.error(`Failed to update booth: ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -107,12 +156,24 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
   const handleDelete = async () => {
     setDeleting(true);
     try {
+      // Debug: Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log("Deleting booth - User:", session?.user.email);
+
       const { error } = await supabase
         .from("booths")
         .delete()
         .eq("id", booth.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Delete error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw error;
+      }
 
       // Invalidate all booth queries to sync across all components
       await queryClient.invalidateQueries({ queryKey: ["booths"] });
@@ -121,9 +182,10 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
       setShowDeleteConfirm(false);
       onClose();
       onBoothUpdated();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting booth:", error);
-      toast.error("Failed to delete booth");
+      const errorMessage = error?.message || error?.details || "Unknown error occurred";
+      toast.error(`Failed to delete booth: ${errorMessage}`);
     } finally {
       setDeleting(false);
     }
