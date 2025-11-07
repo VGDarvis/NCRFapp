@@ -4,11 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Edit, Loader2, Trash2, Plus, Search } from "lucide-react";
+import { Edit, Loader2, Trash2, Plus, Search, Upload } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { useBooths, type Booth } from "@/hooks/useBooths";
 import { BoothEditDialog } from "./BoothEditDialog";
 import { BoothAddDialog } from "./BoothAddDialog";
+import { DallasBoothUpdater } from "./DallasBoothUpdater";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -16,6 +17,7 @@ export function BoothEditorTab() {
   const [selectedEventId, setSelectedEventId] = useState<string>("");
   const [editingBooth, setEditingBooth] = useState<Booth | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [updaterOpen, setUpdaterOpen] = useState(false);
   const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -132,6 +134,10 @@ export function BoothEditorTab() {
               <h3 className="text-lg font-semibold">Booths</h3>
               <div className="flex items-center gap-2">
                 {boothsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                <Button onClick={() => setUpdaterOpen(true)} size="sm" variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Update from CSV
+                </Button>
                 <Button onClick={() => setAddDialogOpen(true)} size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Booth
@@ -245,6 +251,12 @@ export function BoothEditorTab() {
           onBoothAdded={handleBoothUpdated}
         />
       )}
+
+      <DallasBoothUpdater
+        open={updaterOpen}
+        onClose={() => setUpdaterOpen(false)}
+        onComplete={handleBoothUpdated}
+      />
 
       <AlertDialog open={!!deletingBoothId} onOpenChange={(open) => !open && setDeletingBoothId(null)}>
         <AlertDialogContent>
