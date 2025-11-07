@@ -30,6 +30,7 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAllBooths, setShowAllBooths] = useState(false);
   const [boothInputMode, setBoothInputMode] = useState<"select" | "custom">("select");
+  const [orgInputMode, setOrgInputMode] = useState<"select" | "custom">("select");
   const [formData, setFormData] = useState({
     table_no: booth.table_no || "",
     org_name: booth.org_name || "",
@@ -308,9 +309,38 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="org_name">Organization Name *</Label>
-            {orgsLoading ? (
+            
+            <RadioGroup 
+              value={orgInputMode} 
+              onValueChange={(value: "select" | "custom") => setOrgInputMode(value)} 
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="select" id="org-mode-select" />
+                <Label htmlFor="org-mode-select" className="font-normal cursor-pointer">
+                  Select from organizations
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="custom" id="org-mode-custom" />
+                <Label htmlFor="org-mode-custom" className="font-normal cursor-pointer">
+                  Enter custom name
+                </Label>
+              </div>
+            </RadioGroup>
+
+            {orgInputMode === "custom" ? (
+              <Input
+                id="org_name"
+                value={formData.org_name}
+                onChange={(e) => setFormData({ ...formData, org_name: e.target.value })}
+                placeholder="Enter organization name"
+                required
+                className="min-h-[48px]"
+              />
+            ) : orgsLoading ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Loading organizations...
@@ -321,7 +351,7 @@ export function BoothEditDialog({ booth, open, onClose, onBoothUpdated }: BoothE
                 onValueChange={(value) => setFormData({ ...formData, org_name: value })}
                 required
               >
-                <SelectTrigger id="org_name">
+                <SelectTrigger id="org_name" className="min-h-[48px]">
                   <SelectValue placeholder="Select organization" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px] z-[9999] bg-background" position="popper" sideOffset={5}>
