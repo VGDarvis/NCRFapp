@@ -95,7 +95,7 @@ export const WelcomeTab = () => {
 
             <div className="flex gap-3">
               <Button size="lg" className="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700" asChild>
-                <a href="https://www.eventbrite.com/e/16th-annual-houston-black-college-expotm-tickets-1350818457369" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.eventbrite.com/e/8th-annual-dallas-fort-worth-black-college-expo-tickets-1350845919509?aff=erelexpmlt" target="_blank" rel="noopener noreferrer">
                   Register Now <ExternalLink className="w-4 h-4 ml-2" />
                 </a>
               </Button>
