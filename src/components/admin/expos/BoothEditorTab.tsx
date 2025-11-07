@@ -12,6 +12,7 @@ import { BoothAddDialog } from "./BoothAddDialog";
 import { DallasBoothUpdater } from "./DallasBoothUpdater";
 import { DallasExhibitorImporter } from "./DallasExhibitorImporter";
 import { BulkDimensionsDialog } from "./BulkDimensionsDialog";
+import { FixBoothDimensionsButton } from "./FixBoothDimensionsButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -146,6 +147,7 @@ export function BoothEditorTab() {
                   <Maximize2 className="w-4 h-4 mr-2" />
                   Bulk Dimensions
                 </Button>
+                <FixBoothDimensionsButton />
                 <Button onClick={() => setImporterOpen(true)} size="sm" variant="outline">
                   <Upload className="w-4 h-4 mr-2" />
                   Import Dallas CSV
