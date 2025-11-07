@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,37 +45,6 @@ export const BoothGridSelector = ({
   
   // Use standard cell size to match 1200x800 floor plan
   const cellSize = CELL_SIZE;
-  const gridWidth = GRID_COLS * cellSize; // 1200px
-  const gridHeight = GRID_ROWS * cellSize; // 800px
-  
-  // Memoize the initial scale calculation so it's stable across renders
-  const initialScale = useMemo(() => {
-    if (typeof window === 'undefined') return 0.35;
-    
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    
-    const containerWidth = screenWidth - 32;
-    const containerHeight = isMobile ? screenHeight * 0.92 : 700;
-    
-    const scaleByWidth = containerWidth / gridWidth;
-    const scaleByHeight = containerHeight / gridHeight;
-    
-    const fitScale = Math.min(scaleByWidth, scaleByHeight);
-    
-    console.log('📐 Initial scale memoized:', {
-      containerWidth,
-      containerHeight,
-      gridWidth,
-      gridHeight,
-      scaleByWidth: scaleByWidth.toFixed(2),
-      scaleByHeight: scaleByHeight.toFixed(2),
-      fitScale: fitScale.toFixed(2),
-      isMobile
-    });
-    
-    return Math.max(0.3, Math.min(fitScale, 1.5));
-  }, [isMobile, gridWidth, gridHeight]);
 
   // Helper to get booth info for a grid position
   const getBoothInfo = (row: number, col: number) => {
@@ -118,181 +87,173 @@ export const BoothGridSelector = ({
         </div>
 
         <div 
-          className="border rounded-lg bg-muted/20 relative overflow-hidden" 
+          className="relative bg-muted/20 rounded-lg overflow-hidden mx-auto" 
           style={{ 
-            height: isMobile ? "92vh" : "700px",
-            minHeight: "300px",
             width: "100%",
+            maxWidth: "1200px",
+            aspectRatio: "1200/800",
+            height: isMobile ? "auto" : "700px",
           }}
         >
-          <div className="w-full h-full relative flex items-center justify-center">
-            <TransformWrapper
-              initialScale={initialScale}
-              minScale={0.3}
-              maxScale={3}
-              centerOnInit={true}
-              centerZoomedOut={false}
-              limitToBounds={true}
-              disablePadding={false}
-              wheel={{ disabled: false, step: 0.15 }}
-              pinch={{ disabled: false, step: 5 }}
-              doubleClick={{ disabled: false, mode: "zoomIn", step: 0.5 }}
-              panning={{ 
-                disabled: false,
-                velocityDisabled: false,
-              }}
-              onZoom={(ref) => {
-                setZoom(ref.state.scale);
-                console.log('🔍 Current zoom:', ref.state.scale.toFixed(2));
-              }}
-              alignmentAnimation={{ disabled: true }}
-            >
-              {({ zoomIn, zoomOut, resetTransform }) => (
-                <>
-                  <GridZoomControls
-                    onZoomIn={() => zoomIn(0.3)}
-                    onZoomOut={() => zoomOut(0.3)}
-                    onResetZoom={() => resetTransform()}
-                  />
-                  <div className="fixed bottom-32 right-4 z-20 md:hidden">
-                    <Badge variant="secondary" className="text-xs px-2 py-1">
-                      {Math.round(zoom * 100)}%
-                    </Badge>
-                  </div>
-                  <TransformComponent
-                    wrapperStyle={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+          <TransformWrapper
+            initialScale={1}
+            minScale={0.3}
+            maxScale={3}
+            centerOnInit
+            onZoom={(ref) => setZoom(ref.state.scale)}
+          >
+            {({ zoomIn, zoomOut, resetTransform }) => (
+              <>
+                <GridZoomControls
+                  onZoomIn={() => zoomIn()}
+                  onZoomOut={() => zoomOut()}
+                  onResetZoom={() => resetTransform()}
+                />
+                <div className="fixed bottom-32 right-4 z-20 md:hidden">
+                  <Badge variant="secondary" className="text-xs px-2 py-1">
+                    {Math.round(zoom * 100)}%
+                  </Badge>
+                </div>
+                <TransformComponent
+                  wrapperStyle={{ width: "100%", height: "100%" }}
+                  contentStyle={{ width: "100%", height: "100%" }}
+                >
+                  {/* Background image */}
+                  {backgroundImageUrl && (
+                    <img
+                      src={backgroundImageUrl}
+                      alt="Floor plan"
+                      className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                      style={{ opacity: 0.3 }}
+                    />
+                  )}
+
+                  {/* SVG Grid with proper viewBox */}
+                  <svg
+                    width="100%"
+                    height="100%"
+                    viewBox="0 0 1200 800"
+                    className="absolute inset-0"
+                    preserveAspectRatio="xMidYMid meet"
                   >
-                    <div
-                      className="relative"
-                      style={{
-                        width: `${gridWidth}px`,
-                        height: `${gridHeight}px`,
-                        minWidth: "320px",
-                        margin: "0 auto",
-                      }}
-                    >
-                    {/* Background image with controlled opacity */}
-                    {backgroundImageUrl && (
-                      <div 
-                        className="absolute inset-0 pointer-events-none rounded"
-                        style={{
-                          backgroundImage: `url(${backgroundImageUrl})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                          backgroundRepeat: 'no-repeat',
-                          opacity: 0.3,
-                        }}
-                      />
+                    {/* Render zones as SVG rects */}
+                    {zones.map((zone) => (
+                      <g key={zone.id}>
+                        <rect
+                          x={zone.startCol * cellSize}
+                          y={zone.startRow * cellSize}
+                          width={zone.cols * cellSize}
+                          height={zone.rows * cellSize}
+                          fill={`${zone.color}25`}
+                          stroke={zone.color}
+                          strokeWidth="2"
+                          rx="4"
+                        />
+                        <text
+                          x={zone.startCol * cellSize + 5}
+                          y={zone.startRow * cellSize + 20}
+                          fill={zone.color}
+                          fontSize="14"
+                          fontWeight="bold"
+                        >
+                          {zone.name}
+                        </text>
+                      </g>
+                    ))}
+
+                    {/* Render grid cells as SVG */}
+                    {Array.from({ length: GRID_ROWS }).map((_, row) =>
+                      Array.from({ length: GRID_COLS }).map((_, col) => {
+                        const occupied = isCellOccupied(row, col);
+                        const selected = isCellSelected(row, col);
+                        const boothNumber = getBoothNumber(row, col);
+                        const x = col * cellSize;
+                        const y = row * cellSize;
+
+                        return (
+                          <g
+                            key={`${row}-${col}`}
+                            onClick={() => handleCellClick(row, col)}
+                            className={cn(
+                              "cursor-pointer transition-all",
+                              !occupied && "hover:opacity-80"
+                            )}
+                            style={{ pointerEvents: occupied ? "none" : "auto" }}
+                          >
+                            <rect
+                              x={x}
+                              y={y}
+                              width={cellSize}
+                              height={cellSize}
+                              fill={
+                                occupied
+                                  ? "rgba(239, 68, 68, 0.2)"
+                                  : selected
+                                  ? "hsl(var(--primary))"
+                                  : "hsl(var(--background))"
+                              }
+                              stroke={
+                                occupied
+                                  ? "rgb(239, 68, 68)"
+                                  : selected
+                                  ? "hsl(var(--primary))"
+                                  : "hsl(var(--border))"
+                              }
+                              strokeWidth="1"
+                              rx="2"
+                              opacity={gridOpacity}
+                            />
+                            {boothNumber && (
+                              <text
+                                x={x + cellSize / 2}
+                                y={y + cellSize / 2 - 5}
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                                fill="currentColor"
+                                fontSize="10"
+                                fontWeight="bold"
+                              >
+                                {boothNumber}
+                              </text>
+                            )}
+                            {/* Status indicator */}
+                            <circle
+                              cx={x + cellSize / 2}
+                              cy={y + cellSize / 2 + 10}
+                              r="3"
+                              fill={
+                                selected
+                                  ? "rgb(34, 197, 94)"
+                                  : occupied
+                                  ? "rgb(239, 68, 68)"
+                                  : "rgba(0,0,0,0.2)"
+                              }
+                            />
+                          </g>
+                        );
+                      })
                     )}
 
-            {/* Zone overlays */}
-            {zones.map((zone) => (
-              <div
-                key={zone.id}
-                className="absolute border-2 pointer-events-none rounded"
-                style={{
-                  left: `${zone.startCol * cellSize}px`,
-                  top: `${zone.startRow * cellSize}px`,
-                  width: `${zone.cols * cellSize}px`,
-                  height: `${zone.rows * cellSize}px`,
-                  borderColor: zone.color,
-                  backgroundColor: `${zone.color}25`,
-                  borderWidth: isMobile ? "3px" : "2px",
-                }}
-              >
-                <span
-                  className={cn(
-                    "absolute top-1 left-1 font-semibold px-1 rounded shadow-sm",
-                    isMobile ? "text-sm" : "text-xs"
-                  )}
-                  style={{
-                    backgroundColor: zone.color,
-                    color: 'white',
-                  }}
-                >
-                  {zone.name}
-                </span>
-              </div>
-            ))}
-
-            {/* Grid cells */}
-            <div 
-              className="relative grid" 
-              style={{ 
-                gridTemplateColumns: `repeat(${GRID_COLS}, ${cellSize}px)`,
-                opacity: gridOpacity,
-              }}
-            >
-              {Array.from({ length: GRID_ROWS }).map((_, row) =>
-                Array.from({ length: GRID_COLS }).map((_, col) => {
-                  const occupied = isCellOccupied(row, col);
-                  const selected = isCellSelected(row, col);
-                  const hovered = hoveredCell?.row === row && hoveredCell?.col === col;
-                  const boothNumber = getBoothNumber(row, col);
-                  const boothInfo = getBoothInfo(row, col);
-
-                  return (
-                    <button
-                      key={`${row}-${col}`}
-                      onClick={() => handleCellClick(row, col)}
-                      onMouseEnter={() => setHoveredCell({ row, col })}
-                      onMouseLeave={() => setHoveredCell(null)}
-                      disabled={occupied}
-                      title={boothInfo ? `Booth #${boothInfo.table_no} - ${boothInfo.org_name || 'No org'}` : undefined}
-                      className={cn(
-                        `w-[${cellSize}px] h-[${cellSize}px] border transition-all touch-manipulation flex flex-col items-center justify-center gap-0.5`,
-                        "hover:scale-105 active:scale-95",
-                        occupied && "bg-destructive/20 border-destructive cursor-not-allowed",
-                        !occupied && "bg-background border-border hover:bg-accent",
-                        selected && "bg-primary border-primary ring-2 ring-primary",
-                        hovered && !occupied && !selected && "bg-secondary border-secondary"
-                      )}
-                      style={{
-                        width: `${cellSize}px`,
-                        height: `${cellSize}px`,
-                      }}
-                    >
-                      {boothNumber && (
-                        <span className="font-bold leading-none text-xs">
-                          {boothNumber.length > 4 ? `${boothNumber.slice(0, 3)}...` : boothNumber}
-                        </span>
-                      )}
-                      <div className="flex items-center justify-center">
-                        {selected && (
-                          <span className="w-2 h-2 rounded-full bg-green-500" title="Selected" />
-                        )}
-                        {occupied && !selected && (
-                          <span className="w-2 h-2 rounded-full bg-red-500" title="Occupied" />
-                        )}
-                        {!occupied && !selected && (
-                          <span className="w-2 h-2 rounded-full bg-muted-foreground/30" title="Available" />
-                        )}
-                      </div>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Grid labels */}
-            <div className="absolute -left-6 top-0 h-full flex flex-col justify-around text-xs text-muted-foreground">
-              {Array.from({ length: GRID_ROWS }).map((_, i) => (
-                <div key={i}>{String.fromCharCode(65 + i)}</div>
-              ))}
-             </div>
-                     </div>
-                   </TransformComponent>
-                 </>
-               )}
-             </TransformWrapper>
-           </div>
-         </div>
+                    {/* Row labels */}
+                    {Array.from({ length: GRID_ROWS }).map((_, i) => (
+                      <text
+                        key={`row-${i}`}
+                        x="-15"
+                        y={i * cellSize + cellSize / 2}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill="currentColor"
+                        fontSize="12"
+                      >
+                        {String.fromCharCode(65 + i)}
+                      </text>
+                    ))}
+                  </svg>
+                </TransformComponent>
+              </>
+            )}
+          </TransformWrapper>
+        </div>
 
          <div className="flex gap-4 mt-4 text-xs">
           <div className="flex items-center gap-2">
