@@ -78,11 +78,19 @@ export const FloorPlanEditorTab = () => {
     if (!fabricCanvas) return;
     
     let newZoom = zoom;
-    if (direction === "in") newZoom = Math.min(zoom * 1.2, 3);
-    else if (direction === "out") newZoom = Math.max(zoom / 1.2, 0.5);
-    else newZoom = 1;
+    if (direction === "in") {
+      newZoom = Math.min(zoom * 1.2, 3);
+      fabricCanvas.setZoom(newZoom);
+    } else if (direction === "out") {
+      newZoom = Math.max(zoom / 1.2, 0.5);
+      fabricCanvas.setZoom(newZoom);
+    } else {
+      // Fit to screen - reset zoom and center viewport
+      newZoom = 1;
+      fabricCanvas.setZoom(1);
+      fabricCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+    }
     
-    fabricCanvas.setZoom(newZoom);
     setZoom(newZoom);
     fabricCanvas.renderAll();
   };
@@ -128,13 +136,17 @@ export const FloorPlanEditorTab = () => {
               <Button variant="outline" size="sm" onClick={() => handleZoom("out")}>
                 <ZoomOut className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleZoom("reset")}>
+              <Button variant="outline" size="sm" onClick={() => handleZoom("reset")} title="Fit to Screen">
                 <Maximize2 className="w-4 h-4" />
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleZoom("in")}>
                 <ZoomIn className="w-4 h-4" />
               </Button>
             </div>
+            
+            <Badge variant="outline" className="hidden lg:inline-flex">
+              Zoom: {Math.round(zoom * 100)}%
+            </Badge>
 
             <Button onClick={handleSave} disabled={isLoading} size="sm">
               {isLoading ? (
@@ -206,41 +218,34 @@ export const FloorPlanEditorTab = () => {
         </div>
 
         <div 
-          className="border rounded-lg overflow-auto bg-muted/20 relative" 
+          className="border rounded-lg bg-muted/20 relative flex items-center justify-center" 
           style={{ 
-            maxHeight: "calc(100vh - 250px)",
+            height: "calc(100vh - 300px)",
+            minHeight: "600px",
             width: "100%",
-            overflowX: "auto",
-            overflowY: "auto",
-            WebkitOverflowScrolling: "touch",
+            overflow: "hidden",
           }}
         >
-          <div style={{ 
-            minWidth: "1200px",
-            minHeight: "800px",
-            position: "relative"
-          }}>
-            <canvas ref={canvasRef} />
-          </div>
+          <canvas ref={canvasRef} />
         </div>
+        
+        <MobileCanvasControls 
+          canvas={fabricCanvas} 
+          isPanMode={isPanMode}
+          onTogglePanMode={() => setIsPanMode(!isPanMode)}
+          zoom={zoom}
+        />
         
         {/* Mobile Tips */}
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm md:hidden">
           <p className="font-semibold mb-1">📱 Mobile Editor Tips:</p>
           <ul className="text-xs space-y-1 text-muted-foreground">
-            <li>• Touch and hold booth to drag</li>
-            <li>• Pinch to zoom in/out</li>
-            <li>• Two-finger drag to pan</li>
+            <li>• Use controls below to zoom and navigate</li>
+            <li>• Tap booth to select, then drag to move</li>
+            <li>• Toggle Pan mode to scroll the canvas</li>
             <li>• Auto-saves 3 seconds after you stop</li>
-            <li>• Changes broadcast to all attendees</li>
           </ul>
         </div>
-
-        <MobileCanvasControls 
-          canvas={fabricCanvas} 
-          isPanMode={isPanMode}
-          onTogglePanMode={() => setIsPanMode(!isPanMode)}
-        />
 
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md text-sm hidden md:block">
           <p className="font-semibold mb-1">💡 How to use:</p>

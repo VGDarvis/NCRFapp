@@ -9,7 +9,6 @@ import {
   GRID_ROWS,
   GridPosition,
   getGridLabel,
-  getPresetPosition,
 } from "@/hooks/useGridPositioning";
 import { Zone } from "@/hooks/useZones";
 import { useMobileDetection } from "@/hooks/useMobileDetection";
@@ -75,93 +74,8 @@ export const BoothGridSelector = ({
     }
   };
 
-  const handlePresetClick = (preset: string) => {
-    const position = getPresetPosition(preset);
-    if (!isCellOccupied(position.row, position.col)) {
-      onSelectPosition(position);
-    }
-  };
-
   return (
     <div className="space-y-4">
-      <Card className="p-4">
-        <h3 className="text-sm font-semibold mb-3">Quick Position Presets</h3>
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("top-left")}
-            className="text-xs"
-          >
-            ⬉ Top-Left
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("top-center")}
-            className="text-xs"
-          >
-            ⬆ Top-Center
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("top-right")}
-            className="text-xs"
-          >
-            ⬈ Top-Right
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("middle-left")}
-            className="text-xs"
-          >
-            ⬅ Middle-Left
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("center")}
-            className="text-xs"
-          >
-            ● Center
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("middle-right")}
-            className="text-xs"
-          >
-            ➡ Middle-Right
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("bottom-left")}
-            className="text-xs"
-          >
-            ⬋ Bottom-Left
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("bottom-center")}
-            className="text-xs"
-          >
-            ⬇ Bottom-Center
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePresetClick("bottom-right")}
-            className="text-xs"
-          >
-            ⬊ Bottom-Right
-          </Button>
-        </div>
-      </Card>
-
       <Card className="p-4">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-sm font-semibold">Grid Position Selector</h3>
