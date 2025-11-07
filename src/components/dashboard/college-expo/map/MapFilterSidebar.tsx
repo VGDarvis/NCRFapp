@@ -2,28 +2,25 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface MapFilters {
   orgTypes: string[];
-  tiers: string[];
-  distanceRadius: number;
+  sortBy: 'asc' | 'desc' | 'featured' | 'university' | 'college';
 }
 
 interface MapFilterSidebarProps {
   filters: MapFilters;
   onFiltersChange: (filters: MapFilters) => void;
-  userLocation?: { latitude: number; longitude: number } | null;
   className?: string;
 }
 
 export const MapFilterSidebar = ({
   filters,
   onFiltersChange,
-  userLocation,
   className,
 }: MapFilterSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -36,12 +33,6 @@ export const MapFilterSidebar = ({
     { value: "corporate", label: "Corporate" },
   ];
 
-  const tiers = [
-    { value: "platinum", label: "Platinum" },
-    { value: "gold", label: "Gold" },
-    { value: "silver", label: "Silver" },
-  ];
-
   const handleOrgTypeToggle = (value: string) => {
     const newOrgTypes = filters.orgTypes.includes(value)
       ? filters.orgTypes.filter((t) => t !== value)
@@ -49,29 +40,20 @@ export const MapFilterSidebar = ({
     onFiltersChange({ ...filters, orgTypes: newOrgTypes });
   };
 
-  const handleTierToggle = (value: string) => {
-    const newTiers = filters.tiers.includes(value)
-      ? filters.tiers.filter((t) => t !== value)
-      : [...filters.tiers, value];
-    onFiltersChange({ ...filters, tiers: newTiers });
-  };
-
-  const handleDistanceChange = (value: number[]) => {
-    onFiltersChange({ ...filters, distanceRadius: value[0] });
+  const handleSortChange = (value: string) => {
+    onFiltersChange({ ...filters, sortBy: value as MapFilters['sortBy'] });
   };
 
   const resetFilters = () => {
     onFiltersChange({
       orgTypes: [],
-      tiers: [],
-      distanceRadius: 100,
+      sortBy: 'asc',
     });
   };
 
   const hasActiveFilters =
     filters.orgTypes.length > 0 ||
-    filters.tiers.length > 0 ||
-    filters.distanceRadius < 100;
+    filters.sortBy !== 'asc';
 
   return (
     <Card className={`flex flex-col ${className}`}>
@@ -117,45 +99,22 @@ export const MapFilterSidebar = ({
             </div>
           </div>
 
-          {/* Sponsor Tier */}
+          {/* Sort Order */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Sponsor Tier</Label>
-            <div className="space-y-2">
-              {tiers.map((tier) => (
-                <div key={tier.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={tier.value}
-                    checked={filters.tiers.includes(tier.value)}
-                    onCheckedChange={() => handleTierToggle(tier.value)}
-                  />
-                  <label htmlFor={tier.value} className="text-sm cursor-pointer">
-                    {tier.label}
-                  </label>
-                </div>
-              ))}
-            </div>
+            <Label className="text-sm font-medium">Sort Order</Label>
+            <Select value={filters.sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select sort order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="asc">A-Z (Alphabetical)</SelectItem>
+                <SelectItem value="desc">Z-A (Reverse)</SelectItem>
+                <SelectItem value="featured">Featured First</SelectItem>
+                <SelectItem value="university">Universities First</SelectItem>
+                <SelectItem value="college">Colleges First</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          {/* Distance */}
-          {userLocation && (
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">
-                Distance: {filters.distanceRadius}mi
-              </Label>
-              <Slider
-                value={[filters.distanceRadius]}
-                onValueChange={handleDistanceChange}
-                min={10}
-                max={100}
-                step={10}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>10mi</span>
-                <span>100mi</span>
-              </div>
-            </div>
-          )}
         </div>
       </ScrollArea>
     </Card>

@@ -112,9 +112,15 @@ export const DonorsTab = ({ user, isGuest }: DonorsTabProps) => {
               and guidance to students pursuing higher education. Every dollar makes a difference!
             </p>
           </div>
-          <Button size="lg" className="whitespace-nowrap">
-            <Heart className="h-5 w-5 mr-2" />
-            Support Our Mission
+          <Button size="lg" className="whitespace-nowrap" asChild>
+            <a 
+              href="https://ncrfoundation.charityproud.org/Donate" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <Heart className="h-5 w-5 mr-2" />
+              Support Our Mission
+            </a>
           </Button>
         </div>
       </Card>

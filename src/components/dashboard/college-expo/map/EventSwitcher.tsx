@@ -35,7 +35,8 @@ export const EventSwitcher = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">Select Event</label>
+        <label className="text-sm font-medium hidden sm:inline">Select Event</label>
+        <label className="text-sm font-medium sm:hidden">Event</label>
         {selectedEvent && (
           <Badge variant="secondary" className="text-xs">
             Selected
@@ -60,7 +61,7 @@ export const EventSwitcher = ({
             <SelectItem key={event.id} value={event.id}>
               <div className="flex flex-col gap-1 py-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">{event.title}</span>
+                  <span className="font-medium text-sm truncate max-w-[250px]">{event.title}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">

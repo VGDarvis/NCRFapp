@@ -57,8 +57,8 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       component: WelcomeTab
     },
     {
-      id: 'explore',
-      label: 'Explore',
+      id: 'maps',
+      label: 'Maps',
       icon: MapPin,
       component: ExploreTab
     },

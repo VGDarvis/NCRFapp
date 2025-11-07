@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Users, Award, ExternalLink, MapPinned, Building2, Heart, Grid3x3 } from 'lucide-react';
+import { Calendar, MapPin, Users, Award, ExternalLink } from 'lucide-react';
+import { VenueLocationMap } from './VenueLocationMap';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -111,6 +112,12 @@ export const WelcomeTab = () => {
           </div>
         </div>
       </Card>
+
+      {/* Event Location */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Event Location</h2>
+        <VenueLocationMap />
+      </div>
 
       {/* Highlights */}
       {event.highlights && event.highlights.length > 0 && (

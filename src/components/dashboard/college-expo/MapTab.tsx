@@ -29,8 +29,7 @@ export const MapTab = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<MapFilters>({
     orgTypes: [],
-    tiers: [],
-    distanceRadius: 100,
+    sortBy: 'asc',
   });
   const [drawerContent, setDrawerContent] = useState<any>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -49,7 +48,6 @@ export const MapTab = () => {
     {
       search: searchQuery,
       org_type: filters.orgTypes,
-      tier: filters.tiers,
     }
   );
   const { map, isLoaded } = useMapbox("map-container", mapboxToken);
@@ -276,7 +274,6 @@ export const MapTab = () => {
         <MapFilterSidebar
           filters={filters}
           onFiltersChange={setFilters}
-          userLocation={userLocation}
           className="h-full"
         />
       </div>
