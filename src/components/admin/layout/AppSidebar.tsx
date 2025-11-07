@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Calendar, BarChart3, Settings, TrendingUp } from "lucide-react";
+import { LayoutDashboard, Presentation, Calendar, BarChart3, Settings, TrendingUp } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -38,10 +38,10 @@ const navigationItems = [
     description: "Floor plans & booth management"
   },
   { 
-    id: "crm", 
-    label: "CRM", 
-    icon: Users,
-    description: "Contacts & organizations"
+    id: "seminars", 
+    label: "Seminars", 
+    icon: Presentation,
+    description: "Schedule & session management"
   },
   { 
     id: "exhibitors", 

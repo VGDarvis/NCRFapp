@@ -14,7 +14,7 @@ import { RecentActivityFeed } from '@/components/admin/dashboard/RecentActivityF
 import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksWidget';
 import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
-import { CRMModule } from '@/components/admin/crm/CRMModule';
+import { SeminarsModule } from '@/components/admin/seminars/SeminarsModule';
 import { ExposModule } from '@/components/admin/expos/ExposModule';
 import { ExhibitorsModule } from '@/components/admin/expos/ExhibitorsModule';
 import { AnalyticsModule } from '@/components/admin/analytics/AnalyticsModule';
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
               
               {activeTab === 'expos' && <ExposModule />}
               
-              {activeTab === 'crm' && <CRMModule />}
+              {activeTab === 'seminars' && <SeminarsModule />}
               
               {activeTab === 'exhibitors' && <ExhibitorsModule />}
               
