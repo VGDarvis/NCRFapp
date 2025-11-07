@@ -82,8 +82,12 @@ export function useSeminarMutations() {
       return seminar;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seminar-sessions"] });
-      queryClient.invalidateQueries({ queryKey: ["seminar-rooms"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "seminar-sessions" 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "seminar-rooms" 
+      });
       toast({
         title: "Success",
         description: "Seminar created successfully",
@@ -121,8 +125,12 @@ export function useSeminarMutations() {
       return seminar;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seminar-sessions"] });
-      queryClient.invalidateQueries({ queryKey: ["seminar-rooms"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "seminar-sessions" 
+      });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "seminar-rooms" 
+      });
       toast({
         title: "Success",
         description: "Seminar updated successfully",
@@ -147,7 +155,9 @@ export function useSeminarMutations() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["seminar-sessions"] });
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === "seminar-sessions" 
+      });
       toast({
         title: "Success",
         description: "Seminar deleted successfully",
