@@ -86,9 +86,10 @@ export function SeminarDialog({
       return;
     }
 
-    // Convert time to ISO format
-    const startDateTime = `${eventDate}T${formData.start_time}:00`;
-    const endDateTime = `${eventDate}T${formData.end_time}:00`;
+    // Extract date portion from ISO timestamp and combine with time
+    const dateOnly = eventDate.split('T')[0]; // Extract "2025-11-08" from "2025-11-08T00:00:00.000Z"
+    const startDateTime = `${dateOnly}T${formData.start_time}:00`;
+    const endDateTime = `${dateOnly}T${formData.end_time}:00`;
 
     const payload = {
       event_id: eventId,
