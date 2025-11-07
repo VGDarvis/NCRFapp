@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   GRID_COLS,
   GRID_ROWS,
+  CELL_SIZE,
   GridPosition,
   getGridLabel,
 } from "@/hooks/useGridPositioning";
@@ -42,10 +43,10 @@ export const BoothGridSelector = ({
   const { isMobile } = useMobileDetection();
   const [zoom, setZoom] = useState(1);
   
-  // Responsive cell size - larger on mobile for better touch targets
-  const cellSize = isMobile ? 56 : 50;
-  const gridWidth = GRID_COLS * cellSize;
-  const gridHeight = GRID_ROWS * cellSize;
+  // Use standard cell size to match 1200x800 floor plan
+  const cellSize = CELL_SIZE;
+  const gridWidth = GRID_COLS * cellSize; // 1200px
+  const gridHeight = GRID_ROWS * cellSize; // 800px
 
   // Helper to get booth info for a grid position
   const getBoothInfo = (row: number, col: number) => {
@@ -87,14 +88,16 @@ export const BoothGridSelector = ({
           )}
         </div>
 
-        <ScrollArea 
-          className="relative w-full pb-6 border rounded-lg" 
-          style={{ 
-            height: `min(${gridHeight + 140}px, 80vh)`,
-            minHeight: "500px",
-          }}
-        >
-          <div className="flex items-center justify-center w-full h-full min-h-[500px] p-8">
+        <div className="w-full px-2 md:px-4">
+          <div 
+            className="border rounded-lg bg-muted/20 relative overflow-hidden mx-auto" 
+            style={{ 
+              width: "100%",
+              maxWidth: "1200px",
+              aspectRatio: "1200/800",
+            }}
+          >
+            <div className="w-full h-full p-4">
             <TransformWrapper
               initialScale={1}
               minScale={0.5}
@@ -251,7 +254,8 @@ export const BoothGridSelector = ({
                )}
              </TransformWrapper>
            </div>
-         </ScrollArea>
+         </div>
+        </div>
 
         <div className="flex gap-4 mt-4 text-xs">
           <div className="flex items-center gap-2">
