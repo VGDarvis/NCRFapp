@@ -94,41 +94,43 @@ export const BoothGridSelector = ({
             minHeight: "500px",
           }}
         >
-          <TransformWrapper
-            initialScale={1}
-            minScale={0.5}
-            maxScale={3}
-            centerOnInit
-            wheel={{ disabled: !isMobile }}
-            onZoom={(ref) => setZoom(ref.state.scale)}
-          >
-            {({ zoomIn, zoomOut, resetTransform }) => (
-              <>
-                {isMobile && (
-                  <GridZoomControls
-                    onZoomIn={() => zoomIn()}
-                    onZoomOut={() => zoomOut()}
-                    onResetZoom={() => resetTransform()}
-                  />
-                )}
-                <TransformComponent
-                  wrapperStyle={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "20px",
-                  }}
-                >
-                  <div
-                    className="relative mx-auto"
-                    style={{
-                      width: `${gridWidth}px`,
-                      height: `${gridHeight}px`,
-                      minWidth: "320px",
+          <div className="flex items-center justify-center w-full h-full min-h-[500px] p-8">
+            <TransformWrapper
+              initialScale={1}
+              minScale={0.5}
+              maxScale={3}
+              centerOnInit={true}
+              centerZoomedOut={true}
+              wheel={{ disabled: !isMobile }}
+              onZoom={(ref) => setZoom(ref.state.scale)}
+            >
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                  {isMobile && (
+                    <GridZoomControls
+                      onZoomIn={() => zoomIn()}
+                      onZoomOut={() => zoomOut()}
+                      onResetZoom={() => resetTransform()}
+                    />
+                  )}
+                  <TransformComponent
+                    wrapperStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
+                    <div
+                      className="relative"
+                      style={{
+                        width: `${gridWidth}px`,
+                        height: `${gridHeight}px`,
+                        minWidth: "320px",
+                        margin: "0 auto",
+                      }}
+                    >
                     {/* Background image with controlled opacity */}
                     {backgroundImageUrl && (
                       <div 
@@ -243,11 +245,12 @@ export const BoothGridSelector = ({
                 <div key={i}>{String.fromCharCode(65 + i)}</div>
               ))}
              </div>
-                   </div>
-                 </TransformComponent>
-               </>
-             )}
-           </TransformWrapper>
+                     </div>
+                   </TransformComponent>
+                 </>
+               )}
+             </TransformWrapper>
+           </div>
          </ScrollArea>
 
         <div className="flex gap-4 mt-4 text-xs">
