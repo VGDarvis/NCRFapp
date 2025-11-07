@@ -296,9 +296,24 @@ export function useFloorPlanEditor(
                   booth.sponsor_tier === "bronze" ? "rgba(205, 127, 50, 0.7)" :
                   "rgba(59, 130, 246, 0.7)";
           
+          // Validate booth is within canvas bounds (1200x800)
+          const xPos = Number(booth.x_position);
+          const yPos = Number(booth.y_position);
+          const isOutOfBounds = xPos < 0 || xPos > 1200 || yPos < 0 || yPos > 800;
+          
+          if (isOutOfBounds) {
+            console.warn(`⚠️ Booth ${booth.table_no} is out of bounds:`, {
+              id: booth.id,
+              x: xPos,
+              y: yPos,
+              expected: "0-1200 x 0-800",
+              org: booth.org_name
+            });
+          }
+          
           const rect = new Rect({
-            left: Number(booth.x_position),
-            top: Number(booth.y_position),
+            left: xPos,
+            top: yPos,
             width: Number(booth.booth_width || 80),
             height: Number(booth.booth_depth || 80),
             fill: tierColor,
@@ -404,18 +419,28 @@ export function useFloorPlanEditor(
                   }
                 });
                 
-                // Perform save inline
+                // Perform save inline with coordinate validation
                 const updates = loadedBooths
                   .filter(b => b.boothData?.id)
-                  .map((b) => ({
-                    id: b.boothData.id,
-                    event_id: eventId,
-                    org_name: b.boothData.org_name,
-                    x_position: b.rect.left,
-                    y_position: b.rect.top,
-                    booth_width: b.rect.width! * (b.rect.scaleX || 1),
-                    booth_depth: b.rect.height! * (b.rect.scaleY || 1),
-                  }));
+                  .map((b) => {
+                    const rect = b.rect;
+                    const width = rect.width! * (rect.scaleX || 1);
+                    const height = rect.height! * (rect.scaleY || 1);
+                    
+                    // Validate and constrain coordinates within canvas bounds
+                    const x = Math.max(0, Math.min(1200 - width, rect.left || 0));
+                    const y = Math.max(0, Math.min(800 - height, rect.top || 0));
+                    
+                    return {
+                      id: b.boothData.id,
+                      event_id: eventId,
+                      org_name: b.boothData.org_name,
+                      x_position: Math.round(x),
+                      y_position: Math.round(y),
+                      booth_width: Math.round(width),
+                      booth_depth: Math.round(height),
+                    };
+                  });
 
                 if (updates.length > 0) {
                   const { error } = await supabase
@@ -642,14 +667,21 @@ export function useFloorPlanEditor(
         .filter(booth => booth.boothData?.id)
         .map((booth) => {
           const rect = booth.rect;
+          const width = rect.width! * rect.scaleX!;
+          const height = rect.height! * rect.scaleY!;
+          
+          // Validate and constrain coordinates within canvas bounds (1200x800)
+          const x = Math.max(0, Math.min(1200 - width, rect.left || 0));
+          const y = Math.max(0, Math.min(800 - height, rect.top || 0));
+          
           return {
             id: booth.boothData.id,
             event_id: eventId,
             org_name: booth.boothData.org_name,
-            x_position: rect.left,
-            y_position: rect.top,
-            booth_width: rect.width! * rect.scaleX!,
-            booth_depth: rect.height! * rect.scaleY!,
+            x_position: Math.round(x),
+            y_position: Math.round(y),
+            booth_width: Math.round(width),
+            booth_depth: Math.round(height),
           };
         });
 

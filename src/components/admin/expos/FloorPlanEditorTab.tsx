@@ -16,7 +16,20 @@ export const FloorPlanEditorTab = () => {
   const [floorPlanId, setFloorPlanId] = useState<string | null>(null);
   const [isPanMode, setIsPanMode] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [canvasScale, setCanvasScale] = useState(0.8); // CSS scale for visual zoom
+  const [canvasScale, setCanvasScale] = useState(() => {
+    // Calculate initial scale based on viewport for better mobile UX
+    if (typeof window !== 'undefined') {
+      const viewportWidth = window.innerWidth;
+      if (viewportWidth < 768) {
+        // Mobile: scale to fit screen with padding
+        return Math.min((viewportWidth - 32) / 1200, 0.5);
+      } else if (viewportWidth < 1400) {
+        // Tablet: scale to fit comfortably
+        return 0.7;
+      }
+    }
+    return 1; // Desktop: full size by default for 1:1 coordinate mapping
+  });
   const { events } = useEvents();
 
   const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
@@ -156,7 +169,7 @@ export const FloorPlanEditorTab = () => {
             </div>
             
             <Badge variant="outline" className="hidden lg:inline-flex">
-              Scale: {Math.round(canvasScale * 100)}%
+              View: {Math.round(canvasScale * 100)}% | Canvas: 1200×800px
             </Badge>
 
             <Button onClick={handleSave} disabled={isLoading} size="sm">
@@ -216,6 +229,10 @@ export const FloorPlanEditorTab = () => {
               <div className="text-xs text-muted-foreground">
                 Position: X: {Math.round(selectedBooth.rect.left || 0)}, Y: {Math.round(selectedBooth.rect.top || 0)} | 
                 Size: {Math.round((selectedBooth.rect.width || 0) * (selectedBooth.rect.scaleX || 1))} × {Math.round((selectedBooth.rect.height || 0) * (selectedBooth.rect.scaleY || 1))}
+              </div>
+              <div className="text-xs font-mono text-primary mt-1 font-semibold">
+                📍 Grid: Row {String.fromCharCode(65 + Math.floor((selectedBooth.rect.top || 0) / 100))}, 
+                Column {Math.floor((selectedBooth.rect.left || 0) / 100) + 1}
               </div>
             </div>
           </Card>
@@ -283,12 +300,13 @@ export const FloorPlanEditorTab = () => {
             
             <canvas 
               ref={canvasRef}
+              width={1200}
+              height={800}
               style={{ 
-                width: "1200px",
-                height: "800px",
                 display: "block",
                 position: "relative",
                 zIndex: 2,
+                imageRendering: "crisp-edges",
               }} 
             />
           </div>
