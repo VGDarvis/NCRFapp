@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -48,40 +48,34 @@ export const BoothGridSelector = ({
   const gridWidth = GRID_COLS * cellSize; // 1200px
   const gridHeight = GRID_ROWS * cellSize; // 800px
   
-  // Calculate initial scale to fit ENTIRE grid on screen (both width and height)
-  const getInitialScale = () => {
-    if (typeof window === 'undefined') return 0.6;
+  // Memoize the initial scale calculation so it's stable across renders
+  const initialScale = useMemo(() => {
+    if (typeof window === 'undefined') return 0.35;
     
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
     
-    // Calculate container dimensions
-    const containerWidth = screenWidth - 32; // Account for padding
-    const containerHeight = isMobile ? screenHeight * 0.92 : 700; // 92vh on mobile, 700px on desktop
+    const containerWidth = screenWidth - 32;
+    const containerHeight = isMobile ? screenHeight * 0.92 : 700;
     
-    // Calculate scale to fit BOTH width and height
     const scaleByWidth = containerWidth / gridWidth;
     const scaleByHeight = containerHeight / gridHeight;
     
-    // Use the smaller scale to ensure entire grid fits
     const fitScale = Math.min(scaleByWidth, scaleByHeight);
     
-    // No padding - maximize visible area on mobile
-    const finalScale = fitScale * 1.0;
-    
-    console.log('📐 Grid scale calculation:', {
+    console.log('📐 Initial scale memoized:', {
       containerWidth,
       containerHeight,
       gridWidth,
       gridHeight,
       scaleByWidth: scaleByWidth.toFixed(2),
       scaleByHeight: scaleByHeight.toFixed(2),
-      finalScale: finalScale.toFixed(2),
+      fitScale: fitScale.toFixed(2),
       isMobile
     });
     
-    return Math.max(0.2, Math.min(finalScale, 2)); // Clamp between 0.2 and 2
-  };
+    return Math.max(0.3, Math.min(fitScale, 1.5));
+  }, [isMobile, gridWidth, gridHeight]);
 
   // Helper to get booth info for a grid position
   const getBoothInfo = (row: number, col: number) => {
@@ -133,20 +127,24 @@ export const BoothGridSelector = ({
         >
           <div className="w-full h-full relative flex items-center justify-center">
             <TransformWrapper
-              initialScale={getInitialScale()}
-              minScale={0.25}
-              maxScale={4}
+              initialScale={initialScale}
+              minScale={0.3}
+              maxScale={3}
               centerOnInit={true}
               centerZoomedOut={false}
               limitToBounds={true}
-              wheel={{ disabled: false, step: 0.1 }}
-              pinch={{ step: 5 }}
+              disablePadding={false}
+              wheel={{ disabled: false, step: 0.15 }}
+              pinch={{ disabled: false, step: 5 }}
               doubleClick={{ disabled: false, mode: "zoomIn", step: 0.5 }}
               panning={{ 
                 disabled: false,
                 velocityDisabled: false,
               }}
-              onZoom={(ref) => setZoom(ref.state.scale)}
+              onZoom={(ref) => {
+                setZoom(ref.state.scale);
+                console.log('🔍 Current zoom:', ref.state.scale.toFixed(2));
+              }}
               alignmentAnimation={{ disabled: true }}
             >
               {({ zoomIn, zoomOut, resetTransform }) => (
