@@ -143,15 +143,6 @@ export function BoothEditorTab() {
               <h3 className="text-lg font-semibold">Booths</h3>
               <div className="flex items-center gap-2">
                 {boothsLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                <Button onClick={() => setBulkDimensionsOpen(true)} size="sm" variant="outline">
-                  <Maximize2 className="w-4 h-4 mr-2" />
-                  Bulk Dimensions
-                </Button>
-                <FixBoothDimensionsButton />
-                <Button onClick={() => setImporterOpen(true)} size="sm" variant="outline">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Import Dallas CSV
-                </Button>
                 <Button onClick={() => setUpdaterOpen(true)} size="sm" variant="outline">
                   <Upload className="w-4 h-4 mr-2" />
                   Update from CSV
