@@ -232,23 +232,21 @@ export const FloorPlanEditorTab = () => {
           </div>
         </div>
 
-        <div 
-          className="border rounded-lg bg-muted/20 relative overflow-auto" 
-          style={{ 
-            height: "calc(100vh - 280px)",
-            minHeight: "700px",
-            width: "100%",
-          }}
-        >
-          <div className="w-full h-full flex items-center justify-center p-4">
+        <div className="w-full px-2 md:px-4">
+          <div 
+            className="border rounded-lg bg-muted/20 relative overflow-hidden mx-auto" 
+            style={{ 
+              width: "100%",
+              maxWidth: "1200px",
+              aspectRatio: "1200/800",
+            }}
+          >
             <canvas 
               ref={canvasRef} 
+              className="w-full h-full"
               style={{ 
-                width: '1200px',
-                height: '800px',
-                maxWidth: '100%',
-                maxHeight: '100%',
-                display: 'block'
+                display: 'block',
+                objectFit: 'contain'
               }} 
             />
           </div>
