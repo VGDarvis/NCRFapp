@@ -160,6 +160,71 @@ export function useFloorPlanEditor(
     }
   }, [fabricCanvas]);
 
+  // Fit all booths to screen
+  const fitAllBoothsToScreen = useCallback(() => {
+    if (!fabricCanvas || booths.length === 0) return;
+
+    // Get bounding box of all booth objects
+    let minX = Infinity, minY = Infinity;
+    let maxX = -Infinity, maxY = -Infinity;
+
+    booths.forEach(booth => {
+      const rect = booth.rect;
+      const left = rect.left || 0;
+      const top = rect.top || 0;
+      const width = (rect.width || 0) * (rect.scaleX || 1);
+      const height = (rect.height || 0) * (rect.scaleY || 1);
+
+      minX = Math.min(minX, left);
+      minY = Math.min(minY, top);
+      maxX = Math.max(maxX, left + width);
+      maxY = Math.max(maxY, top + height);
+    });
+
+    // Add padding around booths (10% margin)
+    const padding = 50;
+    minX -= padding;
+    minY -= padding;
+    maxX += padding;
+    maxY += padding;
+
+    // Calculate content dimensions
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+
+    // Get canvas viewport dimensions
+    const canvasElement = fabricCanvas.getElement();
+    const viewportWidth = canvasElement.clientWidth;
+    const viewportHeight = canvasElement.clientHeight;
+
+    // Calculate zoom to fit all content
+    const zoomX = viewportWidth / contentWidth;
+    const zoomY = viewportHeight / contentHeight;
+    const optimalZoom = Math.min(zoomX, zoomY, 1); // Don't zoom in more than 1x
+
+    // Calculate center point of all booths
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+
+    // Set zoom
+    fabricCanvas.setZoom(optimalZoom);
+
+    // Center viewport on booth content
+    const vpt = fabricCanvas.viewportTransform!;
+    vpt[4] = viewportWidth / 2 - centerX * optimalZoom;
+    vpt[5] = viewportHeight / 2 - centerY * optimalZoom;
+
+    fabricCanvas.requestRenderAll();
+    
+    console.log('✅ Fit all booths to screen:', {
+      booths: booths.length,
+      zoom: optimalZoom,
+      center: { x: centerX, y: centerY }
+    });
+
+    return optimalZoom;
+  }, [fabricCanvas, booths]);
+
   // Load existing booths from database
   const loadBooths = useCallback(async (eventId: string) => {
     if (!fabricCanvas) return;
@@ -398,6 +463,19 @@ export function useFloorPlanEditor(
     autoLoadBooths();
   }, [fabricCanvas, eventId, loadBooths]);
 
+  // Auto-fit to screen after booths are loaded
+  useEffect(() => {
+    if (!fabricCanvas || booths.length === 0) return;
+    
+    // Wait a brief moment for canvas to be fully rendered
+    const timer = setTimeout(() => {
+      console.log('🎯 Auto-fitting', booths.length, 'booths to screen');
+      fitAllBoothsToScreen();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [booths.length, fabricCanvas, fitAllBoothsToScreen]);
+
   // Handle pan mode
   useEffect(() => {
     if (!fabricCanvas) return;
@@ -583,5 +661,6 @@ export function useFloorPlanEditor(
     deleteBooth,
     saveBooths,
     setSelectedBooth,
+    fitAllBoothsToScreen,
   };
 };

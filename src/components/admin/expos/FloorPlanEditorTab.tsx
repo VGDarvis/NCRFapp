@@ -26,6 +26,7 @@ export const FloorPlanEditorTab = () => {
     booths,
     isLoading,
     saveBooths,
+    fitAllBoothsToScreen,
   } = useFloorPlanEditor(floorPlanId, canvasRef, isPanMode, selectedEventId || undefined);
 
   // Load floor plan for selected event
@@ -81,17 +82,20 @@ export const FloorPlanEditorTab = () => {
     if (direction === "in") {
       newZoom = Math.min(zoom * 1.2, 3);
       fabricCanvas.setZoom(newZoom);
+      setZoom(newZoom);
     } else if (direction === "out") {
       newZoom = Math.max(zoom / 1.2, 0.5);
       fabricCanvas.setZoom(newZoom);
+      setZoom(newZoom);
     } else {
-      // Fit to screen - reset zoom and center viewport
-      newZoom = 1;
-      fabricCanvas.setZoom(1);
-      fabricCanvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+      // Fit to screen - calculate optimal zoom for all booths
+      if (fitAllBoothsToScreen) {
+        const optimalZoom = fitAllBoothsToScreen();
+        setZoom(optimalZoom || 1);
+        toast.success('Showing all booths');
+      }
     }
     
-    setZoom(newZoom);
     fabricCanvas.renderAll();
   };
 
@@ -220,13 +224,13 @@ export const FloorPlanEditorTab = () => {
         <div 
           className="border rounded-lg bg-muted/20 relative flex items-center justify-center" 
           style={{ 
-            height: "calc(100vh - 300px)",
-            minHeight: "600px",
+            height: "calc(100vh - 400px)",
+            minHeight: "500px",
             width: "100%",
             overflow: "hidden",
           }}
         >
-          <canvas ref={canvasRef} />
+          <canvas ref={canvasRef} style={{ maxWidth: '100%', maxHeight: '100%' }} />
         </div>
         
         <MobileCanvasControls 
@@ -234,6 +238,9 @@ export const FloorPlanEditorTab = () => {
           isPanMode={isPanMode}
           onTogglePanMode={() => setIsPanMode(!isPanMode)}
           zoom={zoom}
+          onZoomIn={() => handleZoom("in")}
+          onZoomOut={() => handleZoom("out")}
+          onResetZoom={() => handleZoom("reset")}
         />
         
         {/* Mobile Tips */}

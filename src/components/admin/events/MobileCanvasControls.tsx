@@ -8,28 +8,36 @@ interface MobileCanvasControlsProps {
   isPanMode: boolean;
   onTogglePanMode: () => void;
   zoom?: number;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  onResetZoom?: () => void;
 }
 
-export const MobileCanvasControls = ({ canvas, isPanMode, onTogglePanMode, zoom = 1 }: MobileCanvasControlsProps) => {
+export const MobileCanvasControls = ({ 
+  canvas, 
+  isPanMode, 
+  onTogglePanMode, 
+  zoom = 1,
+  onZoomIn,
+  onZoomOut,
+  onResetZoom
+}: MobileCanvasControlsProps) => {
   const handleZoomIn = () => {
-    if (!canvas) return;
-    const zoom = canvas.getZoom();
-    canvas.setZoom(zoom * 1.2);
-    canvas.renderAll();
+    if (onZoomIn) {
+      onZoomIn();
+    }
   };
 
   const handleZoomOut = () => {
-    if (!canvas) return;
-    const zoom = canvas.getZoom();
-    canvas.setZoom(zoom * 0.8);
-    canvas.renderAll();
+    if (onZoomOut) {
+      onZoomOut();
+    }
   };
 
   const handleResetZoom = () => {
-    if (!canvas) return;
-    canvas.setZoom(1);
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.renderAll();
+    if (onResetZoom) {
+      onResetZoom();
+    }
   };
 
   return (
