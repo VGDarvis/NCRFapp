@@ -1,17 +1,17 @@
 // Grid-based positioning system for booth placement
-// Grid: 120 columns x 80 rows = 9,600 cells
-// Cell size: 10x10 pixels
+// Grid: 60 columns x 40 rows = 2,400 cells
+// Cell size: 20x20 pixels
 // Canvas: 1200x800 pixels
 
-export const GRID_COLS = 120;
-export const GRID_ROWS = 80;
-export const CELL_SIZE = 10;
+export const GRID_COLS = 60;
+export const GRID_ROWS = 40;
+export const CELL_SIZE = 20;
 export const CANVAS_WIDTH = 1200;
 export const CANVAS_HEIGHT = 800;
 
 export interface GridPosition {
-  row: number; // 0-79
-  col: number; // 0-119
+  row: number; // 0-39
+  col: number; // 0-59
 }
 
 export interface CoordinatePosition {
@@ -50,7 +50,7 @@ export const getGridLabel = (gridPos: GridPosition): string => {
     rowLabel = String.fromCharCode(65 + (row % 26)) + rowLabel;
     row = Math.floor(row / 26) - 1;
   }
-  const colLabel = (gridPos.col + 1).toString(); // 1-120
+  const colLabel = (gridPos.col + 1).toString(); // 1-60
   return `Row ${rowLabel}, Column ${colLabel}`;
 };
 
@@ -135,14 +135,14 @@ export const isValidZone = (zone: {
 export const getPresetPosition = (preset: string): GridPosition => {
   const presets: Record<string, GridPosition> = {
     "top-left": { row: 0, col: 0 },
-    "top-center": { row: 0, col: 59 },
-    "top-right": { row: 0, col: 119 },
-    "middle-left": { row: 39, col: 0 },
-    center: { row: 39, col: 59 },
-    "middle-right": { row: 39, col: 119 },
-    "bottom-left": { row: 79, col: 0 },
-    "bottom-center": { row: 79, col: 59 },
-    "bottom-right": { row: 79, col: 119 },
+    "top-center": { row: 0, col: 29 },
+    "top-right": { row: 0, col: 59 },
+    "middle-left": { row: 19, col: 0 },
+    center: { row: 19, col: 29 },
+    "middle-right": { row: 19, col: 59 },
+    "bottom-left": { row: 39, col: 0 },
+    "bottom-center": { row: 39, col: 29 },
+    "bottom-right": { row: 39, col: 59 },
   };
   return presets[preset] || { row: 0, col: 0 };
 };
