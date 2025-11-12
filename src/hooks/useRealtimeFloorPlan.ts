@@ -9,8 +9,10 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
   useEffect(() => {
     if (!eventId) return;
 
+    console.log("🔄 Starting real-time subscription for event:", eventId);
+
     const channel = supabase
-      .channel("floor-plan-changes")
+      .channel(`floor-plan-changes-${eventId}`)
       .on(
         "postgres_changes",
         {
@@ -20,9 +22,10 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
           filter: `event_id=eq.${eventId}`,
         },
         (payload) => {
-          console.log("Booth change detected:", payload);
+          console.log("🔔 Booth change detected:", payload.eventType, payload);
           
-          // Invalidate booths query to refetch
+          // Invalidate both generic and event-specific booth queries
+          queryClient.invalidateQueries({ queryKey: ["booths"] });
           queryClient.invalidateQueries({ queryKey: ["booths", eventId] });
           
           if (payload.eventType === "UPDATE") {
@@ -32,8 +35,8 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
             const gridCol = updatedBooth?.grid_col;
             
             if (gridRow !== null && gridCol !== null) {
-              const rowLabel = String.fromCharCode(65 + gridRow); // A-Z (26 rows)
-              const colLabel = (gridCol + 1).toString(); // 1-40 (40 columns)
+              const rowLabel = String.fromCharCode(65 + gridRow);
+              const colLabel = (gridCol + 1).toString();
               
               toast.success(`📍 Booth ${tableNo} moved`, {
                 description: `New position: Row ${rowLabel}, Column ${colLabel}`,
@@ -41,12 +44,17 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
               });
             } else {
               toast.info(`📍 Booth ${tableNo} updated`, {
-                description: "Floor plan updated by admin",
+                description: "Floor plan updated",
                 duration: 2000,
               });
             }
           } else if (payload.eventType === "INSERT") {
             toast.info("🆕 New booth added to floor plan", {
+              duration: 2000,
+            });
+          } else if (payload.eventType === "DELETE") {
+            const deletedBooth = payload.old as any;
+            toast.info(`🗑️ Booth ${deletedBooth?.table_no || 'Unknown'} removed`, {
               duration: 2000,
             });
           }
@@ -60,13 +68,17 @@ export const useRealtimeFloorPlan = (eventId: string | null) => {
           table: "floor_plans",
         },
         (payload) => {
-          console.log("Floor plan change detected:", payload);
+          console.log("🔔 Floor plan change detected:", payload.eventType);
           queryClient.invalidateQueries({ queryKey: ["floor-plans"] });
+          queryClient.invalidateQueries({ queryKey: ["floor-plan"] });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("📡 Real-time subscription status:", status);
+      });
 
     return () => {
+      console.log("🔌 Unsubscribing from real-time updates");
       supabase.removeChannel(channel);
     };
   }, [eventId, queryClient]);

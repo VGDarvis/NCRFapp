@@ -14,6 +14,9 @@ import { MobileCanvasControls } from "./MobileCanvasControls";
 import { BoothCSVImporter } from "./BoothCSVImporter";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FloorPlanViewer } from "@/components/dashboard/college-expo/floor-plan/FloorPlanViewer";
+import { useBooths } from "@/hooks/useBooths";
+import { useFloorPlans } from "@/hooks/useFloorPlans";
+import { useRealtimeFloorPlan } from "@/hooks/useRealtimeFloorPlan";
 
 interface FloorPlanEditorProps {
   eventId: string;
@@ -28,11 +31,21 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
   const [csvDialogOpen, setCsvDialogOpen] = useState(false);
-  const [floorPlanData, setFloorPlanData] = useState<any>(null);
-  const [boothsData, setBoothsData] = useState<any[]>([]);
+  const [lastSync, setLastSync] = useState<Date>(new Date());
   const isMobile = useIsMobile();
 
+  // Get venue_id for floor plans
+  const [venueId, setVenueId] = useState<string | null>(null);
+
   console.log("🎨 FloorPlanEditor mounted", { eventId, floorPlanId });
+
+  // Use React Query hooks for real-time data
+  const { data: realtimeBooths = [], isLoading: boothsLoading, refetch: refetchBooths } = useBooths(eventId);
+  const { data: floorPlans = [], isLoading: floorPlansLoading } = useFloorPlans(venueId);
+  const floorPlan = floorPlans.find(fp => fp.id === floorPlanId);
+
+  // Subscribe to real-time updates
+  useRealtimeFloorPlan(eventId);
 
   const {
     fabricCanvas,
@@ -49,37 +62,30 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
     setSelectedBooth,
   } = useFloorPlanEditor(floorPlanId, canvasRef, isPanMode, eventId);
 
-  // Load floor plan data for attendee view
+  // Load venue_id from event
   useEffect(() => {
-    if (floorPlanId) {
-      loadFloorPlanData();
-    }
-  }, [floorPlanId]);
-
-  const loadFloorPlanData = async () => {
-    try {
-      console.log("📊 Loading floor plan data for attendee view...");
-      const { data: floorPlan, error: fpError } = await supabase
-        .from("floor_plans")
-        .select("*")
-        .eq("id", floorPlanId)
+    const loadVenueId = async () => {
+      const { data: eventData } = await supabase
+        .from("events")
+        .select("venue_id")
+        .eq("id", eventId)
         .single();
+      
+      if (eventData?.venue_id) {
+        setVenueId(eventData.venue_id);
+      }
+    };
+    
+    loadVenueId();
+  }, [eventId]);
 
-      if (fpError) throw fpError;
-      setFloorPlanData(floorPlan);
-
-      const { data: booths, error: boothError } = await supabase
-        .from("booths")
-        .select("*")
-        .eq("event_id", eventId);
-
-      if (boothError) throw boothError;
-      setBoothsData(booths || []);
-      console.log("✅ Loaded floor plan and", booths?.length || 0, "booths");
-    } catch (error) {
-      console.error("❌ Error loading floor plan data:", error);
+  // Update sync timestamp when booth data changes (triggers re-render of FloorPlanViewer)
+  useEffect(() => {
+    if (realtimeBooths && realtimeBooths.length > 0) {
+      setLastSync(new Date());
+      console.log("✅ Booth data synced:", realtimeBooths.length, "booths");
     }
-  };
+  }, [realtimeBooths]);
 
   // Open drawer when booth is selected on mobile
   useEffect(() => {
@@ -191,17 +197,30 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
           </div>
         </div>
 
-        <div className="text-sm text-muted-foreground px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-md mb-4">
-          👁️ <strong>Attendee View:</strong> Changes made in "Edit Booths" will appear here automatically.
+        <div className="text-sm text-muted-foreground px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-md mb-4 flex items-center justify-between">
+          <span>
+            👁️ <strong>Attendee View:</strong> Changes made in "Edit Booths" will appear here automatically.
+          </span>
+          <span className="text-xs opacity-70">
+            Last sync: {lastSync.toLocaleTimeString()}
+          </span>
         </div>
 
         <div>
-          {floorPlanData && boothsData.length > 0 ? (
+          {floorPlansLoading || boothsLoading ? (
+            <Card className="p-8">
+              <div className="text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Loading floor plan...</p>
+              </div>
+            </Card>
+          ) : floorPlan && realtimeBooths.length > 0 ? (
             <FloorPlanViewer
-              floorPlan={floorPlanData}
-              booths={boothsData}
+              key={`viewer-${lastSync.getTime()}`}
+              floorPlan={floorPlan}
+              booths={realtimeBooths}
               onBoothClick={(boothId) => {
-                const booth = boothsData.find(b => b.id === boothId);
+                const booth = realtimeBooths.find(b => b.id === boothId);
                 console.log("📍 Admin clicked booth:", booth);
                 if (booth) {
                   toast.info(`Booth ${booth.table_no}: ${booth.org_name || 'No organization'}`, {
@@ -213,8 +232,7 @@ export const FloorPlanEditor = ({ eventId, floorPlanId, onFloorPlanCreated }: Fl
           ) : (
             <Card className="p-8">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">Loading floor plan...</p>
+                <p className="text-sm text-muted-foreground">No booths configured yet. Go to "Edit Booths" to add booths.</p>
               </div>
             </Card>
           )}
