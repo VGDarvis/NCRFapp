@@ -92,7 +92,6 @@ export const BoothGridSelector = ({
             width: "100%",
             maxWidth: "1200px",
             aspectRatio: "1200/800",
-            height: isMobile ? "auto" : "700px",
           }}
         >
           <TransformWrapper
