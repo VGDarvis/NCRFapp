@@ -43,11 +43,11 @@ export function useExpoStats(eventId: string | null) {
           .select("*", { count: "exact", head: true })
           .eq("event_id", eventId);
 
-        // Active Now - use match to avoid deep type issue
+        // Active Now - sessions active within last 5 minutes
         const { data: allActiveSessions } = await supabase
           .from("guest_sessions")
           .select("id, last_active_at")
-          .match({ event_id: eventId, is_active: true });
+          .eq("event_id", eventId);
         
         const activeNow = allActiveSessions?.filter(
           s => s.last_active_at && new Date(s.last_active_at) >= fiveMinutesAgo
