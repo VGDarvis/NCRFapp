@@ -137,7 +137,7 @@ export const BoothGridSelector = ({
                     preserveAspectRatio="xMidYMid meet"
                   >
                     {/* Render zones as SVG rects */}
-                    {zones.map((zone) => (
+                    {Array.isArray(zones) && zones.map((zone) => (
                       <g key={zone.id}>
                         <rect
                           x={zone.startCol * cellSize}
