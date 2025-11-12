@@ -5,6 +5,7 @@ import { ZoomIn, ZoomOut, RotateCcw, Star } from "lucide-react";
 import { Booth } from "@/hooks/useBooths";
 import { FloorPlan } from "@/hooks/useFloorPlans";
 import { useRealtimeFloorPlan } from "@/hooks/useRealtimeFloorPlan";
+import { CELL_SIZE } from "@/hooks/useGridPositioning";
 
 interface FloorPlanViewerProps {
   floorPlan: FloorPlan;
@@ -22,8 +23,10 @@ export const FloorPlanViewer = ({
   // Enable real-time updates
   useRealtimeFloorPlan(booths[0]?.event_id || null);
   
+  // Filter booths that have either grid coordinates or x/y positions
   const boothsWithPositions = booths.filter(
-    booth => booth.x_position !== null && booth.y_position !== null
+    booth => (booth.grid_row !== null && booth.grid_col !== null) || 
+             (booth.x_position !== null && booth.y_position !== null)
   );
 
   return (
@@ -92,10 +95,14 @@ export const FloorPlanViewer = ({
                 >
                   {boothsWithPositions.map((booth) => {
                     const isHighlighted = highlightedBoothIds.includes(booth.id);
-                    const x = Number(booth.x_position || 0);
-                    const y = Number(booth.y_position || 0);
-                    const width = Number(booth.booth_width || 30);
-                    const height = Number(booth.booth_depth || 30);
+                    
+                    // Use grid coordinates (prioritized) or fall back to pixel coordinates
+                    const x = booth.grid_col !== null ? booth.grid_col * CELL_SIZE : Number(booth.x_position || 0);
+                    const y = booth.grid_row !== null ? booth.grid_row * CELL_SIZE : Number(booth.y_position || 0);
+                    
+                    // Use fixed cell size to match grid editor
+                    const width = CELL_SIZE;
+                    const height = CELL_SIZE;
 
                     // Color based on sponsor tier
                     const fillColor = booth.sponsor_tier === "gold" ? "rgba(255, 215, 0, 0.6)" :
@@ -121,8 +128,8 @@ export const FloorPlanViewer = ({
                           height={height}
                           fill={isHighlighted ? "rgba(234, 179, 8, 0.8)" : fillColor}
                           stroke={isHighlighted ? "#eab308" : strokeColor}
-                          strokeWidth="3"
-                          rx="4"
+                          strokeWidth="2"
+                          rx="2"
                           className="transition-all"
                         />
                         {booth.table_no && (
