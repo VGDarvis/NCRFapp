@@ -66,9 +66,7 @@ export const FloorPlanViewer = ({
               style={{ 
                 width: "100%",
                 maxWidth: "1200px",
-                aspectRatio: floorPlan.canvas_width && floorPlan.canvas_height 
-                  ? `${floorPlan.canvas_width}/${floorPlan.canvas_height}` 
-                  : "16/9",
+                aspectRatio: "1200/800", // Always match the grid system (3:2 ratio)
               }}
             >
               <TransformComponent
