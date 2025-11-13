@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useActiveEvent } from "@/hooks/useActiveEvent";
+import { useRealtimeEvents } from "@/hooks/useRealtimeEvents";
 import { Calendar, MapPin, Image, BookOpen, LayoutGrid, Plus, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { EmptyState } from "../shared/EmptyState";
@@ -15,6 +16,9 @@ interface EventManagementPanelProps {
 export function EventManagementPanel({ onNavigate }: EventManagementPanelProps) {
   const { activeEvent, isLoading } = useActiveEvent();
   const [flyerDialogOpen, setFlyerDialogOpen] = useState(false);
+  
+  // Subscribe to real-time event updates
+  useRealtimeEvents();
 
   if (isLoading) {
     return (
@@ -113,6 +117,28 @@ export function EventManagementPanel({ onNavigate }: EventManagementPanelProps) 
             </div>
           </div>
         </div>
+
+        {/* Event Flyer Preview */}
+        {activeEvent.flyer_url && (
+          <div className="glass-medium p-4 rounded-lg border border-primary/10">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                <h4 className="font-semibold text-sm">Current Event Flyer</h4>
+              </div>
+              <Badge variant="secondary" className="text-xs">
+                Live on User Dashboard
+              </Badge>
+            </div>
+            <div className="rounded-lg overflow-hidden border border-primary/20">
+              <img 
+                src={activeEvent.flyer_url} 
+                alt={activeEvent.name}
+                className="w-full h-auto object-cover max-h-96"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div>
