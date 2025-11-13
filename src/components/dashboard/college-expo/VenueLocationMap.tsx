@@ -6,11 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMapbox } from "@/hooks/useMapbox";
 import { openNavigation } from "@/lib/navigation-utils";
 import mapboxgl from "mapbox-gl";
+import { useRealtimeEvents } from "@/hooks/useRealtimeEvents";
 
 export const VenueLocationMap = () => {
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+
+  // Subscribe to real-time event updates
+  useRealtimeEvents();
 
   const { map, isLoaded } = useMapbox("venue-map-container", mapboxToken);
 
