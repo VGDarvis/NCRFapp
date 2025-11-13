@@ -184,46 +184,6 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
           )}
         </CardContent>
       </Card>
-
-      {/* Placement Guide */}
-      <Card>
-        <CardHeader>
-          <CardTitle>QR Code Placement Guide</CardTitle>
-          <CardDescription>Recommended locations for maximum visibility</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-              <div>
-                <div className="font-medium">Main Entrance</div>
-                <div className="text-sm text-muted-foreground">Welcome banner - 1024px</div>
-              </div>
-              <div className="text-sm font-mono bg-background px-2 py-1 rounded">1024px</div>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-              <div>
-                <div className="font-medium">Registration Tables</div>
-                <div className="text-sm text-muted-foreground">Handouts & posters - 512px</div>
-              </div>
-              <div className="text-sm font-mono bg-background px-2 py-1 rounded">512px</div>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-              <div>
-                <div className="font-medium">Information Booths</div>
-                <div className="text-sm text-muted-foreground">Standing banners - 512px</div>
-              </div>
-              <div className="text-sm font-mono bg-background px-2 py-1 rounded">512px</div>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-              <div>
-                <div className="font-medium">Restrooms & Food Court</div>
-                <div className="text-sm text-muted-foreground">Wall posters - 256px</div>
-              </div>
-              <div className="text-sm font-mono bg-background px-2 py-1 rounded">256px</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
