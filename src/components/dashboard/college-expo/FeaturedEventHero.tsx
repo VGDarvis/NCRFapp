@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Users, ExternalLink, CheckCircle2 } from 'lucide-react';
 import { format, differenceInDays, differenceInHours } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRealtimeEvents } from '@/hooks/useRealtimeEvents';
 
 interface Event {
   id: string;
@@ -29,6 +30,9 @@ export const FeaturedEventHero = () => {
   const [featuredEvent, setFeaturedEvent] = useState<Event | null>(null);
   const [completedEvent, setCompletedEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Enable real-time updates for events
+  useRealtimeEvents();
 
   useEffect(() => {
     fetchEvents();

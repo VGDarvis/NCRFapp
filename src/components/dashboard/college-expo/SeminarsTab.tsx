@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useSeminarSessions } from "@/hooks/useSeminarSessions";
 import { useSeminarFavorites } from "@/hooks/useSeminarFavorites";
+import { useRealtimeSeminars } from "@/hooks/useRealtimeSeminars";
 import { format, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,9 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
   const [expandedSeminar, setExpandedSeminar] = useState<string | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<string>("all");
   const [user, setUser] = useState<any>(null);
+  
+  // Enable real-time updates for seminars
+  useRealtimeSeminars(eventId);
 
   // Check user authentication
   useState(() => {
