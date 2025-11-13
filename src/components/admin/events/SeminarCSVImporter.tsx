@@ -156,7 +156,9 @@ export function SeminarCSVImporter({ eventId, venueId, eventDate, onImportComple
   const downloadTemplate = () => {
     const template = `title,presenter_name,presenter_org,start_time,end_time,room_name,description,category
 SAT Prep Strategies,Dr. Michael Chen,Princeton Review,10:00 AM,11:00 AM,Room A,Learn proven strategies to boost SAT scores,test_prep
-FAFSA Workshop,Jennifer Rodriguez,Texas Education Agency,11:30 AM,12:30 PM,Room B,Step-by-step FAFSA completion guide,financial_aid`;
+FAFSA Workshop,Jennifer Rodriguez,Texas Education Agency,11:30 AM,12:30 PM,Room B,Step-by-step FAFSA completion guide,financial_aid
+Grand Prize Scholarship Giveaway,NCRF Team,NCRF,2:00 PM,3:00 PM,Main Stage,$5000 scholarship announcement and presentation,scholarship_giveaway
+Entertainment Hour Opening,DJ Marcus,Local Entertainment,12:00 PM,1:00 PM,Main Stage,Live DJ performance and community celebration,entertainment`;
     
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

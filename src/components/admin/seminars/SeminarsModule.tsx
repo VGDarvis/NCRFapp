@@ -11,6 +11,7 @@ import { useSeminarSessions } from "@/hooks/useSeminarSessions";
 import { useSeminarMutations } from "@/hooks/useSeminarMutations";
 import { SeminarDialog } from "./SeminarDialog";
 import { SeminarCSVImporter } from "../events/SeminarCSVImporter";
+import { StagePerformancesTab } from "./StagePerformancesTab";
 import { LoadingSpinner } from "../shared/LoadingSpinner";
 import { EmptyState } from "../shared/EmptyState";
 import { SeedDallasButton } from "./SeedDallasButton";
@@ -37,8 +38,14 @@ export function SeminarsModule() {
   const [seminarToDelete, setSeminarToDelete] = useState<string | null>(null);
 
   const { events, isLoading: eventsLoading } = useEvents();
-  const { data: seminars, isLoading: seminarsLoading } = useSeminarSessions(selectedEventId);
+  const { data: allSeminars, isLoading: seminarsLoading } = useSeminarSessions(selectedEventId);
   const { deleteSeminar } = useSeminarMutations();
+
+  // Filter to only show educational seminars (not stage performances)
+  const educationalCategories = ['general', 'test_prep', 'financial_aid', 'college_selection', 'career'];
+  const seminars = allSeminars?.filter(seminar => 
+    !seminar.category || educationalCategories.includes(seminar.category)
+  ) || [];
 
   // Sync editingSeminar with fresh data when seminars refetch
   useEffect(() => {
@@ -52,12 +59,12 @@ export function SeminarsModule() {
 
   const selectedEvent = events?.find((e) => e.id === selectedEventId);
 
-  const filteredSeminars = seminars?.filter((seminar) => {
+  const filteredSeminars = seminars.filter((seminar) => {
     const matchesSearch = seminar.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       seminar.presenter_name?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRoom = selectedRoom === "all" || seminar.room?.room_name === selectedRoom;
     return matchesSearch && matchesRoom;
-  }) || [];
+  });
 
   const uniqueRooms = Array.from(new Set(seminars?.map((s) => s.room?.room_name).filter(Boolean))) as string[];
 
@@ -88,10 +95,14 @@ export function SeminarsModule() {
 
   const getCategoryColor = (category: string | null) => {
     switch (category) {
-      case "test_prep": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      case "financial_aid": return "bg-green-500/10 text-green-500 border-green-500/20";
-      case "college_selection": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
-      case "career": return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+      case "test_prep": return "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20";
+      case "financial_aid": return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20";
+      case "college_selection": return "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20";
+      case "career": return "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20";
+      case "entertainment": return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20";
+      case "money_giveaway": return "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20";
+      case "scholarship_giveaway": return "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20";
+      case "stage_performance": return "bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-500/20";
       default: return "bg-muted text-muted-foreground border-border";
     }
   };
@@ -108,6 +119,7 @@ export function SeminarsModule() {
       <Tabs defaultValue="manage" className="space-y-6">
         <TabsList>
           <TabsTrigger value="manage">Manage Seminars</TabsTrigger>
+          <TabsTrigger value="stage">Stage Performances</TabsTrigger>
           <TabsTrigger value="import">Bulk Import</TabsTrigger>
         </TabsList>
 
@@ -263,6 +275,27 @@ export function SeminarsModule() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* Stage Performances Tab */}
+        <TabsContent value="stage" className="space-y-6">
+          {selectedEventId && selectedEvent ? (
+            <StagePerformancesTab 
+              selectedEventId={selectedEventId}
+              venueId={selectedEvent.venue_id || ""}
+              eventDate={selectedEvent.start_at}
+            />
+          ) : (
+            <Card>
+              <CardContent className="py-12">
+                <EmptyState
+                  title="Select an event first"
+                  description="Choose an event from the dropdown above to manage stage performances"
+                  icon={Calendar}
+                />
               </CardContent>
             </Card>
           )}

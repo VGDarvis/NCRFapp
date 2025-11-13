@@ -41,6 +41,10 @@ export function SeminarDialog({
     registration_required: false,
   });
 
+  // Check if this is a stage performance
+  const isStagePerformance = formData.category && 
+    ['entertainment', 'money_giveaway', 'scholarship_giveaway', 'stage_performance'].includes(formData.category);
+
   useEffect(() => {
     if (seminar) {
       // Parse UTC time to local HH:MM format for input
@@ -147,9 +151,17 @@ export function SeminarDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{seminar ? "Edit Seminar" : "Create New Seminar"}</DialogTitle>
+          <DialogTitle>
+            {seminar 
+              ? (isStagePerformance ? 'Edit Stage Performance' : 'Edit Seminar')
+              : (isStagePerformance ? 'Create Stage Performance' : 'Create New Seminar')
+            }
+          </DialogTitle>
           <DialogDescription>
-            {seminar ? "Update seminar details" : "Add a new seminar session to the event"}
+            {isStagePerformance 
+              ? "Set up an entertainment segment, giveaway, or special performance for the grand finale"
+              : (seminar ? "Update seminar details" : "Add a new seminar session to the event")
+            }
           </DialogDescription>
         </DialogHeader>
 
@@ -161,7 +173,7 @@ export function SeminarDialog({
               required
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Seminar title"
+              placeholder={isStagePerformance ? "e.g., Grand Prize $5000 Scholarship Giveaway" : "Seminar title"}
             />
           </div>
 
@@ -190,13 +202,13 @@ export function SeminarDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="room_name">Location/Room *</Label>
+            <Label htmlFor="room_name">{isStagePerformance ? "Stage/Location *" : "Location/Room *"}</Label>
             <Input
               id="room_name"
               required
               value={formData.room_name}
               onChange={(e) => setFormData({ ...formData, room_name: e.target.value })}
-              placeholder="e.g., Main Hall, Room 101"
+              placeholder={isStagePerformance ? "e.g., Main Stage, Center Stage" : "e.g., Main Hall, Room 101"}
             />
           </div>
 
@@ -207,22 +219,26 @@ export function SeminarDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="general">General Seminar</SelectItem>
                 <SelectItem value="test_prep">Test Preparation</SelectItem>
                 <SelectItem value="financial_aid">Financial Aid</SelectItem>
                 <SelectItem value="college_selection">College Selection</SelectItem>
-                <SelectItem value="career">Career</SelectItem>
+                <SelectItem value="career">Career Development</SelectItem>
+                <SelectItem value="entertainment">🎭 Entertainment</SelectItem>
+                <SelectItem value="money_giveaway">💰 Money Giveaway</SelectItem>
+                <SelectItem value="scholarship_giveaway">🎓 Scholarship Giveaway</SelectItem>
+                <SelectItem value="stage_performance">⭐ Stage Performance</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="presenter_name">Presenter Name</Label>
+            <Label htmlFor="presenter_name">{isStagePerformance ? "Host/Performer Name" : "Presenter Name"}</Label>
             <Input
               id="presenter_name"
               value={formData.presenter_name}
               onChange={(e) => setFormData({ ...formData, presenter_name: e.target.value })}
-              placeholder="John Doe"
+              placeholder={isStagePerformance ? "e.g., NCRF Team, DJ Name" : "John Doe"}
             />
           </div>
 
@@ -266,7 +282,10 @@ export function SeminarDialog({
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Seminar description..."
+              placeholder={isStagePerformance 
+                ? "Describe the performance, prizes, or special moments"
+                : "Seminar description..."
+              }
               rows={3}
             />
           </div>
