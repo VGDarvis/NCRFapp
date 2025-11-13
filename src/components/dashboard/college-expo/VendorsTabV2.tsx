@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2, Building2 } from "lucide-react";
 import { VendorCard } from "./vendors/VendorCard";
 import { VendorFilters } from "./vendors/VendorFilters";
 import { useBooths } from "@/hooks/useBooths";
 import { useBoothFavorites } from "@/hooks/useBoothFavorites";
-import { supabase } from "@/integrations/supabase/client";
+import { useActiveEvent } from "@/hooks/useActiveEvent";
 import { toast } from "sonner";
 
 interface VendorsTabV2Props {
@@ -13,26 +13,14 @@ interface VendorsTabV2Props {
 }
 
 export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
-  const [eventId, setEventId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrgType, setSelectedOrgType] = useState<string | null>(null);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [showSpecialFeatures, setShowSpecialFeatures] = useState(false);
 
-  useEffect(() => {
-    const fetchEvent = async () => {
-      const { data } = await supabase
-        .from("events")
-        .select("id")
-        .eq("status", "upcoming")
-        .order("start_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      
-      if (data) setEventId(data.id);
-    };
-    fetchEvent();
-  }, []);
+  // Use activeEvent hook for real-time updates
+  const { activeEvent } = useActiveEvent();
+  const eventId = activeEvent?.id || null;
 
   const { data: booths, isLoading } = useBooths(eventId, {
     search: searchTerm,
