@@ -21,8 +21,12 @@ interface Event {
   attendee_count?: number;
   venue?: {
     name: string;
+    address: string;
     city: string;
     state: string;
+    zip_code?: string;
+    latitude?: number;
+    longitude?: number;
   };
 }
 
@@ -50,7 +54,9 @@ export const FeaturedEventHero = () => {
 
   const fetchEvents = async () => {
     try {
-      // Fetch in_progress or upcoming events
+      // Fetch in_progress or upcoming events (future events only)
+      const now = new Date().toISOString();
+      
       const { data: activeEvents, error: activeError } = await supabase
         .from('events')
         .select(`
@@ -58,6 +64,7 @@ export const FeaturedEventHero = () => {
           venue:venues(*)
         `)
         .in('status', ['in_progress', 'upcoming'])
+        .gte('start_at', now)
         .order('start_at', { ascending: true })
         .limit(1);
 
@@ -169,11 +176,17 @@ export const FeaturedEventHero = () => {
                   <span>{format(new Date(featuredEvent.start_at), 'EEEE, MMMM d, yyyy • h:mm a')}</span>
                 </div>
                 {featuredEvent.venue && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-emerald-600" />
-                    <span>
-                      {featuredEvent.venue.name}, {featuredEvent.venue.city}, {featuredEvent.venue.state}
-                    </span>
+                  <div className="flex items-start gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="font-medium">{featuredEvent.venue.name}</span>
+                      <span className="text-muted-foreground">
+                        {featuredEvent.venue.address}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {featuredEvent.venue.city}, {featuredEvent.venue.state} {featuredEvent.venue.zip_code || ''}
+                      </span>
+                    </div>
                   </div>
                 )}
                 {featuredEvent.capacity && (
