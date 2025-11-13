@@ -25,7 +25,9 @@ export function useActiveEvent() {
   const { data: activeEvent, isLoading } = useQuery({
     queryKey: ["active-event"],
     queryFn: async () => {
-      // First get the upcoming event
+      // Get the next upcoming event (future events only)
+      const now = new Date().toISOString();
+      
       const { data: event, error: eventError } = await supabase
         .from("events")
         .select(`
@@ -33,6 +35,7 @@ export function useActiveEvent() {
           venue:venues(name, city, state)
         `)
         .eq("status", "upcoming")
+        .gte("start_at", now) // Only future events
         .order("start_at", { ascending: true })
         .limit(1)
         .maybeSingle();
