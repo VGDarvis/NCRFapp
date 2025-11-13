@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -5,6 +6,7 @@ import { useActiveEvent } from "@/hooks/useActiveEvent";
 import { Calendar, MapPin, Image, BookOpen, LayoutGrid, Plus, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { EmptyState } from "../shared/EmptyState";
+import { EventFlyerUploadDialog } from "../events/EventFlyerUploadDialog";
 
 interface EventManagementPanelProps {
   onNavigate: (tab: string) => void;
@@ -12,6 +14,7 @@ interface EventManagementPanelProps {
 
 export function EventManagementPanel({ onNavigate }: EventManagementPanelProps) {
   const { activeEvent, isLoading } = useActiveEvent();
+  const [flyerDialogOpen, setFlyerDialogOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -117,7 +120,7 @@ export function EventManagementPanel({ onNavigate }: EventManagementPanelProps) 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
             <Button
               variant="outline"
-              onClick={() => onNavigate("expos")}
+              onClick={() => setFlyerDialogOpen(true)}
               className="action-button justify-start"
             >
               <Image className="w-4 h-4 mr-2" />
@@ -157,6 +160,12 @@ export function EventManagementPanel({ onNavigate }: EventManagementPanelProps) 
           </div>
         </div>
       </CardContent>
+      
+      <EventFlyerUploadDialog 
+        open={flyerDialogOpen}
+        onOpenChange={setFlyerDialogOpen}
+        eventId={activeEvent.id}
+      />
     </Card>
   );
 }
