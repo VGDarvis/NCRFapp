@@ -7,10 +7,14 @@ import { VenueLocationMap } from './VenueLocationMap';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { useRealtimeEvents } from '@/hooks/useRealtimeEvents';
 
 export const WelcomeTab = () => {
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Subscribe to real-time event updates
+  useRealtimeEvents();
 
   useEffect(() => {
     fetchFeaturedEvent();
@@ -105,7 +109,7 @@ export const WelcomeTab = () => {
 
           <div className="rounded-lg overflow-hidden shadow-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-green-500/10">
             <img 
-              src="/images/dallas-fort-worth-flyer.png" 
+              src={event.event_flyer_url || "/images/dallas-fort-worth-flyer.png"} 
               alt={event.title}
               className="w-full h-full object-cover"
             />
