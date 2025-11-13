@@ -10,8 +10,7 @@ import { EventQRCodeGenerator } from '@/components/admin/events/EventQRCodeGener
 import { AppSidebar } from '@/components/admin/layout/AppSidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { MetricsGrid } from '@/components/admin/dashboard/MetricsGrid';
-import { RecentActivityFeed } from '@/components/admin/dashboard/RecentActivityFeed';
-import { UpcomingTasksWidget } from '@/components/admin/dashboard/UpcomingTasksWidget';
+import { EventManagementPanel } from '@/components/admin/dashboard/EventManagementPanel';
 import { Shield } from 'lucide-react';
 import { ThemeProvider } from "next-themes";
 import { SeminarsModule } from '@/components/admin/seminars/SeminarsModule';
@@ -112,13 +111,10 @@ export default function AdminDashboard() {
             <main className="flex-1 container mx-auto px-4 py-6 space-y-6 max-w-7xl">
               {activeTab === 'dashboard' && (
                 <>
-                  <MetricsGrid />
-                  <div className="grid gap-6 lg:grid-cols-2">
-                    <RecentActivityFeed />
-                    <UpcomingTasksWidget />
-                  </div>
-                </>
-              )}
+                <MetricsGrid />
+                <EventManagementPanel onNavigate={setActiveTab} />
+              </>
+            )}
               
               {activeTab === 'analytics' && <AnalyticsModule />}
               
