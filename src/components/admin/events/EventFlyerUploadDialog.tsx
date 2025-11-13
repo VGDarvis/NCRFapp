@@ -125,6 +125,98 @@ export function EventFlyerUploadDialog({ open, onOpenChange, eventId }: EventFly
     }
   };
 
+  const geocodeAddress = async (address: string, city: string, state: string, zipCode: string) => {
+    try {
+      // Get Mapbox token
+      const { data: tokenData, error: tokenError } = await supabase.functions.invoke('get-mapbox-token');
+      if (tokenError || !tokenData?.token) {
+        console.error('Failed to get Mapbox token:', tokenError);
+        return null;
+      }
+
+      // Geocode the address
+      const fullAddress = `${address}, ${city}, ${state} ${zipCode}`;
+      const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullAddress)}.json?access_token=${tokenData.token}`;
+      
+      const response = await fetch(geocodeUrl);
+      const data = await response.json();
+      
+      if (data.features?.[0]) {
+        const [longitude, latitude] = data.features[0].center;
+        return { latitude, longitude };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return null;
+    }
+  };
+
+  const findOrCreateVenue = async (venueData: any, coordinates: { latitude: number; longitude: number } | null) => {
+    try {
+      // Search for existing venue by name and city
+      const { data: existingVenue } = await supabase
+        .from('venues')
+        .select('*')
+        .eq('name', venueData.venueName)
+        .eq('city', venueData.city)
+        .maybeSingle();
+
+      if (existingVenue) {
+        // Update existing venue with new coordinates
+        const venueUpdates: any = {
+          address: venueData.address,
+          state: venueData.state,
+          zip_code: venueData.zipCode,
+          updated_at: new Date().toISOString()
+        };
+
+        if (coordinates) {
+          venueUpdates.latitude = coordinates.latitude;
+          venueUpdates.longitude = coordinates.longitude;
+        }
+
+        await supabase
+          .from('venues')
+          .update(venueUpdates)
+          .eq('id', existingVenue.id);
+
+        return existingVenue.id;
+      } else {
+        // Create new venue
+        const newVenueData: any = {
+          name: venueData.venueName,
+          address: venueData.address,
+          city: venueData.city,
+          state: venueData.state,
+          zip_code: venueData.zipCode,
+          venue_type: 'high_school',
+          amenities: ['WiFi', 'Parking', 'Restrooms', 'Air Conditioning'],
+          parking_info: 'Free parking available in school parking lot',
+          accessibility_info: 'Accessible gymnasium and restrooms available'
+        };
+
+        if (coordinates) {
+          newVenueData.latitude = coordinates.latitude;
+          newVenueData.longitude = coordinates.longitude;
+        }
+
+        const { data: newVenue, error } = await supabase
+          .from('venues')
+          .insert(newVenueData)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return newVenue.id;
+      }
+    } catch (error) {
+      console.error('Venue creation/update error:', error);
+      return null;
+    }
+  };
+
   const handleSaveAndPublish = async () => {
     if (!selectedEventId) {
       toast.error('Please select an event');
@@ -144,6 +236,32 @@ export function EventFlyerUploadDialog({ open, onOpenChange, eventId }: EventFly
       }
       if (extractedData.eventDate && extractedData.endTime) {
         updates.end_at = `${extractedData.eventDate}T${extractedData.endTime}:00`;
+      }
+
+      // Geocode venue address if we have venue info
+      if (extractedData.venueName && extractedData.address && extractedData.city && extractedData.state) {
+        toast.loading('Geocoding venue address...', { id: 'geocoding' });
+        
+        const coordinates = await geocodeAddress(
+          extractedData.address,
+          extractedData.city,
+          extractedData.state,
+          extractedData.zipCode
+        );
+
+        if (coordinates) {
+          toast.success('Location found on map!', { id: 'geocoding' });
+        } else {
+          toast.warning('Could not geocode address', { id: 'geocoding' });
+        }
+
+        // Create or update venue
+        const venueId = await findOrCreateVenue(extractedData, coordinates);
+        
+        if (venueId) {
+          updates.venue_id = venueId;
+          toast.success('Venue updated with location data');
+        }
       }
 
       await updateEvent.mutateAsync({
