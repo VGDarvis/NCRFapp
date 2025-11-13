@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCard } from "../shared/StatsCard";
-import { QrCode, Users, Activity, Mail, Clock, Star } from "lucide-react";
+import { QrCode, Users, Activity, Star } from "lucide-react";
 import { useExpoStats } from "@/hooks/useExpoStats";
 
 export function MetricsGrid() {
@@ -42,7 +42,7 @@ export function MetricsGrid() {
   };
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatsCard
         title="QR Code Scans Today"
         value={stats.qrScansToday}
@@ -62,18 +62,6 @@ export function MetricsGrid() {
         description="Live in the last 5 minutes"
         icon={Activity}
         className="border-accent/20"
-      />
-      <StatsCard
-        title="Beta Interest Sign-Ups"
-        value={stats.betaSignUps}
-        description="Want to test new features"
-        icon={Mail}
-      />
-      <StatsCard
-        title="Avg. Session Duration"
-        value={formatDuration(stats.avgSessionDuration)}
-        description="Time spent in app"
-        icon={Clock}
       />
       <StatsCard
         title="Popular Booths"
