@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Heart, Award, Users } from 'lucide-react';
+import { Heart, Users } from 'lucide-react';
 import scholarshipsImage from '@/assets/scholarships-giveaway.jpg';
 
 interface DonorsTabProps {
@@ -13,36 +11,7 @@ interface DonorsTabProps {
 }
 
 export const DonorsTab = ({ user, isGuest }: DonorsTabProps) => {
-  const [donors, setDonors] = useState<any[]>([]);
   const studentsHelped = 500000;
-
-  useEffect(() => {
-    const fetchDonors = async () => {
-      const { data } = await supabase
-        .from('donor_information')
-        .select('*')
-        .eq('is_active', true)
-        .eq('public_recognition', true)
-        .order('total_contributed', { ascending: false });
-
-      if (data) {
-        setDonors(data);
-      }
-    };
-
-    fetchDonors();
-  }, []);
-
-  const getRecognitionBadge = (level: string) => {
-    const colors: Record<string, string> = {
-      platinum: 'bg-purple-500/20 text-purple-500',
-      gold: 'bg-yellow-500/20 text-yellow-500',
-      silver: 'bg-gray-500/20 text-gray-500',
-      bronze: 'bg-orange-500/20 text-orange-500',
-      supporter: 'bg-blue-500/20 text-blue-500',
-    };
-    return colors[level] || colors.supporter;
-  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -99,44 +68,6 @@ export const DonorsTab = ({ user, isGuest }: DonorsTabProps) => {
             </div>
           </div>
         </Card>
-      </div>
-
-      {/* Donor Recognition */}
-      <div className="mt-12">
-        <h2 className="text-3xl font-bold text-foreground mb-6 text-center">Donor Recognition</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {donors.length > 0 ? (
-            donors.map((donor) => (
-              <Card key={donor.id} className="p-6 glass-light border-primary/20">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-primary/20">
-                      <Award className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{donor.donor_name}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        Since {new Date(donor.donation_start_date).getFullYear()}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge className={getRecognitionBadge(donor.recognition_level)}>
-                    {donor.recognition_level}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Contributing ${donor.monthly_amount}/month
-                </p>
-              </Card>
-            ))
-          ) : (
-            <Card className="p-8 glass-light border-primary/20 col-span-3">
-              <p className="text-center text-muted-foreground">
-                Be the first to become a monthly donor and support our mission!
-              </p>
-            </Card>
-          )}
-        </div>
       </div>
     </div>
   );
