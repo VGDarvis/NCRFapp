@@ -86,7 +86,7 @@ export const WelcomeTab = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4" />
-                <span>{format(new Date(event.start_at), 'MMMM d, yyyy • h:mm a')}</span>
+                <span>{format(new Date(event.start_at), 'MMMM d, yyyy • h:mm a')} - {format(new Date(event.end_at), 'h:mm a')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <MapPin className="w-4 h-4" />
