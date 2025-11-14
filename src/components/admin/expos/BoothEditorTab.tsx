@@ -17,6 +17,7 @@ import { FixBoothDimensionsButton } from "./FixBoothDimensionsButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRealtimeFloorPlan } from "@/hooks/useRealtimeFloorPlan";
 
 export function BoothEditorTab() {
   const queryClient = useQueryClient();
@@ -34,6 +35,9 @@ export function BoothEditorTab() {
   
   const { events, isLoading: eventsLoading } = useEvents();
   const { data: booths, isLoading: boothsLoading } = useBooths(selectedEventId);
+  
+  // Subscribe to real-time booth updates
+  useRealtimeFloorPlan(selectedEventId);
 
   const collegeExpos = events?.filter((e) => e.event_type === "college_fair") || [];
 
