@@ -1762,6 +1762,9 @@ export type Database = {
           end_at: string
           event_flyer_url: string | null
           event_type: string
+          flyer_confidence_score: number | null
+          flyer_manual_override: boolean | null
+          flyer_scanned_at: string | null
           highlights: Json | null
           id: string
           image_url: string | null
@@ -1796,6 +1799,9 @@ export type Database = {
           end_at: string
           event_flyer_url?: string | null
           event_type?: string
+          flyer_confidence_score?: number | null
+          flyer_manual_override?: boolean | null
+          flyer_scanned_at?: string | null
           highlights?: Json | null
           id?: string
           image_url?: string | null
@@ -1830,6 +1836,9 @@ export type Database = {
           end_at?: string
           event_flyer_url?: string | null
           event_type?: string
+          flyer_confidence_score?: number | null
+          flyer_manual_override?: boolean | null
+          flyer_scanned_at?: string | null
           highlights?: Json | null
           id?: string
           image_url?: string | null
