@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
-import { Home, Calendar, MapPin, GraduationCap, Heart, Wifi } from 'lucide-react';
+import { Home, Calendar, MapPin, GraduationCap, Heart } from 'lucide-react';
 import { useGuestSession } from '@/hooks/useGuestSession';
 import { useRealtimeEvents } from '@/hooks/useRealtimeEvents';
 import { useActiveEvent } from '@/hooks/useActiveEvent';
@@ -86,14 +86,6 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
         subtitle="Your Journey to Higher Education"
         isGuest={isGuest}
       />
-      
-      {/* Live Updates Indicator */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-primary/20 shadow-lg">
-          <Wifi className="w-3 h-3 text-primary animate-pulse" />
-          <span className="text-xs text-muted-foreground font-medium">Live Updates</span>
-        </div>
-      </div>
       
       {/* Main Content */}
       <div className="flex-1 pb-20">
