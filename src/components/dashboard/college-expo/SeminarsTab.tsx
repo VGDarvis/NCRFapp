@@ -61,12 +61,12 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
   }
 
   // Get unique rooms
-  const rooms = Array.from(new Set(sessions.map(s => s.room?.room_number).filter(Boolean)));
+  const rooms = Array.from(new Set(sessions.map(s => s.room?.room_name).filter(Boolean)));
   
   // Filter sessions by room
   const filteredSessions = selectedRoom === "all" 
     ? sessions 
-    : sessions.filter(s => s.room?.room_number === selectedRoom);
+    : sessions.filter(s => s.room?.room_name === selectedRoom);
 
   const handleShare = async (session: any) => {
     const shareData = {
@@ -127,7 +127,7 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
             <Badge variant="secondary" className="ml-2">{sessions.length}</Badge>
           </Button>
           {rooms.map((room) => {
-            const count = sessions.filter(s => s.room?.room_number === room).length;
+            const count = sessions.filter(s => s.room?.room_name === room).length;
             return (
               <Button
                 key={room}
@@ -175,13 +175,13 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
                   </div>
 
                   {/* PROMINENT ROOM NUMBER */}
-                  {session.room && (
+                  {session.room?.room_name && (
                     <Badge 
                       variant="secondary" 
                       className="text-base px-3 py-1.5 font-bold bg-primary/10 text-primary shrink-0"
                     >
                       <MapPin className="w-4 h-4 mr-1" />
-                      {session.room.room_number}
+                      {session.room.room_name}
                     </Badge>
                   )}
                 </div>
@@ -191,9 +191,9 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
                   <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
                     {session.title}
                   </h3>
-                  {session.room?.room_number && (
+                  {session.room?.room_name && (
                     <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                      Room {session.room.room_number}
+                      {session.room.room_name}
                     </Badge>
                   )}
                 </div>
