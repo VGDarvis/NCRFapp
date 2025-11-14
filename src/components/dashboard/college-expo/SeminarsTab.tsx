@@ -187,9 +187,16 @@ export const SeminarsTab = ({ eventId }: SeminarsTabProps) => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  {session.title}
-                </h3>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                    {session.title}
+                  </h3>
+                  {session.room && (
+                    <Badge variant="secondary" className="text-xs px-2 py-0.5">
+                      Room {session.room.room_number}
+                    </Badge>
+                  )}
+                </div>
 
                 {/* Presenter (when collapsed) */}
                 {!isExpanded && session.presenter_name && (
