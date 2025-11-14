@@ -11,6 +11,7 @@ import { BoothEditDialog } from "./BoothEditDialog";
 import { BoothAddDialog } from "./BoothAddDialog";
 import { DallasBoothUpdater } from "./DallasBoothUpdater";
 import { DallasExhibitorImporter } from "./DallasExhibitorImporter";
+import { SeattleExhibitorImporter } from "./SeattleExhibitorImporter";
 import { BulkDimensionsDialog } from "./BulkDimensionsDialog";
 import { FixBoothDimensionsButton } from "./FixBoothDimensionsButton";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,7 @@ export function BoothEditorTab() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [updaterOpen, setUpdaterOpen] = useState(false);
   const [importerOpen, setImporterOpen] = useState(false);
+  const [seattleImporterOpen, setSeattleImporterOpen] = useState(false);
   const [bulkDimensionsOpen, setBulkDimensionsOpen] = useState(false);
   const [deletingBoothId, setDeletingBoothId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -147,6 +149,14 @@ export function BoothEditorTab() {
                   <Upload className="w-4 h-4 mr-2" />
                   Update from CSV
                 </Button>
+                <Button onClick={() => setImporterOpen(true)} size="sm" variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Dallas CSV
+                </Button>
+                <Button onClick={() => setSeattleImporterOpen(true)} size="sm" variant="outline">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Seattle CSV
+                </Button>
                 <Button onClick={() => setAddDialogOpen(true)} size="sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Booth
@@ -268,12 +278,20 @@ export function BoothEditorTab() {
       />
 
       {selectedEventId && (
-        <DallasExhibitorImporter
-          open={importerOpen}
-          onClose={() => setImporterOpen(false)}
-          eventId={selectedEventId}
-          eventTitle={collegeExpos.find(e => e.id === selectedEventId)?.title || ""}
-        />
+        <>
+          <DallasExhibitorImporter
+            open={importerOpen}
+            onClose={() => setImporterOpen(false)}
+            eventId={selectedEventId}
+            eventTitle={collegeExpos.find(e => e.id === selectedEventId)?.title || ""}
+          />
+          <SeattleExhibitorImporter
+            open={seattleImporterOpen}
+            onClose={() => setSeattleImporterOpen(false)}
+            eventId={selectedEventId}
+            eventTitle={collegeExpos.find(e => e.id === selectedEventId)?.title || ""}
+          />
+        </>
       )}
 
       {selectedEventId && booths && (
