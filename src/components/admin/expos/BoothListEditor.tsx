@@ -64,6 +64,8 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   const [featuresDrawerBooth, setFeaturesDrawerBooth] = useState<any>(null);
   const [isFeaturesDrawerOpen, setIsFeaturesDrawerOpen] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const [deleteBoothId, setDeleteBoothId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const { isMobile } = useMobileDetection();
 
@@ -314,43 +316,64 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
   };
 
   const handleClearPositions = async () => {
-    if (selectedBooths.size === 0) {
-      toast.error("No booths selected");
-      return;
-    }
-
-    const boothIds = Array.from(selectedBooths);
-    setIsSaving(true);
-    toast.loading(`Clearing positions for ${boothIds.length} booth(s)...`, { id: "clear-positions" });
+    if (selectedBooths.size === 0 || !selectedEvent) return;
 
     try {
-      for (const boothId of boothIds) {
+      const boothIds = Array.from(selectedBooths);
+      const updates = boothIds.map(boothId => ({
+        id: boothId,
+        grid_row: null,
+        grid_col: null,
+        x_position: null,
+        y_position: null,
+      }));
+
+      for (const update of updates) {
         const { error } = await supabase
           .from("booths")
-          .update({
-            grid_row: null,
-            grid_col: null,
-            x_position: null,
-            y_position: null,
-          })
-          .eq("id", boothId);
+          .update(update)
+          .eq("id", update.id);
 
         if (error) throw error;
       }
 
-      toast.success(`Cleared positions for ${boothIds.length} booth(s)`, {
-        id: "clear-positions",
-        description: "These booths can now be repositioned anywhere",
-      });
+      queryClient.invalidateQueries({ queryKey: ["booths"] });
+      toast.success(`Cleared positions for ${boothIds.length} booth(s)`);
       setSelectedBooths(new Set());
+      setShowClearDialog(false);
+    } catch (error) {
+      console.error("Error clearing positions:", error);
+      toast.error("Failed to clear positions");
+    }
+  };
+
+  const handleDeleteBooth = async () => {
+    if (!deleteBoothId) return;
+
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("booths")
+        .delete()
+        .eq("id", deleteBoothId);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["booths"] });
+      toast.success("Booth deleted successfully");
       
-      // Invalidate all booth queries to sync across all components
-      await queryClient.invalidateQueries({ queryKey: ["booths"] });
-    } catch (error: any) {
-      console.error("Error clearing booth positions:", error);
-      toast.error("Failed to clear booth positions", { id: "clear-positions" });
+      // Remove from selected booths if it was selected
+      setSelectedBooths(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(deleteBoothId);
+        return newSet;
+      });
+      setDeleteBoothId(null);
+    } catch (error) {
+      console.error("Error deleting booth:", error);
+      toast.error("Failed to delete booth");
     } finally {
-      setIsSaving(false);
+      setIsDeleting(false);
     }
   };
 
@@ -823,6 +846,15 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
                     >
                       Auto-Assign Position
                     </Button>
+                    <Button
+                      variant="outline"
+                      size={isMobile ? "lg" : "sm"}
+                      onClick={() => setDeleteBoothId(booth.id)}
+                      className={cn("w-full text-destructive hover:text-destructive", isMobile && "min-h-[48px]")}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete Booth
+                    </Button>
                   </div>
                 )}
               </Card>
@@ -892,6 +924,28 @@ export const BoothListEditor = ({ floorPlanId }: BoothListEditorProps) => {
               className="bg-destructive hover:bg-destructive/90"
             >
               Clear Positions
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deleteBoothId} onOpenChange={(open) => !open && setDeleteBoothId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Booth?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete booth #{filteredBooths.find(b => b.id === deleteBoothId)?.table_no} - {filteredBooths.find(b => b.id === deleteBoothId)?.org_name}? 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteBooth}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete Booth"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
