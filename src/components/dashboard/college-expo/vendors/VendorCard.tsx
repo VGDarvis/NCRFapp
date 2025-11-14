@@ -41,22 +41,8 @@ export const VendorCard = ({
   onToggleFavorite,
   onViewFloorPlan 
 }: VendorCardProps) => {
-  const getTierColor = (tier?: string) => {
-    switch (tier?.toLowerCase()) {
-      case 'platinum': return 'bg-gradient-to-r from-slate-400 to-slate-200';
-      case 'gold': return 'bg-gradient-to-r from-yellow-400 to-yellow-200';
-      case 'silver': return 'bg-gradient-to-r from-gray-400 to-gray-200';
-      case 'bronze': return 'bg-gradient-to-r from-amber-600 to-amber-400';
-      default: return 'bg-muted';
-    }
-  };
-
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      {booth.sponsor_tier && (
-        <div className={`h-2 ${getTierColor(booth.sponsor_tier)}`} />
-      )}
-      
       <div className="p-6 space-y-4">
         <div className="flex items-start gap-4">
           {booth.logo_url ? (

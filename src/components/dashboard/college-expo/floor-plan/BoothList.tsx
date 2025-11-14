@@ -72,9 +72,6 @@ export const BoothList = ({
                 {booth.org_type && (
                   <Badge variant="secondary">{booth.org_type}</Badge>
                 )}
-                {booth.sponsor_tier && (
-                  <Badge variant="outline">{booth.sponsor_tier}</Badge>
-                )}
                 {booth.offers_on_spot_admission && (
                   <Badge className="bg-success text-success-foreground">
                     On-Spot Admission

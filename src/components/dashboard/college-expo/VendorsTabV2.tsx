@@ -15,7 +15,6 @@ interface VendorsTabV2Props {
 export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrgType, setSelectedOrgType] = useState<string | null>(null);
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [showSpecialFeatures, setShowSpecialFeatures] = useState(false);
 
   // Use activeEvent hook for real-time updates
@@ -25,7 +24,6 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
   const { data: booths, isLoading } = useBooths(eventId, {
     search: searchTerm,
     org_type: selectedOrgType ? [selectedOrgType] : undefined,
-    tier: selectedTier ? [selectedTier] : undefined,
   });
 
   const { favorites, addFavorite, removeFavorite, isFavorite } = useBoothFavorites(eventId);
@@ -50,14 +48,6 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
     return true;
   }) || [];
 
-  // Sort to show featured/platinum sponsors first
-  const sortedBooths = [...filteredBooths].sort((a, b) => {
-    const tierOrder = { platinum: 0, gold: 1, silver: 2, bronze: 3 };
-    const aTier = a.sponsor_tier?.toLowerCase() as keyof typeof tierOrder;
-    const bTier = b.sponsor_tier?.toLowerCase() as keyof typeof tierOrder;
-    return (tierOrder[aTier] ?? 999) - (tierOrder[bTier] ?? 999);
-  });
-
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -74,7 +64,7 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
       <div className="mb-6">
         <h2 className="text-3xl font-bold mb-2">Exhibitors & Vendors</h2>
         <p className="text-muted-foreground">
-          Explore {sortedBooths.length} colleges, universities, and organizations attending the expo
+          Explore {filteredBooths.length} colleges, universities, and organizations attending the expo
         </p>
       </div>
 
@@ -86,8 +76,6 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
               onSearchChange={setSearchTerm}
               selectedOrgType={selectedOrgType}
               onOrgTypeChange={setSelectedOrgType}
-              selectedTier={selectedTier}
-              onTierChange={setSelectedTier}
               showSpecialFeatures={showSpecialFeatures}
               onToggleSpecialFeatures={() => setShowSpecialFeatures(!showSpecialFeatures)}
             />
@@ -95,9 +83,9 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
         </aside>
 
         <div className="lg:col-span-3">
-          {sortedBooths.length > 0 ? (
+          {filteredBooths.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              {sortedBooths.map(booth => (
+              {filteredBooths.map(booth => (
                 <VendorCard
                   key={booth.id}
                   booth={booth}

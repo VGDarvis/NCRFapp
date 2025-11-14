@@ -8,8 +8,6 @@ interface VendorFiltersProps {
   onSearchChange: (value: string) => void;
   selectedOrgType: string | null;
   onOrgTypeChange: (type: string | null) => void;
-  selectedTier: string | null;
-  onTierChange: (tier: string | null) => void;
   showSpecialFeatures: boolean;
   onToggleSpecialFeatures: () => void;
 }
@@ -23,29 +21,19 @@ const ORG_TYPES = [
   'Scholarship Org'
 ];
 
-const SPONSOR_TIERS = [
-  'Platinum',
-  'Gold',
-  'Silver',
-  'Bronze'
-];
-
 export const VendorFilters = ({
   searchTerm,
   onSearchChange,
   selectedOrgType,
   onOrgTypeChange,
-  selectedTier,
-  onTierChange,
   showSpecialFeatures,
   onToggleSpecialFeatures
 }: VendorFiltersProps) => {
-  const hasActiveFilters = selectedOrgType || selectedTier || showSpecialFeatures;
+  const hasActiveFilters = selectedOrgType || showSpecialFeatures;
 
   const clearAllFilters = () => {
     onSearchChange('');
     onOrgTypeChange(null);
-    onTierChange(null);
     if (showSpecialFeatures) onToggleSpecialFeatures();
   };
 
@@ -74,22 +62,6 @@ export const VendorFilters = ({
                 onClick={() => onOrgTypeChange(selectedOrgType === type ? null : type)}
               >
                 {type}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h4 className="text-sm font-medium mb-2">Sponsor Tier</h4>
-          <div className="flex flex-wrap gap-2">
-            {SPONSOR_TIERS.map(tier => (
-              <Badge
-                key={tier}
-                variant={selectedTier === tier ? "default" : "outline"}
-                className="cursor-pointer hover:bg-accent"
-                onClick={() => onTierChange(selectedTier === tier ? null : tier)}
-              >
-                {tier}
               </Badge>
             ))}
           </div>
