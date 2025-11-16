@@ -17,19 +17,23 @@ export const getBaseUrl = (): string => {
 };
 
 /**
- * Generate guest access URL for QR codes
+ * Generate guest access URL for QR codes with source tracking
  * All QR codes lead to the same guest dashboard
- * Example: https://expo.collegeexpoapp.org/guest/college-expo?event=123
+ * Example: https://expo.collegeexpoapp.org/guest/college-expo?event=123&source=qr_entrance
  */
-export const generateGuestAccessUrl = (eventId?: string): string => {
+export const generateGuestAccessUrl = (eventId?: string, source?: string): string => {
   const baseUrl = getBaseUrl();
   let url = `${baseUrl}/guest/college-expo`;
   
+  const params = new URLSearchParams();
   if (eventId) {
-    return `${url}?event=${eventId}`;
+    params.append('event', eventId);
+  }
+  if (source) {
+    params.append('source', source);
   }
   
-  return url;
+  return params.toString() ? `${url}?${params.toString()}` : url;
 };
 
 /**

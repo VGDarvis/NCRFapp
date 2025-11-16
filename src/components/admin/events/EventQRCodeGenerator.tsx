@@ -18,8 +18,9 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
   const [qrSize, setQrSize] = useState<number>(512);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [qrSource, setQrSource] = useState<string>("qr_entrance");
 
-  const guestUrl = generateGuestAccessUrl(); // Dashboard only - no event parameter
+  const guestUrl = generateGuestAccessUrl(eventId, qrSource);
 
   const handleGenerateQR = async () => {
     setIsGenerating(true);
@@ -126,14 +127,41 @@ export const EventQRCodeGenerator = ({ eventId }: EventQRCodeGeneratorProps) => 
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* URL Display */}
-          <div className="space-y-2">
-            <Label>Guest Access URL</Label>
-            <div className="flex gap-2">
-              <Input value={guestUrl} readOnly className="font-mono text-sm" />
-              <Button onClick={handleCopyUrl} variant="outline" size="icon">
-                <Copy className="h-4 w-4" />
-              </Button>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="qr-source">QR Code Type</Label>
+              <Select value={qrSource} onValueChange={setQrSource}>
+                <SelectTrigger id="qr-source" className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="qr_entrance">🚪 Entrance QR (Main Event)</SelectItem>
+                  <SelectItem value="qr_booth">🎪 Booth QR (Individual Exhibitor)</SelectItem>
+                  <SelectItem value="qr_flyer">📄 Flyer QR (Physical Marketing)</SelectItem>
+                  <SelectItem value="qr_social">📱 Social Media QR</SelectItem>
+                  <SelectItem value="qr_checkin">✅ Check-in QR (Registration)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="guest-url">Guest Access URL</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  id="guest-url"
+                  value={guestUrl}
+                  readOnly
+                  className="font-mono text-sm"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleCopyUrl}
+                  title="Copy URL"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
 
