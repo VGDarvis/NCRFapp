@@ -6,7 +6,7 @@ import { BoothCSVImporter } from "./BoothCSVImporter";
 import { SeminarCSVImporter } from "./SeminarCSVImporter";
 import { RegistrationCSVImporter } from "./RegistrationCSVImporter";
 import { EventQRCodeGenerator } from "./EventQRCodeGenerator";
-import { GuestAnalyticsDashboard } from "./GuestAnalyticsDashboard";
+import { QRAnalyticsDashboard } from "../analytics/QRAnalyticsDashboard";
 import { useEvents } from "@/hooks/useEvents";
 import { useVenues } from "@/hooks/useVenues";
 import { toast } from "sonner";
@@ -154,7 +154,7 @@ export const EventsModule = () => {
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-6">
-          <GuestAnalyticsDashboard eventId={firstEvent?.id || null} />
+          <QRAnalyticsDashboard />
         </TabsContent>
       </Tabs>
     </div>
