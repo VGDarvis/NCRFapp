@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Users, BarChart, Loader2, QrCode } from "lucide-react";
+import { Calendar, MapPin, Users, BarChart, Loader2, QrCode, Upload } from "lucide-react";
 import { FloorPlanUploader } from "./FloorPlanUploader";
 import { BoothCSVImporter } from "./BoothCSVImporter";
 import { SeminarCSVImporter } from "./SeminarCSVImporter";
+import { RegistrationCSVImporter } from "./RegistrationCSVImporter";
 import { EventQRCodeGenerator } from "./EventQRCodeGenerator";
 import { GuestAnalyticsDashboard } from "./GuestAnalyticsDashboard";
 import { useEvents } from "@/hooks/useEvents";
 import { useVenues } from "@/hooks/useVenues";
+import { toast } from "sonner";
 
 export const EventsModule = () => {
   const { events, isLoading: isLoadingEvents } = useEvents();
@@ -33,7 +35,7 @@ export const EventsModule = () => {
       </div>
 
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="grid w-full max-w-3xl grid-cols-5">
+        <TabsList className="grid w-full max-w-3xl grid-cols-6">
           <TabsTrigger value="events" className="gap-2">
             <Calendar className="w-4 h-4" />
             Events
@@ -45,6 +47,10 @@ export const EventsModule = () => {
           <TabsTrigger value="booths" className="gap-2">
             <Users className="w-4 h-4" />
             Booths
+          </TabsTrigger>
+          <TabsTrigger value="registrations" className="gap-2">
+            <Upload className="w-4 h-4" />
+            Registrations
           </TabsTrigger>
           <TabsTrigger value="qr-codes" className="gap-2">
             <QrCode className="w-4 h-4" />
@@ -117,6 +123,27 @@ export const EventsModule = () => {
               <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground">
                 {!firstEvent ? 'No events found. Create an event first.' : 'No venues found. Create a venue first.'}
+              </p>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="registrations" className="mt-6">
+          {firstEvent ? (
+            <div className="grid gap-4">
+              <RegistrationCSVImporter 
+                defaultEventId={firstEvent.id}
+                onImportComplete={() => {
+                  toast.success('Registrations imported! Check Analytics tab to view scan data.');
+                  window.location.reload();
+                }}
+              />
+            </div>
+          ) : (
+            <Card className="p-8 text-center">
+              <Upload className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                No events found. Create an event first.
               </p>
             </Card>
           )}
