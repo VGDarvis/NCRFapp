@@ -1,20 +1,29 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEventEngagementAnalytics } from "@/hooks/useEventEngagementAnalytics";
+import { useQRCodeAnalytics } from "@/hooks/useQRCodeAnalytics";
 import { useEvents } from "@/hooks/useEvents";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { QrCode, Users, UserCheck, Activity, Smartphone, TrendingUp } from "lucide-react";
+import { QrCode, Users, UserCheck, Activity, Smartphone, TrendingUp, Calendar } from "lucide-react";
 import { BarChartCard } from "./charts/BarChartCard";
 import { PieChartCard } from "./charts/PieChartCard";
+import { LineChartCard } from "./charts/LineChartCard";
 import { LoadingSpinner } from "../shared/LoadingSpinner";
 import { ExportButton } from "./shared/ExportButton";
+import { DateRangePicker } from "./shared/DateRangePicker";
+import { StatsCard } from "../shared/StatsCard";
 import { supabase } from "@/integrations/supabase/client";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { subDays, format } from "date-fns";
 
 export function EventEngagementAnalyticsTab() {
   const { events } = useEvents();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
 
   const {
     qrMetrics,
@@ -26,6 +35,12 @@ export function EventEngagementAnalyticsTab() {
     hourlyActivity,
     isLoading,
   } = useEventEngagementAnalytics(selectedEventId);
+
+  // Historical QR Analytics
+  const { data: historicalQR, isLoading: historicalLoading } = useQRCodeAnalytics(
+    selectedEventId ? [selectedEventId] : null,
+    dateRange
+  );
 
   // Auto-select the most recent upcoming event
   useEffect(() => {
@@ -85,7 +100,7 @@ export function EventEngagementAnalyticsTab() {
     return `${mins}m ${secs}s`;
   };
 
-  if (isLoading) {
+  if (isLoading || historicalLoading) {
     return <LoadingSpinner />;
   }
 
@@ -93,97 +108,133 @@ export function EventEngagementAnalyticsTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Event Selector */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Event Engagement Analytics</h2>
-          <p className="text-muted-foreground">
-            Real-time tracking of QR scans, app usage, and attendee engagement
-          </p>
-        </div>
-        <div className="flex gap-2 items-center">
-          <Select value={selectedEventId || ""} onValueChange={setSelectedEventId}>
-            <SelectTrigger className="w-[280px]">
-              <SelectValue placeholder="Select an event" />
-            </SelectTrigger>
-            <SelectContent>
-              {events?.map((event) => (
-                <SelectItem key={event.id} value={event.id}>
-                  {event.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <ExportButton 
-            data={[{
-              event: selectedEvent?.title,
-              qrMetrics,
-              appUsage,
-              registrationMetrics,
-              entrySources,
-              deviceTypes,
-              boothEngagement,
-            }]} 
-            filename={`event-engagement-${selectedEvent?.title || 'report'}`} 
-          />
+      {/* Header with Event Selector and Date Range */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold">Event Engagement Analytics</h2>
+            <p className="text-muted-foreground">
+              Real-time tracking and historical analysis of QR scans, app usage, and attendee engagement
+            </p>
+          </div>
+          <div className="flex gap-2 items-center flex-wrap">
+            <Select value={selectedEventId || ""} onValueChange={setSelectedEventId}>
+              <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select an event" />
+              </SelectTrigger>
+              <SelectContent>
+                {events?.map((event) => (
+                  <SelectItem key={event.id} value={event.id}>
+                    {event.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
+            <ExportButton
+              data={[
+                { section: "QR Metrics", ...qrMetrics },
+                { section: "App Usage", ...appUsage },
+                { section: "Registration Metrics", ...registrationMetrics },
+                { section: "Historical QR Data", ...historicalQR },
+              ]}
+              filename={`${selectedEvent?.title || "event"}-analytics-${new Date().toISOString()}`}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Real-Time KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">QR Codes Scanned</CardTitle>
-            <QrCode className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{qrMetrics?.total_qr_scans || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {qrMetrics?.conversion_rate.toFixed(1)}% conversion to registration
-            </p>
-          </CardContent>
-        </Card>
+      {/* Historical QR Analytics Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-primary" />
+          <h3 className="text-xl font-semibold">Historical QR Code Analytics</h3>
+          <span className="text-sm text-muted-foreground">
+            ({format(dateRange.from, "MMM d")} - {format(dateRange.to, "MMM d, yyyy")})
+          </span>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active App Users</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{appUsage?.active_now || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {appUsage?.total_sessions || 0} total sessions
-            </p>
-          </CardContent>
-        </Card>
+        {/* Historical KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="Cumulative Scans"
+            value={historicalQR?.totalScans || 0}
+            description={`Across ${Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24))} days`}
+            icon={QrCode}
+          />
+          <StatsCard
+            title="Daily Average"
+            value={historicalQR?.averagePerDay.toFixed(1) || "0"}
+            description="Average scans per day"
+            icon={TrendingUp}
+          />
+          <StatsCard
+            title="Peak Day"
+            value={historicalQR?.peakDay?.scans || 0}
+            description={historicalQR?.peakDay ? format(new Date(historicalQR.peakDay.date), "MMM d") : "No data"}
+            icon={Activity}
+          />
+          <StatsCard
+            title="Unique Attendees"
+            value={historicalQR?.uniqueAttendees || 0}
+            description={`${((historicalQR?.uniqueAttendees || 0) / (historicalQR?.totalScans || 1) * 100).toFixed(0)}% unique rate`}
+            icon={Users}
+          />
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Checked-In Attendees</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {registrationMetrics?.checked_in || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              of {registrationMetrics?.total_registrations || 0} registered ({registrationMetrics?.check_in_rate.toFixed(1)}%)
-            </p>
-          </CardContent>
-        </Card>
+        {/* Daily Breakdown Chart */}
+        <LineChartCard
+          title="Daily QR Code Scans"
+          description="Scan activity over the selected date range"
+          data={historicalQR?.dailyBreakdown.map(d => ({
+            ...d,
+            dateFormatted: format(new Date(d.date), "MMM d")
+          })) || []}
+          dataKey="scans"
+          xAxisKey="dateFormatted"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Profile Signups</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{registrationMetrics?.profile_signups || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {appUsage?.unique_visitors || 0} unique visitors
-            </p>
-          </CardContent>
-        </Card>
+        {/* Event Comparison if multiple events */}
+        {historicalQR?.byEvent && historicalQR.byEvent.length > 1 && (
+          <BarChartCard
+            title="Scans by Event"
+            description="Comparison across events in the selected period"
+            data={historicalQR.byEvent}
+            dataKey="totalScans"
+            xAxisKey="eventName"
+          />
+        )}
+      </div>
+
+      {/* Real-time Activity Section */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold">Real-time Activity</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="QR Code Scans Today"
+            value={qrMetrics?.total_qr_scans || 0}
+            description={`${qrMetrics?.conversion_rate.toFixed(1)}% conversion rate`}
+            icon={QrCode}
+          />
+          <StatsCard
+            title="Active App Users"
+            value={appUsage?.active_now || 0}
+            description={`${appUsage?.total_sessions || 0} total sessions`}
+            icon={Activity}
+          />
+          <StatsCard
+            title="Checked In"
+            value={registrationMetrics?.checked_in || 0}
+            description={`${registrationMetrics?.check_in_rate.toFixed(1)}% of registrations`}
+            icon={UserCheck}
+          />
+          <StatsCard
+            title="Profile Sign-ups"
+            value={registrationMetrics?.profile_signups || 0}
+            description={`${((registrationMetrics?.profile_signups || 0) / (registrationMetrics?.total_registrations || 1) * 100).toFixed(1)}% of attendees`}
+            icon={Users}
+          />
+        </div>
       </div>
 
       {/* Charts Grid */}
@@ -284,58 +335,51 @@ export function EventEngagementAnalyticsTab() {
           </CardContent>
         </Card>
 
-        {/* Booth Engagement */}
+        {/* Top Booth Engagement */}
         <BarChartCard
-          title="Top 10 Most Visited Booths"
-          description="Booth engagement rankings"
-          data={boothEngagement?.map((booth) => ({
-            name: booth.booth_number,
-            value: booth.visits,
-          })) || []}
-          dataKey="value"
-          xAxisKey="name"
-          color="hsl(var(--chart-3))"
+          title="Top Booth Engagement"
+          description="Most visited booths"
+          data={boothEngagement?.slice(0, 10) || []}
+          dataKey="visits"
+          xAxisKey="booth_number"
         />
       </div>
 
       {/* Engagement Insights */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Engagement Insights
-          </CardTitle>
+          <CardTitle>Engagement Insights</CardTitle>
+          <CardDescription>Key takeaways from the analytics</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-            <div>
-              <p className="font-medium">Average Session Duration</p>
-              <p className="text-sm text-muted-foreground">
-                {formatDuration(appUsage?.avg_duration_seconds || 0)} per visitor
-              </p>
-            </div>
+          <div className="flex items-start gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5" />
+            <p className="text-sm">
+              <strong>Session Duration:</strong> Average session time is{" "}
+              {formatDuration(appUsage?.avg_duration_seconds || 0)}, showing{" "}
+              {(appUsage?.avg_duration_seconds || 0) > 180 ? "strong" : "moderate"} engagement
+            </p>
           </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-            <div>
-              <p className="font-medium">Total Page Views</p>
-              <p className="text-sm text-muted-foreground">
-                {appUsage?.total_page_views || 0} pages viewed across all sessions
-              </p>
-            </div>
+          <div className="flex items-start gap-2">
+            <div className="w-2 h-2 rounded-full bg-accent mt-1.5" />
+            <p className="text-sm">
+              <strong>QR Code Performance:</strong> {qrMetrics?.conversion_rate.toFixed(1)}%
+              conversion rate from scan to registration. Historical average:{" "}
+              {historicalQR?.averagePerDay.toFixed(1)} scans/day
+            </p>
           </div>
-          {qrMetrics && qrMetrics.conversion_rate > 0 && (
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 rounded-full bg-primary mt-2" />
-              <div>
-                <p className="font-medium">QR Code Performance</p>
-                <p className="text-sm text-muted-foreground">
-                  {qrMetrics.conversion_rate.toFixed(1)}% of QR scans resulted in registrations
-                </p>
-              </div>
-            </div>
-          )}
+          <div className="flex items-start gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5" />
+            <p className="text-sm">
+              <strong>Peak Activity:</strong> Most activity occurs at{" "}
+              {hourlyActivity && hourlyActivity.length > 0
+                ? hourlyActivity.reduce((max, h) =>
+                    h.sessions > max.sessions ? h : max
+                  ).hour
+                : "N/A"}{" "}
+              - consider timing key announcements during this window
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
