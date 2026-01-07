@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 // Mock data offset for demo purposes - set enabled to false for production
 const MOCK_DATA_CONFIG = {
   enabled: true,
-  totalAppUsersOffset: 2500,
-  qrScansTodayOffset: 150,
+  totalAppUsersOffset: 1000,
+  qrScansTodayOffset: 75,
 };
 
 interface ExpoStats {
