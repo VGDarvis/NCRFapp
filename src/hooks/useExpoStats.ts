@@ -1,6 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+// Mock data offset for demo purposes - set enabled to false for production
+const MOCK_DATA_CONFIG = {
+  enabled: true,
+  totalAppUsersOffset: 2500,
+  qrScansTodayOffset: 150,
+};
+
 interface ExpoStats {
   qrScansToday: number;
   totalAppUsers: number;
@@ -85,8 +92,8 @@ export function useExpoStats(eventId: string | null) {
         const popularBoothsCount = checkInsData ? new Set(checkInsData.map(c => c.booth_id)).size : 0;
 
         return {
-          qrScansToday: qrScansToday || 0,
-          totalAppUsers: totalAppUsers || 0,
+          qrScansToday: (qrScansToday || 0) + (MOCK_DATA_CONFIG.enabled ? MOCK_DATA_CONFIG.qrScansTodayOffset : 0),
+          totalAppUsers: (totalAppUsers || 0) + (MOCK_DATA_CONFIG.enabled ? MOCK_DATA_CONFIG.totalAppUsersOffset : 0),
           activeNow,
           betaSignUps: betaSignUps || 0,
           avgSessionDuration: Math.round(avgSessionDuration),
