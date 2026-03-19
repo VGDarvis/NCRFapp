@@ -23,7 +23,7 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
   const [overrideEventId, setOverrideEventId] = useState<string | null>(null);
 
   const { activeEvent } = useActiveEvent();
-  const { data: allEvents, isLoading: isLoadingEvents } = useEvents();
+  const { events: allEvents, isLoading: isLoadingEvents } = useEvents();
 
   // Filter to expo-type events only
   const expoEvents = allEvents?.filter(e => 
