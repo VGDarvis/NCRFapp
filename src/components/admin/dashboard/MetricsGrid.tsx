@@ -20,7 +20,7 @@ function usePlatformStats() {
       const boothsRes = await supabase.from("booths").select("org_name");
       const boothCountRes = await supabase.from("booths").select("id", { count: "exact", head: true });
       const seminarsRes = await supabase.from("seminar_sessions").select("id", { count: "exact", head: true }) as { count: number | null };
-      const guestsRes = await supabase.from("guest_sessions").select("id", { count: "exact", head: true });
+      const guestsRes = await supabase.from("guest_sessions").select("id", { count: "exact", head: true }) as { count: number | null };
       const bookletsRes = await supabase.from("scholarship_booklets").select("id").eq("is_published", true);
 
       const totalExpos = eventsRes.count || 0;
