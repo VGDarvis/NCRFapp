@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Building2, Calendar, MapPin } from "lucide-react";
+import { Loader2, Building2, Calendar } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VendorCard } from "./vendors/VendorCard";
 import { VendorFilters } from "./vendors/VendorFilters";
@@ -23,9 +23,8 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
   const [overrideEventId, setOverrideEventId] = useState<string | null>(null);
 
   const { activeEvent } = useActiveEvent();
-  const { events: allEvents, isLoading: isLoadingEvents } = useEvents();
+  const { events: allEvents } = useEvents();
 
-  // Filter to expo-type events only
   const expoEvents = allEvents?.filter(e => 
     e.event_type === 'college_expo' || e.event_type === 'expo' || e.category?.includes('expo')
   ) || [];
@@ -33,10 +32,11 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
   const overrideEvent = overrideEventId ? expoEvents.find(e => e.id === overrideEventId) : null;
   const eventId = overrideEvent?.id || activeEvent?.id || null;
 
-  // Normalize event name for display
-  const eventDisplayName = overrideEvent?.title || (activeEvent as any)?.name || activeEvent?.id || null;
-  const eventStartAt = overrideEvent?.start_at || activeEvent?.start_at || null;
-  const eventEndAt = overrideEvent?.end_at || activeEvent?.end_at || null;
+  // Normalized display values
+  const displayName = overrideEvent?.title || (activeEvent as any)?.name || "Expo";
+  const startAt = overrideEvent?.start_at || activeEvent?.start_at || null;
+  const endAt = overrideEvent?.end_at || activeEvent?.end_at || null;
+  const isEventPast = endAt ? new Date(endAt) < new Date() : false;
 
   const { data: booths, isLoading } = useBooths(eventId, {
     search: searchTerm,
@@ -50,7 +50,6 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
       toast.error("No event selected");
       return;
     }
-
     if (isFavorite(boothId)) {
       await removeFavorite.mutateAsync({ boothId, eventId });
     } else {
@@ -64,8 +63,6 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
     }
     return true;
   }) || [];
-
-  const isEventPast = selectedEvent?.end_at ? new Date(selectedEvent.end_at) < new Date() : false;
 
   if (isLoading) {
     return (
@@ -81,7 +78,7 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        {/* Event header with selector */}
+        {/* Event header with expo selector */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
           {expoEvents.length > 1 ? (
             <Select
@@ -98,41 +95,34 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
                     <SelectItem key={event.id} value={event.id}>
                       <div className="flex items-center gap-2">
                         <span>{event.title}</span>
-                        {isPast && (
-                          <Badge variant="outline" className="text-xs">Past</Badge>
-                        )}
+                        {isPast && <Badge variant="outline" className="text-xs">Past</Badge>}
                       </div>
                     </SelectItem>
                   );
                 })}
               </SelectContent>
             </Select>
-          ) : selectedEvent ? (
-            <h2 className="text-2xl font-bold">{selectedEvent.title}</h2>
           ) : (
-            <h2 className="text-2xl font-bold">Exhibitors & Vendors</h2>
+            <h2 className="text-2xl font-bold">{displayName}</h2>
           )}
 
-          {selectedEvent && (
-            <div className="flex items-center gap-2 flex-wrap">
-              {isEventPast ? (
-                <Badge variant="outline" className="text-muted-foreground">Past Event</Badge>
-              ) : (
-                <Badge className="bg-primary text-primary-foreground">Upcoming</Badge>
-              )}
-              {selectedEvent.start_at && (
-                <span className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {format(new Date(selectedEvent.start_at), "MMM d, yyyy")}
-                </span>
-              )}
-            </div>
-          )}
+          <div className="flex items-center gap-2 flex-wrap">
+            {isEventPast ? (
+              <Badge variant="outline" className="text-muted-foreground">Past Event</Badge>
+            ) : (
+              <Badge className="bg-primary text-primary-foreground">Upcoming</Badge>
+            )}
+            {startAt && (
+              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5" />
+                {format(new Date(startAt), "MMM d, yyyy")}
+              </span>
+            )}
+          </div>
         </div>
 
         <p className="text-muted-foreground">
-          Explore {filteredBooths.length} colleges, universities, and organizations attending
-          {selectedEvent ? ` ${selectedEvent.title}` : " the expo"}
+          Explore {filteredBooths.length} colleges, universities, and organizations attending {displayName}
         </p>
       </div>
 
