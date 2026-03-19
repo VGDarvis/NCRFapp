@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,16 @@ import { FloorPlanViewer } from "./floor-plan/FloorPlanViewer";
 import { BoothList } from "./floor-plan/BoothList";
 import { BoothDetailDrawer } from "./floor-plan/BoothDetailDrawer";
 import { MyFavoritesPanel } from "./floor-plan/MyFavoritesPanel";
+import { toast } from "sonner";
 
 interface FloorPlanTabProps {
   eventId: string;
   venueId: string | null;
+  initialBoothId?: string | null;
+  onBoothNavigated?: () => void;
 }
 
-export const FloorPlanTab = ({ eventId, venueId }: FloorPlanTabProps) => {
+export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigated }: FloorPlanTabProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBoothId, setSelectedBoothId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
