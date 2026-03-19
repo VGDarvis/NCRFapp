@@ -30,10 +30,13 @@ export const VendorsTabV2 = ({ onSwitchToFloorPlan }: VendorsTabV2Props) => {
     e.event_type === 'college_expo' || e.event_type === 'expo' || e.category?.includes('expo')
   ) || [];
 
-  const selectedEvent = overrideEventId 
-    ? expoEvents.find(e => e.id === overrideEventId) || activeEvent
-    : activeEvent;
-  const eventId = selectedEvent?.id || null;
+  const overrideEvent = overrideEventId ? expoEvents.find(e => e.id === overrideEventId) : null;
+  const eventId = overrideEvent?.id || activeEvent?.id || null;
+
+  // Normalize event name for display
+  const eventDisplayName = overrideEvent?.title || (activeEvent as any)?.name || activeEvent?.id || null;
+  const eventStartAt = overrideEvent?.start_at || activeEvent?.start_at || null;
+  const eventEndAt = overrideEvent?.end_at || activeEvent?.end_at || null;
 
   const { data: booths, isLoading } = useBooths(eventId, {
     search: searchTerm,
