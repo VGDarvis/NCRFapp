@@ -5,7 +5,12 @@ import { FloorPlanTab } from "./FloorPlanTab";
 import { EventSwitcher } from "./map/EventSwitcher";
 import { useEvents } from "@/hooks/useEvents";
 
-export const FloorPlanTabWrapper = () => {
+interface FloorPlanTabWrapperProps {
+  initialBoothId?: string | null;
+  onBoothNavigated?: () => void;
+}
+
+export const FloorPlanTabWrapper = ({ initialBoothId, onBoothNavigated }: FloorPlanTabWrapperProps) => {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const { eventsWithVenues, isLoadingEventsWithVenues } = useEvents();
 
