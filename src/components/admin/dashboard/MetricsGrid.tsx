@@ -16,21 +16,20 @@ function usePlatformStats() {
   return useQuery({
     queryKey: ["platform-stats"],
     queryFn: async (): Promise<PlatformStats> => {
-      const [
-        { count: totalExpos },
-        { data: boothsData },
-        { count: totalBooths },
-        { count: seminarSessions },
-        { count: guestInteractions },
-        { count: scholarshipBooklets },
-      ] = await Promise.all([
-        supabase.from("events").select("*", { count: "exact", head: true }),
+      const [eventsRes, boothsRes, boothCountRes, seminarsRes, guestsRes, bookletsRes] = await Promise.all([
+        supabase.from("events").select("id", { count: "exact", head: true }),
         supabase.from("booths").select("org_name"),
-        supabase.from("booths").select("*", { count: "exact", head: true }),
-        supabase.from("seminar_sessions").select("*", { count: "exact", head: true }),
-        supabase.from("guest_sessions").select("*", { count: "exact", head: true }),
-        supabase.from("scholarship_booklets").select("*", { count: "exact", head: true }).eq("is_published", true),
+        supabase.from("booths").select("id", { count: "exact", head: true }),
+        supabase.from("seminar_sessions").select("id", { count: "exact", head: true }),
+        supabase.from("guest_sessions").select("id", { count: "exact", head: true }),
+        supabase.from("scholarship_booklets").select("id", { count: "exact", head: true }).eq("is_published", true),
       ]);
+
+      const totalExpos = eventsRes.count || 0;
+      const totalBooths = boothCountRes.count || 0;
+      const seminarSessions = seminarsRes.count || 0;
+      const guestInteractions = guestsRes.count || 0;
+      const scholarshipBooklets = bookletsRes.count || 0;
 
       const uniqueColleges = new Set(boothsData?.map((b) => b.org_name) || []);
 
