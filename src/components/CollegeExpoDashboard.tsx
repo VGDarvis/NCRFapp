@@ -10,6 +10,7 @@ import { ExploreTab } from './dashboard/college-expo/ExploreTab';
 import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
 import { VendorsTabV2 } from './dashboard/college-expo/VendorsTabV2';
 import { DonorsTab } from './dashboard/college-expo/DonorsTab';
+import { toast } from 'sonner';
 import { DashboardHeader } from './DashboardHeader';
 import logoGreenClean from '@/assets/logo-green-clean.png';
 
@@ -20,6 +21,7 @@ interface CollegeExpoDashboardProps {
 export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardProps) => {
   const [activeTab, setActiveTab] = useState('home');
   const [user, setUser] = useState<User | null>(null);
+  const [selectedBoothId, setSelectedBoothId] = useState<string | null>(null);
   
   // Enable real-time updates for all event data across all tabs
   const { activeEvent } = useActiveEvent();
@@ -89,7 +91,16 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       
       {/* Main Content */}
       <div className="flex-1 pb-20">
-        <ActiveComponent user={user} isGuest={isGuest} />
+        {activeTab === 'vendors' ? (
+          <VendorsTabV2 onSwitchToFloorPlan={(boothId) => {
+            setSelectedBoothId(boothId);
+            setActiveTab('maps');
+          }} />
+        ) : activeTab === 'maps' ? (
+          <ExploreTab initialBoothId={selectedBoothId} onBoothNavigated={() => setSelectedBoothId(null)} />
+        ) : (
+          <ActiveComponent user={user} isGuest={isGuest} />
+        )}
       </div>
       
       {/* Bottom Navigation */}

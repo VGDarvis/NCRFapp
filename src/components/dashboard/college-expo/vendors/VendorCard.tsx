@@ -121,7 +121,7 @@ export const VendorCard = ({
             className="flex-1"
           >
             <Map className="w-4 h-4 mr-2" />
-            View on Map
+            {booth.table_no ? `Booth #${booth.table_no} on Map` : 'View on Map'}
           </Button>
           {booth.website_url && (
             <Button

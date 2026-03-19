@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,16 @@ import { FloorPlanViewer } from "./floor-plan/FloorPlanViewer";
 import { BoothList } from "./floor-plan/BoothList";
 import { BoothDetailDrawer } from "./floor-plan/BoothDetailDrawer";
 import { MyFavoritesPanel } from "./floor-plan/MyFavoritesPanel";
+import { toast } from "sonner";
 
 interface FloorPlanTabProps {
   eventId: string;
   venueId: string | null;
+  initialBoothId?: string | null;
+  onBoothNavigated?: () => void;
 }
 
-export const FloorPlanTab = ({ eventId, venueId }: FloorPlanTabProps) => {
+export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigated }: FloorPlanTabProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBoothId, setSelectedBoothId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
@@ -41,6 +44,27 @@ export const FloorPlanTab = ({ eventId, venueId }: FloorPlanTabProps) => {
     
     return matchesSearch && matchesFavorites;
   }) || [];
+
+  // Auto-select booth when navigating from vendor card
+  useEffect(() => {
+    if (initialBoothId && booths && booths.length > 0) {
+      const booth = booths.find(b => b.id === initialBoothId);
+      if (booth) {
+        setSelectedBoothId(initialBoothId);
+        setViewMode("map");
+        const boothLabel = booth.table_no ? `Booth #${booth.table_no}` : booth.org_name;
+        toast.success(`Showing ${boothLabel} — ${booth.org_name}`, {
+          description: "Tap the booth on the map to see details",
+          duration: 4000,
+        });
+      } else {
+        toast.info(`Navigated to map — "${booths.find(b => b.id === initialBoothId)?.org_name || 'Booth'}" is not yet placed on the floor plan`, {
+          duration: 4000,
+        });
+      }
+      onBoothNavigated?.();
+    }
+  }, [initialBoothId, booths]);
 
   const selectedBooth = booths?.find(b => b.id === selectedBoothId);
 
@@ -94,7 +118,10 @@ export const FloorPlanTab = ({ eventId, venueId }: FloorPlanTabProps) => {
                   floorPlan={selectedFloorPlan}
                   booths={filteredBooths}
                   onBoothClick={setSelectedBoothId}
-                  highlightedBoothIds={favorites?.map(f => f.booth_id) || []}
+                  highlightedBoothIds={[
+                    ...(favorites?.map(f => f.booth_id) || []),
+                    ...(selectedBoothId ? [selectedBoothId] : []),
+                  ]}
                 />
               ) : (
                 <Card className="p-12 text-center">
