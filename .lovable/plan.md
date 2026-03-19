@@ -1,47 +1,36 @@
-# Wire Up "View on Map" Button to Navigate to Floor Plan
 
-## Problem
 
-The "View on Map" button on vendor cards calls `onSwitchToFloorPlan?.(boothId)`, but this prop is **never passed** to `VendorsTabV2`. The button currently does nothing when clicked.
+# Add Booth Directory Below Map + Expo-Specific Filtering for Colleges Tab
 
-## Solution
+## Two Changes
 
-Wire up tab switching in `CollegeExpoDashboard` so clicking "View on Map" switches to the floor plan tab with the specific booth pre-selected and highlighted. The floor plan viewer will auto-scroll/zoom to that booth.
+### 1. Add scrollable booth directory below the map in FloorPlanTab
 
-## Changes
+**What**: Below the interactive map on the Maps tab, render the full `BoothList` component so students can scroll down to browse all booths by number/name. Clicking a booth in the list scrolls back up and highlights it on the map, plus opens the `BoothDetailDrawer`.
 
-### 1. `CollegeExpoDashboard.tsx` — Add state for selected booth + pass props
+**File**: `src/components/dashboard/college-expo/FloorPlanTab.tsx`
+- After the map view `TabsContent`, always render a section titled "All Booths" with a count badge
+- Reuse the existing `BoothList` component (already built and imported)
+- Wire `onBoothClick` to set `selectedBoothId` and scroll to the map
+- Remove the sidebar favorites panel on mobile to keep it clean — the full list replaces it
+- Add a divider and heading like "📋 All Booths (42)" between map and list
 
-- Add `selectedBoothId` state
-- When rendering `VendorsTabV2`, pass `onSwitchToFloorPlan` that sets the booth ID and switches `activeTab` to the floor plan tab (currently under "explore" or needs a dedicated tab)
-- Pass `selectedBoothId` to the floor plan component so it auto-selects on mount
+### 2. Show active event name + add expo selector on VendorsTabV2 (Colleges tab)
 
-### 2. Use existing (Explore tab)
+**What**: The Colleges tab currently pulls booths from `useActiveEvent` silently — users have no idea which expo they're viewing. Add the event name as a visible header and, when multiple events exist, a dropdown to switch between them.
 
-- Currently there's no dedicated floor plan tab in the guest dashboard's bottom nav. The floor plan lives inside `ExploreTab` or `FloorPlanTabWrapper`. We'll check if the Explore tab already contains the floor plan, and if so, switch to it with the booth pre-selected.
-- If needed, add a direct floor plan tab to the bottom nav for quicker access.
+**Files**:
+- `src/components/dashboard/college-expo/VendorsTabV2.tsx`
+  - Query all events (not just active) so we can populate a selector
+  - Add an event name badge/header: "Houston College Expo 2025"
+  - Add a `Select` dropdown when there are multiple events, letting users switch which expo's booths they see
+  - When user picks a different event, update the `eventId` used for booth queries
+  - Show event date and status badge (past/upcoming) next to event name
 
-### 3. `FloorPlanTab.tsx` — Accept and use `initialBoothId` prop
+## Technical Details
 
-- Accept an optional `initialBoothId` prop
-- On mount, if set, auto-select that booth (opens the `BoothDetailDrawer`) and scroll the floor plan to center on it
-- Show a brief toast like "Showing Booth #42 — Howard University" so the user knows exactly where to look
+- `BoothList` component already exists at `src/components/dashboard/college-expo/floor-plan/BoothList.tsx` — no new component needed
+- For the expo selector, query `events` table ordered by `event_date desc` using a simple Supabase select
+- Use `useActiveEvent` as default selection, allow override via local state
+- ~80 lines of changes across 2 files
 
-### 4. `VendorCard.tsx` — Small UX polish
-
-- Show the booth number on the button: "View Booth #42 on Map" instead of generic "View on Map"
-- Makes it clearer what will happen
-
-## Technical Detail
-
-- The tab switching mechanism already exists via `setActiveTab` in `CollegeExpoDashboard`
-- `FloorPlanViewer` already accepts `onBoothClick` and `highlightedBoothIds` — we just need to feed the selected booth into these
-- No database changes needed
-
-## Scope
-
-~4 files, ~40 lines changed
-
-GOAL:
-
-allow users to quicly find their booths and location on the map when the admin assign them. If the booth isnt on the map, then it will just take them to the respective map and they can visually see
