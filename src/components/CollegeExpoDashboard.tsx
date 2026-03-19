@@ -20,6 +20,7 @@ interface CollegeExpoDashboardProps {
 export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardProps) => {
   const [activeTab, setActiveTab] = useState('home');
   const [user, setUser] = useState<User | null>(null);
+  const [selectedBoothId, setSelectedBoothId] = useState<string | null>(null);
   
   // Enable real-time updates for all event data across all tabs
   const { activeEvent } = useActiveEvent();
