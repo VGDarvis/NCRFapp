@@ -78,8 +78,8 @@ export const WelcomeTab = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
           <div className="space-y-6">
             <div>
-              <Badge className="mb-3 bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                Next Event
+              <Badge className={`mb-3 ${event.status === 'completed' ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}`}>
+                {event.status === 'completed' ? 'Past Event — For Reference' : event.status === 'in_progress' ? 'Happening Now' : 'Next Event'}
               </Badge>
               <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
                 {event.title}
