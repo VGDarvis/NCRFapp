@@ -118,7 +118,10 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
                   floorPlan={selectedFloorPlan}
                   booths={filteredBooths}
                   onBoothClick={setSelectedBoothId}
-                  highlightedBoothIds={favorites?.map(f => f.booth_id) || []}
+                  highlightedBoothIds={[
+                    ...(favorites?.map(f => f.booth_id) || []),
+                    ...(selectedBoothId ? [selectedBoothId] : []),
+                  ]}
                 />
               ) : (
                 <Card className="p-12 text-center">
