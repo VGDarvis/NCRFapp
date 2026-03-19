@@ -21,7 +21,7 @@ function usePlatformStats() {
       const boothCountRes = await supabase.from("booths").select("id", { count: "exact", head: true });
       const seminarsRes = await supabase.from("seminar_sessions").select("id", { count: "exact", head: true }) as { count: number | null };
       const guestsRes = await supabase.from("guest_sessions").select("id", { count: "exact", head: true }) as { count: number | null };
-      const bookletsRes = await supabase.from("scholarship_booklets").select("id").eq("is_published", true);
+      const bookletsRes = await supabase.from("scholarship_booklets").select("id").eq("is_published", true) as { data: { id: string }[] | null };
 
       const totalExpos = eventsRes.count || 0;
       const totalBooths = boothCountRes.count || 0;
