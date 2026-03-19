@@ -90,7 +90,16 @@ export const CollegeExpoDashboard = ({ isGuest = false }: CollegeExpoDashboardPr
       
       {/* Main Content */}
       <div className="flex-1 pb-20">
-        <ActiveComponent user={user} isGuest={isGuest} />
+        {activeTab === 'vendors' ? (
+          <VendorsTabV2 onSwitchToFloorPlan={(boothId) => {
+            setSelectedBoothId(boothId);
+            setActiveTab('maps');
+          }} />
+        ) : activeTab === 'maps' ? (
+          <ExploreTab initialBoothId={selectedBoothId} onBoothNavigated={() => setSelectedBoothId(null)} />
+        ) : (
+          <ActiveComponent user={user} isGuest={isGuest} />
+        )}
       </div>
       
       {/* Bottom Navigation */}
