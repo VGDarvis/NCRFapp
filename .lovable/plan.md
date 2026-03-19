@@ -1,37 +1,47 @@
-
-
-# Allow Guests to View Past Event Data
+# Wire Up "View on Map" Button to Navigate to Floor Plan
 
 ## Problem
-Once an event's status changes from "upcoming" to "completed", the entire guest dashboard goes blank. All tabs depend on `useActiveEvent` which only returns future upcoming events.
+
+The "View on Map" button on vendor cards calls `onSwitchToFloorPlan?.(boothId)`, but this prop is **never passed** to `VendorsTabV2`. The button currently does nothing when clicked.
 
 ## Solution
-Update the event resolution logic to use a **fallback chain**: show the current/upcoming event if one exists, otherwise show the most recently completed event. This way guests always see relevant content.
+
+Wire up tab switching in `CollegeExpoDashboard` so clicking "View on Map" switches to the floor plan tab with the specific booth pre-selected and highlighted. The floor plan viewer will auto-scroll/zoom to that booth.
 
 ## Changes
 
-### 1. Update `useActiveEvent.ts` — Add fallback to most recent event
-Modify the query logic:
-- First, try to find an `in_progress` event (currently happening)
-- Then, try `upcoming` events (next scheduled)
-- Finally, fall back to the most recent `completed` event
+### 1. `CollegeExpoDashboard.tsx` — Add state for selected booth + pass props
 
-This single change cascades to all tabs since they all use `useActiveEvent` for the event ID.
+- Add `selectedBoothId` state
+- When rendering `VendorsTabV2`, pass `onSwitchToFloorPlan` that sets the booth ID and switches `activeTab` to the floor plan tab (currently under "explore" or needs a dedicated tab)
+- Pass `selectedBoothId` to the floor plan component so it auto-selects on mount
 
-### 2. Update `WelcomeTab.tsx` — Same fallback for featured event
-The WelcomeTab has its own direct query filtering by `status: "upcoming"`. Apply the same fallback logic so the welcome hero card shows the most recent event when no upcoming one exists.
+### 2. Use existing (Explore tab)
 
-### 3. Update `SeminarsTabWrapper.tsx` — Same fallback
-This component also independently queries for `status: "upcoming"`. Apply the same pattern.
+- Currently there's no dedicated floor plan tab in the guest dashboard's bottom nav. The floor plan lives inside `ExploreTab` or `FloorPlanTabWrapper`. We'll check if the Explore tab already contains the floor plan, and if so, switch to it with the booth pre-selected.
+- If needed, add a direct floor plan tab to the bottom nav for quicker access.
 
-### 4. Add a "Past Event" indicator badge
-When displaying a completed event, show a subtle badge (e.g., "Past Event — For Reference") so users understand they're viewing historical data, not a live event. This appears on the WelcomeTab hero and potentially the header.
+### 3. `FloorPlanTab.tsx` — Accept and use `initialBoothId` prop
 
-## What stays the same
+- Accept an optional `initialBoothId` prop
+- On mount, if set, auto-select that booth (opens the `BoothDetailDrawer`) and scroll the floor plan to center on it
+- Show a brief toast like "Showing Booth #42 — Howard University" so the user knows exactly where to look
+
+### 4. `VendorCard.tsx` — Small UX polish
+
+- Show the booth number on the button: "View Booth #42 on Map" instead of generic "View on Map"
+- Makes it clearer what will happen
+
+## Technical Detail
+
+- The tab switching mechanism already exists via `setActiveTab` in `CollegeExpoDashboard`
+- `FloorPlanViewer` already accepts `onBoothClick` and `highlightedBoothIds` — we just need to feed the selected booth into these
 - No database changes needed
-- No new tables or migrations
-- All existing tabs (Vendors, Schedule, Floor Plan, Donors) automatically work since they consume `eventId` from `useActiveEvent`
 
-## Estimated scope
-4 files modified, ~60 lines changed total.
+## Scope
 
+~4 files, ~40 lines changed
+
+GOAL:
+
+allow users to quicly find their booths and location on the map when the admin assign them. If the booth isnt on the map, then it will just take them to the respective map and they can visually see
