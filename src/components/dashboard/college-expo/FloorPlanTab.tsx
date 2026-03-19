@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Star, MapPin, Grid3x3, List, Filter } from "lucide-react";
+import { Search, Star, MapPin, Grid3x3, List, LayoutList } from "lucide-react";
 import { useFloorPlans } from "@/hooks/useFloorPlans";
 import { useBooths } from "@/hooks/useBooths";
 import { useBoothFavorites } from "@/hooks/useBoothFavorites";
@@ -23,6 +23,7 @@ interface FloorPlanTabProps {
 }
 
 export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigated }: FloorPlanTabProps) => {
+  const mapRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBoothId, setSelectedBoothId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
@@ -33,7 +34,7 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
   const { favorites, isFavorite, addFavorite, removeFavorite, isGuest } = useBoothFavorites(eventId);
   const { hasVisitedBooth, createCheckIn } = useBoothCheckIns(eventId);
 
-  const selectedFloorPlan = floorPlans?.[0]; // Default to first floor
+  const selectedFloorPlan = floorPlans?.[0];
 
   const filteredBooths = booths?.filter(booth => {
     const matchesSearch = !searchQuery || 
@@ -67,6 +68,20 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
   }, [initialBoothId, booths]);
 
   const selectedBooth = booths?.find(b => b.id === selectedBoothId);
+
+  const handleBoothClickFromList = (boothId: string) => {
+    setSelectedBoothId(boothId);
+    setViewMode("map");
+    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleToggleFavorite = (boothId: string) => {
+    if (isFavorite(boothId)) {
+      removeFavorite.mutate({ boothId, eventId });
+    } else {
+      addFavorite.mutate({ boothId, eventId });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -112,45 +127,41 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
-            <TabsContent value="map" className="mt-0">
-              {selectedFloorPlan ? (
-                <FloorPlanViewer
-                  floorPlan={selectedFloorPlan}
+            <div ref={mapRef}>
+              <TabsContent value="map" className="mt-0">
+                {selectedFloorPlan ? (
+                  <FloorPlanViewer
+                    floorPlan={selectedFloorPlan}
+                    booths={filteredBooths}
+                    onBoothClick={setSelectedBoothId}
+                    highlightedBoothIds={[
+                      ...(favorites?.map(f => f.booth_id) || []),
+                      ...(selectedBoothId ? [selectedBoothId] : []),
+                    ]}
+                  />
+                ) : (
+                  <Card className="p-12 text-center">
+                    <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold mb-2">No Floor Plan Available</h3>
+                    <p className="text-muted-foreground">
+                      Floor plan data is not yet available for this event.
+                    </p>
+                  </Card>
+                )}
+              </TabsContent>
+
+              <TabsContent value="list" className="mt-0">
+                <BoothList
                   booths={filteredBooths}
                   onBoothClick={setSelectedBoothId}
-                  highlightedBoothIds={[
-                    ...(favorites?.map(f => f.booth_id) || []),
-                    ...(selectedBoothId ? [selectedBoothId] : []),
-                  ]}
+                  favorites={favorites || []}
+                  onToggleFavorite={handleToggleFavorite}
                 />
-              ) : (
-                <Card className="p-12 text-center">
-                  <MapPin className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">No Floor Plan Available</h3>
-                  <p className="text-muted-foreground">
-                    Floor plan data is not yet available for this event.
-                  </p>
-                </Card>
-              )}
-            </TabsContent>
-
-            <TabsContent value="list" className="mt-0">
-              <BoothList
-                booths={filteredBooths}
-                onBoothClick={setSelectedBoothId}
-                favorites={favorites || []}
-                onToggleFavorite={(boothId) => {
-                  if (isFavorite(boothId)) {
-                    removeFavorite.mutate({ boothId, eventId });
-                  } else {
-                    addFavorite.mutate({ boothId, eventId });
-                  }
-                }}
-              />
-            </TabsContent>
+              </TabsContent>
+            </div>
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="hidden lg:block lg:col-span-1">
             <MyFavoritesPanel
               eventId={eventId}
               favorites={favorites || []}
@@ -161,6 +172,24 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
             />
           </div>
         </div>
+
+        {/* Booth directory below the map */}
+        <div className="mt-8 border-t border-border pt-6">
+          <div className="flex items-center gap-3 mb-4">
+            <LayoutList className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-bold">All Booths</h2>
+            <Badge variant="secondary">{filteredBooths.length}</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Scroll through all exhibitors. Tap any booth to highlight it on the map above.
+          </p>
+          <BoothList
+            booths={filteredBooths}
+            onBoothClick={handleBoothClickFromList}
+            favorites={favorites || []}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        </div>
       </Tabs>
 
       {selectedBooth && (
@@ -170,13 +199,7 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
           onClose={() => setSelectedBoothId(null)}
           isFavorite={isFavorite(selectedBooth.id)}
           hasVisited={hasVisitedBooth(selectedBooth.id)}
-          onToggleFavorite={() => {
-            if (isFavorite(selectedBooth.id)) {
-              removeFavorite.mutate({ boothId: selectedBooth.id, eventId });
-            } else {
-              addFavorite.mutate({ boothId: selectedBooth.id, eventId });
-            }
-          }}
+          onToggleFavorite={() => handleToggleFavorite(selectedBooth.id)}
           onCheckIn={() => createCheckIn.mutate({ boothId: selectedBooth.id, eventId })}
         />
       )}
