@@ -45,6 +45,27 @@ export const FloorPlanTab = ({ eventId, venueId, initialBoothId, onBoothNavigate
     return matchesSearch && matchesFavorites;
   }) || [];
 
+  // Auto-select booth when navigating from vendor card
+  useEffect(() => {
+    if (initialBoothId && booths && booths.length > 0) {
+      const booth = booths.find(b => b.id === initialBoothId);
+      if (booth) {
+        setSelectedBoothId(initialBoothId);
+        setViewMode("map");
+        const boothLabel = booth.table_no ? `Booth #${booth.table_no}` : booth.org_name;
+        toast.success(`Showing ${boothLabel} — ${booth.org_name}`, {
+          description: "Tap the booth on the map to see details",
+          duration: 4000,
+        });
+      } else {
+        toast.info(`Navigated to map — "${booths.find(b => b.id === initialBoothId)?.org_name || 'Booth'}" is not yet placed on the floor plan`, {
+          duration: 4000,
+        });
+      }
+      onBoothNavigated?.();
+    }
+  }, [initialBoothId, booths]);
+
   const selectedBooth = booths?.find(b => b.id === selectedBoothId);
 
   return (

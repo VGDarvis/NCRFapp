@@ -10,6 +10,7 @@ import { ExploreTab } from './dashboard/college-expo/ExploreTab';
 import { ScheduleTab } from './dashboard/college-expo/ScheduleTab';
 import { VendorsTabV2 } from './dashboard/college-expo/VendorsTabV2';
 import { DonorsTab } from './dashboard/college-expo/DonorsTab';
+import { toast } from 'sonner';
 import { DashboardHeader } from './DashboardHeader';
 import logoGreenClean from '@/assets/logo-green-clean.png';
 

@@ -1,7 +1,12 @@
 import { FloorPlanTabWrapper } from "./FloorPlanTabWrapper";
 import { Grid3x3 } from "lucide-react";
 
-export const ExploreTab = () => {
+interface ExploreTabProps {
+  initialBoothId?: string | null;
+  onBoothNavigated?: () => void;
+}
+
+export const ExploreTab = ({ initialBoothId, onBoothNavigated }: ExploreTabProps) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-6">
@@ -14,7 +19,7 @@ export const ExploreTab = () => {
         </p>
       </div>
       
-      <FloorPlanTabWrapper />
+      <FloorPlanTabWrapper initialBoothId={initialBoothId} onBoothNavigated={onBoothNavigated} />
     </div>
   );
 };

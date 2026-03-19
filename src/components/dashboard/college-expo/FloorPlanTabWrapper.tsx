@@ -86,7 +86,7 @@ export const FloorPlanTabWrapper = ({ initialBoothId, onBoothNavigated }: FloorP
         />
       </Card>
 
-      <FloorPlanTab eventId={selectedEventId} venueId={venueId} />
+      <FloorPlanTab eventId={selectedEventId} venueId={venueId} initialBoothId={initialBoothId} onBoothNavigated={onBoothNavigated} />
     </div>
   );
 };
