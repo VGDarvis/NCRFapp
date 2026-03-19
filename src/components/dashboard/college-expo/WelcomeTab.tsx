@@ -22,20 +22,24 @@ export const WelcomeTab = () => {
 
   const fetchFeaturedEvent = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select(`
-          *,
-          venue:venues(*),
-          event_tags(tag:tags(*))
-        `)
-        .eq('status', 'upcoming')
-        .order('start_at', { ascending: true })
-        .limit(1)
-        .single();
+      const selectFields = `*, venue:venues(*), event_tags(tag:tags(*))`;
+      const now = new Date().toISOString();
 
-      if (error) throw error;
-      setEvent(data);
+      // Fallback chain: in_progress → upcoming → most recent completed
+      const tryFetch = async (status: string, ascending: boolean, timeFilter?: { col: string; op: 'gte' | 'lte'; val: string }) => {
+        let q = supabase.from('events').select(selectFields).eq('status', status).order('start_at', { ascending }).limit(1);
+        if (timeFilter) q = q[timeFilter.op](timeFilter.col, timeFilter.val);
+        const { data, error } = await q.maybeSingle();
+        if (error) throw error;
+        return data;
+      };
+
+      const result =
+        (await tryFetch('in_progress', true)) ||
+        (await tryFetch('upcoming', true, { col: 'start_at', op: 'gte', val: now })) ||
+        (await tryFetch('completed', false));
+
+      setEvent(result);
     } catch (error) {
       console.error('Error fetching event:', error);
     } finally {

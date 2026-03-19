@@ -11,18 +11,22 @@ export const SeminarsTabWrapper = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const { data, error } = await supabase
-          .from("events")
-          .select("id")
-          .eq("status", "upcoming")
-          .order("start_at", { ascending: true })
-          .limit(1)
-          .maybeSingle();
+        const now = new Date().toISOString();
+        const tryFetch = async (status: string, ascending: boolean, timeFilter?: { col: string; op: 'gte' | 'lte'; val: string }) => {
+          let q = supabase.from("events").select("id, status").eq("status", status).order("start_at", { ascending }).limit(1);
+          if (timeFilter) q = q[timeFilter.op](timeFilter.col, timeFilter.val);
+          const { data, error } = await q.maybeSingle();
+          if (error) throw error;
+          return data;
+        };
 
-        if (error) throw error;
-        
-        if (data) {
-          setEventId(data.id);
+        const result =
+          (await tryFetch("in_progress", true)) ||
+          (await tryFetch("upcoming", true, { col: "start_at", op: "gte", val: now })) ||
+          (await tryFetch("completed", false));
+
+        if (result) {
+          setEventId(result.id);
         }
       } catch (error) {
         console.error("Error fetching event:", error);
