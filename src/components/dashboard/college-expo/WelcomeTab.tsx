@@ -22,20 +22,24 @@ export const WelcomeTab = () => {
 
   const fetchFeaturedEvent = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select(`
-          *,
-          venue:venues(*),
-          event_tags(tag:tags(*))
-        `)
-        .eq('status', 'upcoming')
-        .order('start_at', { ascending: true })
-        .limit(1)
-        .single();
+      const selectFields = `*, venue:venues(*), event_tags(tag:tags(*))`;
+      const now = new Date().toISOString();
 
-      if (error) throw error;
-      setEvent(data);
+      // Fallback chain: in_progress → upcoming → most recent completed
+      const tryFetch = async (status: string, ascending: boolean, timeFilter?: { col: string; op: 'gte' | 'lte'; val: string }) => {
+        let q = supabase.from('events').select(selectFields).eq('status', status).order('start_at', { ascending }).limit(1);
+        if (timeFilter) q = q[timeFilter.op](timeFilter.col, timeFilter.val);
+        const { data, error } = await q.maybeSingle();
+        if (error) throw error;
+        return data;
+      };
+
+      const result =
+        (await tryFetch('in_progress', true)) ||
+        (await tryFetch('upcoming', true, { col: 'start_at', op: 'gte', val: now })) ||
+        (await tryFetch('completed', false));
+
+      setEvent(result);
     } catch (error) {
       console.error('Error fetching event:', error);
     } finally {
@@ -74,8 +78,8 @@ export const WelcomeTab = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
           <div className="space-y-6">
             <div>
-              <Badge className="mb-3 bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                Next Event
+              <Badge className={`mb-3 ${event.status === 'completed' ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}`}>
+                {event.status === 'completed' ? 'Past Event — For Reference' : event.status === 'in_progress' ? 'Happening Now' : 'Next Event'}
               </Badge>
               <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
                 {event.title}

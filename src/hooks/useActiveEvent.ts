@@ -25,22 +25,28 @@ export function useActiveEvent() {
   const { data: activeEvent, isLoading } = useQuery({
     queryKey: ["active-event"],
     queryFn: async () => {
-      // Get the next upcoming event (future events only)
-      const now = new Date().toISOString();
-      
-      const { data: event, error: eventError } = await supabase
-        .from("events")
-        .select(`
-          *,
-          venue:venues(name, city, state)
-        `)
-        .eq("status", "upcoming")
-        .gte("start_at", now) // Only future events
-        .order("start_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
+      // Fallback chain: in_progress → upcoming → most recent completed
+      const tryFetch = async (status: string, ascending: boolean, timeFilter?: { col: string; op: 'gte' | 'lte'; val: string }) => {
+        let q = supabase
+          .from("events")
+          .select(`*, venue:venues(name, city, state)`)
+          .eq("status", status)
+          .order("start_at", { ascending })
+          .limit(1);
+        if (timeFilter) {
+          q = q[timeFilter.op](timeFilter.col, timeFilter.val);
+        }
+        const { data, error } = await q.maybeSingle();
+        if (error) throw error;
+        return data;
+      };
 
-      if (eventError) throw eventError;
+      const now = new Date().toISOString();
+      const event =
+        (await tryFetch("in_progress", true)) ||
+        (await tryFetch("upcoming", true, { col: "start_at", op: "gte", val: now })) ||
+        (await tryFetch("completed", false));
+
       if (!event) return null;
 
       // Get booth count
