@@ -36,6 +36,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/guest/:program" element={<Dashboard />} />
             <Route path="/college-expo" element={<JoinCollegeExpo />} />
+            <Route path="/bce-programs" element={<BCEPrograms />} />
+            <Route path="/bce-programs/:marketSlug" element={<BCEMarketPage />} />
             <Route path="/signout" element={<SignOut />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
