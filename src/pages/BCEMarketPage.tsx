@@ -127,10 +127,10 @@ const BCEMarketPage = () => {
             </TabsList>
 
             <TabsContent value="vendors">
-              <VendorsTabV2 user={null} isGuest eventId={eventId!} />
+              <VendorsTabV2 />
             </TabsContent>
             <TabsContent value="floorplan">
-              <FloorPlanTabWrapper user={null} isGuest eventId={eventId!} />
+              <FloorPlanTabWrapper />
             </TabsContent>
             <TabsContent value="scholarships">
               <ScholarshipsTab user={null} isGuest />
