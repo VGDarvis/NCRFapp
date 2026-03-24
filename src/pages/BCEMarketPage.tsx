@@ -12,6 +12,7 @@ import { VendorsTabV2 } from '@/components/dashboard/college-expo/VendorsTabV2';
 import { FloorPlanTabWrapper } from '@/components/dashboard/college-expo/FloorPlanTabWrapper';
 import { ScholarshipsTab } from '@/components/dashboard/college-expo/ScholarshipsTab';
 import { Skeleton } from '@/components/ui/skeleton';
+import logoGreenClean from '@/assets/logo-green-clean.png';
 
 const BCEMarketPage = () => {
   const { marketSlug } = useParams<{ marketSlug: string }>();
