@@ -18,6 +18,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import SchoolFinder from "./pages/SchoolFinder";
 import ComingSoon from "./pages/ComingSoon";
+import BCEPrograms from "./pages/BCEPrograms";
+import BCEMarketPage from "./pages/BCEMarketPage";
 
 const queryClient = new QueryClient();
 
