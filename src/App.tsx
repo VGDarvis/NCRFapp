@@ -18,6 +18,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import SchoolFinder from "./pages/SchoolFinder";
 import ComingSoon from "./pages/ComingSoon";
+import BCEPrograms from "./pages/BCEPrograms";
+import BCEMarketPage from "./pages/BCEMarketPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/guest/:program" element={<Dashboard />} />
             <Route path="/college-expo" element={<JoinCollegeExpo />} />
+            <Route path="/bce-programs" element={<BCEPrograms />} />
+            <Route path="/bce-programs/:marketSlug" element={<BCEMarketPage />} />
             <Route path="/signout" element={<SignOut />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />

@@ -3,6 +3,7 @@ import { User } from '@supabase/supabase-js';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, Users } from 'lucide-react';
+import { VideoSection } from '@/components/VideoSection';
 import scholarshipsImage from '@/assets/scholarships-giveaway.jpg';
 
 interface DonorsTabProps {
@@ -15,6 +16,11 @@ export const DonorsTab = ({ user, isGuest }: DonorsTabProps) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Video Section */}
+      <div className="mb-8">
+        <VideoSection />
+      </div>
+
       {/* Hero Section with Image & Quote */}
       <Card className="relative overflow-hidden border-primary/20 mb-8">
         <div className="relative h-[400px] md:h-[500px]">
