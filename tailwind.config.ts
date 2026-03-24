@@ -97,10 +97,10 @@ export default {
         },
         "glow-pulse": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsl(194 100% 50% / 0.4)"
+            boxShadow: "0 0 20px hsl(18 90% 40% / 0.2)"
           },
           "50%": {
-            boxShadow: "0 0 40px hsl(194 100% 50% / 0.8)"
+            boxShadow: "0 0 40px hsl(18 90% 40% / 0.4)"
           }
         },
         "cyber-rotate": {
@@ -113,10 +113,10 @@ export default {
         },
         "neon-glow": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsl(154 100% 50% / 0.4), 0 0 40px hsl(194 100% 50% / 0.2)"
+            boxShadow: "0 0 20px hsl(36 88% 43% / 0.2), 0 0 40px hsl(18 90% 40% / 0.1)"
           },
           "50%": {
-            boxShadow: "0 0 40px hsl(154 100% 50% / 0.8), 0 0 80px hsl(194 100% 50% / 0.4)"
+            boxShadow: "0 0 40px hsl(36 88% 43% / 0.4), 0 0 80px hsl(18 90% 40% / 0.2)"
           }
         },
         "float": {
