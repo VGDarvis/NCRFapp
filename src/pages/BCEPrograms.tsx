@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, ChevronRight } from 'lucide-react';
+import { ArrowLeft, MapPin, ChevronRight, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { format, isPast, parseISO } from 'date-fns';
+import calendarImage from '@/assets/expo-calendar-2026.png';
 
 export interface ExpoMarket {
   slug: string;
   city: string;
   venue: string;
-  date: string; // ISO date
+  date: string;
   type: 'BCE' | 'HBCU Caravan';
   state: string;
 }
@@ -37,41 +40,76 @@ export const EXPO_MARKETS_2026: ExpoMarket[] = [
 
 const BCEPrograms = () => {
   const navigate = useNavigate();
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <div className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-lg">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-3">
+        <div className="flex items-center gap-3 px-3 py-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold">Black College Expo™</h1>
-            <p className="text-sm text-muted-foreground">2026 Expo Calendar</p>
+            <h1 className="text-lg sm:text-xl font-bold">Black College Expo™</h1>
+            <p className="text-xs text-muted-foreground">2026 Expo Calendar</p>
           </div>
         </div>
       </div>
 
-      {/* Hero Banner */}
+      {/* Hero */}
       <div className="bg-gradient-to-br from-primary/15 via-background to-accent/10 border-b border-border">
-        <div className="container mx-auto px-4 py-10 md:py-16 text-center">
+        <div className="px-3 py-6 sm:py-10 text-center">
           <motion.h2
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-5xl font-bold mb-3"
+            className="text-2xl sm:text-3xl md:text-5xl font-bold mb-2"
           >
             2026 Expo Season
           </motion.h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-base md:text-lg">
+          <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
             {EXPO_MARKETS_2026.length} events across the nation. Find a Black College Expo or HBCU Caravan near you.
           </p>
         </div>
       </div>
 
-      {/* Markets Grid */}
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="grid gap-4 md:gap-5 max-w-4xl mx-auto">
+      {/* Calendar Image Card */}
+      <div className="px-3 py-4">
+        <button
+          onClick={() => setCalendarOpen(true)}
+          className="w-full rounded-xl border border-primary/30 overflow-hidden bg-card hover:border-primary/60 transition-all group"
+        >
+          <img
+            src={calendarImage}
+            alt="2026 Black College Expo Calendar"
+            className="w-full object-contain"
+            loading="lazy"
+          />
+          <div className="flex items-center justify-center gap-2 p-3 text-sm text-primary font-medium border-t border-border">
+            <ImageIcon className="w-4 h-4" />
+            Tap to view full calendar
+          </div>
+        </button>
+      </div>
+
+      {/* Calendar Full-Screen Dialog */}
+      <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-2 sm:p-4 overflow-auto">
+          <DialogTitle className="sr-only">2026 Expo Calendar</DialogTitle>
+          <img
+            src={calendarImage}
+            alt="2026 Black College Expo Calendar"
+            className="w-full h-auto object-contain"
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Markets List */}
+      <div className="px-3 pb-8">
+        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
+          All Events
+        </h3>
+        <div className="space-y-3">
           {EXPO_MARKETS_2026.map((market, index) => {
             const eventDate = parseISO(market.date);
             const past = isPast(eventDate);
@@ -83,40 +121,42 @@ const BCEPrograms = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.03 }}
                 onClick={() => navigate(`/bce-programs/${market.slug}`)}
-                className={`w-full flex items-center gap-4 p-4 md:p-5 rounded-xl border text-left transition-all duration-200 group hover:shadow-lg ${
+                className={`w-full rounded-xl border text-left transition-all duration-200 group hover:shadow-lg ${
                   past
                     ? 'border-border/40 bg-muted/30 opacity-70 hover:opacity-90'
                     : 'border-primary/30 bg-card hover:border-primary/60 hover:shadow-[var(--glow-blue)]'
                 }`}
               >
-                {/* Date block */}
-                <div className={`shrink-0 w-16 h-16 rounded-lg flex flex-col items-center justify-center text-center ${
-                  past ? 'bg-muted text-muted-foreground' : 'bg-primary/15 text-primary'
-                }`}>
-                  <span className="text-xs font-medium uppercase">{format(eventDate, 'MMM')}</span>
-                  <span className="text-xl font-bold leading-none">{format(eventDate, 'd')}</span>
-                </div>
+                <div className="flex items-center gap-3 p-3 sm:p-4">
+                  {/* Date block */}
+                  <div className={`shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-lg flex flex-col items-center justify-center text-center ${
+                    past ? 'bg-muted text-muted-foreground' : 'bg-primary/15 text-primary'
+                  }`}>
+                    <span className="text-[10px] sm:text-xs font-medium uppercase">{format(eventDate, 'MMM')}</span>
+                    <span className="text-lg sm:text-xl font-bold leading-none">{format(eventDate, 'd')}</span>
+                  </div>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-semibold text-foreground text-base md:text-lg">{market.city}</span>
-                    <Badge variant={market.type === 'BCE' ? 'default' : 'secondary'} className="text-[10px] px-2 py-0">
-                      {market.type}
-                    </Badge>
-                    {past && (
-                      <Badge variant="outline" className="text-[10px] px-2 py-0 text-muted-foreground border-muted-foreground/30">
-                        Past
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span className="font-semibold text-foreground text-sm sm:text-base">{market.city}</span>
+                      <Badge variant={market.type === 'BCE' ? 'default' : 'secondary'} className="text-[10px] px-1.5 py-0">
+                        {market.type}
                       </Badge>
-                    )}
+                      {past && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-muted-foreground border-muted-foreground/30">
+                          Past
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-start gap-1 text-xs sm:text-sm text-muted-foreground">
+                      <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
+                      <span className="line-clamp-2">{market.venue}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground truncate">
-                    <MapPin className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{market.venue}</span>
-                  </div>
-                </div>
 
-                <ChevronRight className="w-5 h-5 shrink-0 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
+                  <ChevronRight className="w-5 h-5 shrink-0 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
+                </div>
               </motion.button>
             );
           })}
