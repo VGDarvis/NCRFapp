@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { format, isPast, parseISO } from 'date-fns';
 import calendarImage from '@/assets/expo-calendar-2026.png';
+import logoGreenClean from '@/assets/logo-green-clean.png';
 
 export interface ExpoMarket {
   slug: string;
