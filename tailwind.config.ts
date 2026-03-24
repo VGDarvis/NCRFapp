@@ -97,10 +97,10 @@ export default {
         },
         "glow-pulse": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsl(194 100% 50% / 0.4)"
+            boxShadow: "0 0 20px hsl(18 90% 40% / 0.2)"
           },
           "50%": {
-            boxShadow: "0 0 40px hsl(194 100% 50% / 0.8)"
+            boxShadow: "0 0 40px hsl(18 90% 40% / 0.4)"
           }
         },
         "cyber-rotate": {
