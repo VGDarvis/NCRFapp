@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { format, isPast, parseISO } from 'date-fns';
 import calendarImage from '@/assets/expo-calendar-2026.png';
+import logoGreenClean from '@/assets/logo-green-clean.png';
 
 export interface ExpoMarket {
   slug: string;
@@ -50,6 +51,7 @@ const BCEPrograms = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
+          <img src={logoGreenClean} alt="BCE Logo" className="w-8 h-8 rounded-md object-contain" />
           <div>
             <h1 className="text-lg sm:text-xl font-bold">Black College Expo™</h1>
             <p className="text-xs text-muted-foreground">2026 Expo Calendar</p>

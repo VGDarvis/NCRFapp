@@ -12,6 +12,7 @@ import { VendorsTabV2 } from '@/components/dashboard/college-expo/VendorsTabV2';
 import { FloorPlanTabWrapper } from '@/components/dashboard/college-expo/FloorPlanTabWrapper';
 import { ScholarshipsTab } from '@/components/dashboard/college-expo/ScholarshipsTab';
 import { Skeleton } from '@/components/ui/skeleton';
+import logoGreenClean from '@/assets/logo-green-clean.png';
 
 const BCEMarketPage = () => {
   const { marketSlug } = useParams<{ marketSlug: string }>();
@@ -64,6 +65,7 @@ const BCEMarketPage = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate('/bce-programs')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
+          <img src={logoGreenClean} alt="BCE Logo" className="w-8 h-8 rounded-md object-contain" />
           <div className="flex-1 min-w-0">
             <h1 className="text-base sm:text-lg font-bold truncate">{market.city} {market.type}</h1>
             <p className="text-xs text-muted-foreground">{format(eventDate, 'MMMM d, yyyy')}</p>
