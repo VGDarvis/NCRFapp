@@ -1,44 +1,43 @@
 
 
-# UI/UX Polish: Logos, Calendar Image, and Mobile-First Layout
+# Update App Color Scheme — Warm Orange/Gold/Cream Palette
 
-## Changes
+## Inspiration
+The reference image uses a warm, elegant palette: cream/off-white backgrounds, deep orange-red primary buttons, golden accents, warm amber highlights, and soft warm shadows. Light mode, clean, premium feel.
 
-### 1. Landing Page — Replace stock icons with actual program logos
-**File:** `src/components/LogoSelectionLanding.tsx`
+## Approach
+Only update CSS variables and utility classes in `src/index.css` and gradient references in `tailwind.config.ts`. No layout, component, or functional changes.
 
-Replace the `icon: GraduationCap` etc. with imported logo images from `src/assets/`:
-- College Expo → `logo-green-clean.png`
-- STEAM → `logo-steam.png`
-- Athlete → `logo-athlete.png`
-- Movement → `logo-movement.png`
-- Internships → `logo-internships-career.png`
+## New Color Palette
 
-Change the icon rendering from `<Icon className="w-6 h-6" />` to `<img src={logo} className="w-12 h-12 rounded-lg object-contain" />` — larger, circular/rounded logos that match the brand.
+| Role | Current (Cyber Blue/Green) | New (Warm Gold/Orange) |
+|------|---------------------------|----------------------|
+| Background | `#0F0F23` dark navy | `#FFF8F0` warm cream |
+| Foreground | `#FAFAFA` white | `#2D1810` dark brown |
+| Card | `#1A1A3A` dark | `#FFFFFF` white |
+| Primary | `#00D4FF` neon blue | `#C4420A` deep orange-red |
+| Secondary | `#26263A` dark | `#FFF0E5` light peach |
+| Accent | `#00FF88` cyber green | `#D4890A` warm gold |
+| Muted | dark gray | `#FEF3E8` warm beige |
+| Border | dark border | `#F0D9C4` warm tan |
+| Destructive | red (keep similar) | stays red |
 
-### 2. BCE Programs — Add calendar image as clickable reference
-**File:** `src/pages/BCEPrograms.tsx`
+## File Changes
 
-- Copy the uploaded calendar image to `src/assets/expo-calendar-2026.png`
-- Add it in the hero section as a clickable/tappable image that opens full-screen in a dialog (using shadcn `Dialog`) so students can pinch-zoom on mobile
-- Display it as a card below the hero text: "View Full 2026 Calendar" with the image as a thumbnail
+### 1. `src/index.css` — Rewrite CSS variables
+- Replace `:root` variables with warm palette HSL values
+- Update `.dark` to use a warm dark variant (dark brown/maroon tones instead of navy)
+- Update all glass classes: swap `rgba(26, 26, 58, ...)` to warm cream/brown tones
+- Update glow effects: blue glows → warm orange/gold glows
+- Update hover effects, shadows, gradients to match warm theme
+- Change body background gradient to cream
 
-### 3. Mobile-first aspect ratio fixes across all 3 pages
-**Files:** `LogoSelectionLanding.tsx`, `BCEPrograms.tsx`, `BCEMarketPage.tsx`
+### 2. `tailwind.config.ts` — Update keyframe glow colors
+- `glow-pulse` and `neon-glow` keyframes: change blue/green HSL values to orange/gold
+- Gradient references stay as CSS variable references (auto-updated via CSS)
 
-- **Landing page**: Reduce padding, make program buttons full-width with no max-width constraint on mobile. Ensure vertical scroll fills the screen naturally.
-- **BCE Programs**: Change market cards from horizontal row layout to stacked vertical on mobile (date block above city name instead of side-by-side). Remove truncation on venue name so it wraps. Reduce horizontal padding.
-- **BCE Market Page**: Make tabs stack vertically on mobile (full-width tab triggers), ensure hero section doesn't use excessive vertical padding. Tab content should be full-bleed on mobile.
-
-## Files Changed
-
-| File | Action |
-|------|--------|
-| `src/assets/expo-calendar-2026.png` | Copy uploaded image |
-| `src/components/LogoSelectionLanding.tsx` | Replace icons with logo images |
-| `src/pages/BCEPrograms.tsx` | Add calendar image dialog + mobile layout fixes |
-| `src/pages/BCEMarketPage.tsx` | Mobile aspect ratio polish |
-
-## Scope
-~4 files, ~120 lines changed
+## What does NOT change
+- All component files, layouts, sections, routing, and functions remain untouched
+- Only the color tokens and utility class colors change
+- The design system structure (glass classes, hover effects, transitions) stays — just new colors
 
