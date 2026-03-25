@@ -282,4 +282,48 @@
   .data-table-row:hover {
     background: hsl(var(--primary) / 0.05);
   }
+
+  /* Ambient Flare Effects */
+  .flare {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(80px);
+    opacity: 0.3;
+  }
+
+  .flare-red {
+    background: radial-gradient(circle, hsl(358 85% 45% / 0.6), transparent 70%);
+  }
+
+  .flare-gold {
+    background: radial-gradient(circle, hsl(40 80% 48% / 0.4), transparent 70%);
+  }
+
+  .flare-sm { width: 200px; height: 200px; }
+  .flare-md { width: 350px; height: 350px; }
+  .flare-lg { width: 500px; height: 500px; }
+
+  @keyframes flare-drift {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+      opacity: 0.25;
+    }
+    25% {
+      transform: translate(15px, -20px) scale(1.08);
+      opacity: 0.35;
+    }
+    50% {
+      transform: translate(-10px, 10px) scale(0.95);
+      opacity: 0.2;
+    }
+    75% {
+      transform: translate(20px, 15px) scale(1.05);
+      opacity: 0.3;
+    }
+  }
+
+  .flare-animate {
+    animation: flare-drift 8s ease-in-out infinite;
+  }
 }

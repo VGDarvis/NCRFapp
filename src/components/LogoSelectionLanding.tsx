@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ParticleBackground } from './ParticleBackground';
+import RedFlares from './RedFlares';
 import { Button } from './ui/button';
 import { Shield, ShoppingBag, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -61,6 +62,7 @@ export const LogoSelectionLanding = () => {
   return (
     <div className="min-h-screen relative overflow-hidden cyber-gradient">
       <ParticleBackground />
+      <RedFlares />
 
       {/* Top Navigation Buttons */}
       <motion.div

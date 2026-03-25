@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { EXPO_MARKETS_2026 } from './BCEPrograms';
 import { ArrowLeft, MapPin, Calendar, ExternalLink, Users } from 'lucide-react';
+import RedFlares from '@/components/RedFlares';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -58,7 +59,8 @@ const BCEMarketPage = () => {
   const hasData = !!eventId;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <RedFlares />
       {/* Header */}
       <div className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="flex items-center gap-3 px-3 py-3">
