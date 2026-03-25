@@ -1,66 +1,53 @@
 
 
-# Dark Premium Color Scheme + Program Logos on All Pages
+# Add Crimson Glowing Flare Effects
 
-## Inspiration
-The reference image shows a **dark, luxurious UI**: near-black backgrounds (#0D0D0D), deep charcoal cards with subtle glass borders, **crimson/red primary** buttons with glow, **gold accent** text, and warm red ambient lighting. Very premium, app-like feel.
+## What
+Add ambient red/crimson glowing orb flares — the floating, soft, translucent red light effects visible in the reference image. These are purely CSS-driven decorative elements (no JS needed) using radial gradients, blur, and subtle animation.
 
-## Part 1: Color Scheme Update
+## Approach
+Create reusable CSS utility classes for glowing flares, then add a lightweight `RedFlares` component that renders 3-4 positioned `<div>` elements with these classes. Place them on key pages as background decoration.
 
-### `src/index.css` — Rewrite all CSS variables
+## CSS Classes (in `src/index.css`)
 
-**New palette:**
+**`.flare`** — Base: `position: absolute`, `border-radius: 50%`, `pointer-events: none`, `filter: blur(80px)`, `opacity: 0.3`
 
-| Role | New Value |
-|------|-----------|
-| Background | `0 0% 5%` (#0D0D0D near-black) |
-| Foreground | `0 0% 95%` (#F2F2F2 off-white) |
-| Card | `0 0% 9%` (#171717 dark charcoal) |
-| Primary | `0 85% 45%` (#D41920 crimson red) |
-| Secondary | `0 0% 13%` (#212121 dark gray) |
-| Accent | `40 80% 55%` (#D4A020 warm gold) |
-| Muted | `0 0% 12%` (#1F1F1F) |
-| Border | `0 0% 16%` (#292929 subtle) |
+**`.flare-red`** — `background: radial-gradient(circle, rgba(212, 25, 32, 0.6), transparent 70%)`
 
-- Update all glass classes to use dark semi-transparent backgrounds (`rgba(20,20,20,0.7)`)
-- Glow effects become red/crimson glows
-- Gradients shift to dark-to-darker with red/gold accent sweeps
-- Body background: solid near-black, no gradient
-- Remove `.dark` selector duplication (the default IS dark now)
+**`.flare-gold`** — `background: radial-gradient(circle, rgba(212, 160, 32, 0.4), transparent 70%)`
 
-### `tailwind.config.ts` — Update keyframe glow HSL values
-- `glow-pulse` → crimson red HSL
-- `neon-glow` → red + gold HSL
+**`@keyframes flare-drift`** — Slow position + scale oscillation (~8s infinite) for organic movement
 
-## Part 2: Program Logos Instead of Stock Icons
+**`.flare-sm`** — `width: 200px; height: 200px`
+**`.flare-md`** — `width: 350px; height: 350px`
+**`.flare-lg`** — `width: 500px; height: 500px`
 
-These dashboards still use Lucide icons for tab navigation. Replace with actual program logo images:
+## New Component: `src/components/RedFlares.tsx`
+A simple presentational component that renders 3-4 absolutely positioned flare divs. Used as a background layer (like `ParticleBackground`). Positions:
+- Top-right corner: large red flare
+- Bottom-left corner: medium red flare
+- Center-right: small gold flare
+- Top-left: medium red flare (offset)
 
-### `src/components/CollegeExpoDashboard.tsx`
-- Already imports `logoGreenClean` — use it as a small icon in the "Colleges" tab instead of `GraduationCap`
+Each has a slightly different animation delay for organic feel.
 
-### `src/components/AthleteDashboard.tsx`
-- Import `logo-athlete.png`, use in header area. Tab icons (Home, Sports, etc.) are generic navigation — those stay as Lucide icons since they represent actions not programs.
+## Integration
+Add `<RedFlares />` to:
+- `LogoSelectionLanding.tsx` (alongside existing `ParticleBackground`)
+- `BCEPrograms.tsx` (hero area)
+- `BCEMarketPage.tsx` (hero area)
 
-### `src/components/SteamDashboard.tsx`, `InternshipsDashboard.tsx`, `MovementDashboard.tsx`, `EsportsDashboard.tsx`
-- Each already passes its logo to `DashboardHeader` — confirm and ensure the header logo is visible. Tab icons for navigation actions (Home, Stats, etc.) remain as Lucide since they describe function, not program identity.
-
-### `src/pages/BCEPrograms.tsx` and `src/pages/BCEMarketPage.tsx`
-- Add the BCE logo (`logo-green-clean.png`) in the top-left corner as a brand identifier on these pages
-
-## What does NOT change
-- All layouts, sections, routing, and component logic remain identical
-- Only color tokens, glass utility colors, and logo placement change
+The flares sit in a `position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none` container so they don't interfere with content.
 
 ## Files Changed
 
 | File | Change |
 |------|--------|
-| `src/index.css` | Full CSS variable rewrite to dark premium palette |
-| `tailwind.config.ts` | Keyframe glow colors to red/gold |
-| `src/pages/BCEPrograms.tsx` | Add BCE logo in header corner |
-| `src/pages/BCEMarketPage.tsx` | Add BCE logo in header corner |
-| `src/components/AthleteDashboard.tsx` | Import + show athlete logo in header |
+| `src/index.css` | Add flare utility classes + keyframe |
+| `src/components/RedFlares.tsx` | New — renders ambient glow orbs |
+| `src/components/LogoSelectionLanding.tsx` | Import + render `<RedFlares />` |
+| `src/pages/BCEPrograms.tsx` | Import + render `<RedFlares />` |
+| `src/pages/BCEMarketPage.tsx` | Import + render `<RedFlares />` |
 
-~5 files, ~150 lines changed
+~5 files, ~80 lines new code
 
