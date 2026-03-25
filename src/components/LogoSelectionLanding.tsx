@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ParticleBackground } from './ParticleBackground';
+import RedFlares from './RedFlares';
 import { Button } from './ui/button';
 import { Shield, ShoppingBag, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
