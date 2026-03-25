@@ -62,6 +62,7 @@ export const LogoSelectionLanding = () => {
   return (
     <div className="min-h-screen relative overflow-hidden cyber-gradient">
       <ParticleBackground />
+      <RedFlares />
 
       {/* Top Navigation Buttons */}
       <motion.div

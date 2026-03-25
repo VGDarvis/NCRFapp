@@ -59,7 +59,8 @@ const BCEMarketPage = () => {
   const hasData = !!eventId;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative">
+      <RedFlares />
       {/* Header */}
       <div className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="flex items-center gap-3 px-3 py-3">
